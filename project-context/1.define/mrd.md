@@ -16,7 +16,11 @@ Despite high device ownership — roughly 9 in 10 U.S. adults 50+ own smartphone
 
 Technical feasibility for an agentic tutoring system is strong. Recent multi-agent intelligent tutoring architectures (ITAS, IntelliCode, AIA-PAL, ELA Tutor) demonstrate proven patterns: centralized learner-state orchestration, specialized pedagogical/scaffolding/safety agents, RAG-grounded content, and human-in-the-loop escalation. Existing competitors (TechMaid, TechMentor Companion, OLAI, GetSetUp/Helen) validate demand for AI-assisted senior tech support but leave gaps in **true multi-agent specialization** (tutor + safety coach + progress tracker + family/caregiver liaison), **cross-device continuity**, **adaptive pacing for cognitive and motor decline**, and **B2B2C distribution** through health plans, senior living, and libraries.
 
-**Recommended approach**: Build an MVP agentic digital literacy platform targeting U.S. adults 65+ (with expansion path to 60+ and English-first markets), differentiated by patient multi-agent tutoring, integrated scam-awareness coaching, accessibility-first UX (WCAG 2.1 AA+), and optional human escalation. Prioritize B2C subscription ($9.99–$19.99/month range, aligned with TechMentor) plus B2B2C pilots with senior living communities, Area Agencies on Aging, and Medicare Advantage plans. Use a `crewai` sequential multi-agent architecture with a coordinator agent, specialized tutor/safety/progress agents, and RAG over curated senior-friendly content.
+**Recommended approach (dual-track — see §6 Gap Analysis)**: Market demand supports **both** a capital-intensive agentic platform path and a **near-zero founder-cost community assembly path**. For founders avoiding custom software and dedicated venues at launch, the lowest-cost sequence is: (1) pilot at one partner site with existing space and seniors, (2) use free public curricula as the lesson backbone, (3) recruit volunteer facilitators, (4) use partner-owned or loaner devices, (5) add custom AI tooling **only after demand is proven** (Harvard GSE / LeadingAge practice patterns).
+
+**Capitalized product path** (if/when custom tooling is justified): MVP agentic platform targeting U.S. adults 65+, differentiated by patient multi-agent tutoring, integrated scam-awareness coaching, accessibility-first UX (WCAG 2.1 AA+), and optional human escalation — with RAG grounded in **free public curricula** (DigitalLearn, Tech Boomers, Senior Planet) where possible rather than net-new content authoring.
+
+**Immediate gap to resolve**: Stakeholder has not confirmed which track leads — community pilot ($0–5K coordination) vs. engineered MVP ($150–250K per prior estimate). PRD v1.1 assumes custom PWA; this MRD revision flags misalignment until resolved.
 
 ---
 
@@ -237,6 +241,111 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 
 ---
 
+### 6. Low-Cost Delivery Model & Gap Analysis
+
+*Added from stakeholder research brief on almost-zero founder cost options (Aug 2026). Purpose: identify gaps between community-assembly delivery and the custom agentic platform assumed in §2–§5.*
+
+#### Key Insights
+
+1. **Avoid custom software at launch to minimize founder cost.** The cheapest structure positions the founder as **organizer and quality layer** — curating experience, recruiting partners, lightly adapting content — not as operator of venue, hardware, staff, and product engineering (LeadingAge pattern).
+2. **Free public curricula can replace much net-new content.** DigitalLearn (PLA), TechBoomers, Senior Planet / OATS, and similar libraries supply lesson material without building a proprietary corpus from scratch — reducing both **content cost** and **RAG authoring** scope if AI is added later.
+3. **Partner-owned infrastructure eliminates capital spend.** Libraries, senior centers, and housing communities often provide **space, Wi‑Fi, and computers**; main cost becomes coordination, scheduling, and facilitator training — not SaaS infra or device procurement (ODLAN / digital equity program models).
+4. **Volunteer and peer models are proven for seniors.** Senior Planet-style free 1-on-1 and volunteer-supported tutoring, drop-in workshops, and **peer-to-peer learning** (seniors teaching seniors) reduce paid-staff need and align with Frontiers in Psychology findings on older-adult learning preferences.
+5. **Printed guides and repeatable scripts substitute for polished software early.** Paper handouts plus facilitator scripts can deliver step-by-step and scam-awareness content before any PWA exists — especially for No-Device and low-literacy cohorts (LeadingAge; aligns with PRD Carmen persona visual-first intent).
+6. **Hybrid support is the realistic AI entry point.** One live session + free hotline, prerecorded lesson, or lightweight GPT-style assistant for between-session questions matches Senior Planet / GetSetUp patterns — **AI as supplement, not primary product**, until utilization is validated.
+7. **City and state digital equity programs already list free tools.** Programs (e.g., municipal connected-learning listings) offer affordable internet, device support, and literacy resources — **plug in rather than duplicate** (Detroit digital equity / statewide inclusion listings).
+
+#### Almost-Zero Founder Cost Model (Reference Architecture)
+
+| Layer | Low-cost approach | Typical cost to founder |
+|-------|-------------------|-------------------------|
+| **Founder role** | Experience design, partner recruitment, light content curation | Time only |
+| **Space** | Donated: library, senior center, housing community room | $0 |
+| **Teachers** | Volunteers, interns, students, retirees, civic groups | $0– stipends |
+| **Content** | DigitalLearn, TechBoomers, Senior Planet + short custom handouts | $0 |
+| **Devices** | Partner-owned, donated refurbished, loaner programs | $0 |
+| **Support between sessions** | Hotline, printed FAQ, optional lightweight AI chat | $0– low |
+| **Custom multi-agent app** | **Deferred** until demand proven | $0 at launch |
+
+#### Best No-Cost Launch Sequence (Stakeholder Recommended)
+
+1. **Pilot one partner site** that already has space and interested seniors (Future Insight / community pilot pattern).
+2. **Use free content libraries** for lesson plans (DigitalLearn, ODLAN resource lists).
+3. **Recruit volunteers or interns** for facilitation (LeadingAge; Harvard GSE Studio on volunteer tutoring).
+4. **Avoid hardware spend** — partner devices and refurbished loaners (California Aging / digital equity refurbished-device pathways).
+5. **Add custom tooling only after demand is proven** — workshops attended, repeat visits, scam questions logged, waitlists (Harvard GSE; Policy Lab Rutgers workshop evaluation patterns).
+
+#### Other Cost-Saving Delivery Options
+
+| Option | Benefit | Tradeoff |
+|--------|---------|----------|
+| Drop-in workshop series | One facilitator serves many; lower scheduling overhead | Less personalized pacing than 1-on-1 AI |
+| Peer-to-peer learning | Reduces paid staff; builds community trust | Quality variance; needs facilitator oversight |
+| Hybrid (live + hotline / prerecorded / GPT assistant) | Extends reach between sessions | AI quality and scam-advice liability if unsupervised |
+| Partner with digital equity programs | Devices, connectivity, referrals already exist | Less brand control; coordination overhead |
+
+#### Gap Matrix: Community Model vs. Custom Agentic Platform (PRD v1.1)
+
+| Need (from PRD / personas) | Low-cost community model | Custom agentic platform | Gap severity | Mitigation / bridge |
+|------------------------------|--------------------------|-------------------------|--------------|---------------------|
+| **Scam Defense as headline** | Printed scam cards, workshop drills, AARP/IC3 handouts, volunteer-led "check this message" | Safety Coach agent, 24/7 scam hub, streaks | **Medium** | Start with printed + workshop; log scam questions to justify AI later |
+| **Emotional safety & patience** | Volunteer training scripts; no-timer classroom norms | Product-level pause, frustration detection, copy guardrails | **High** | Facilitator guide must encode PRD emotional-safety rules; no automated detection |
+| **Three learning tracks** | Separate workshop tracks or 1-on-1 intake questionnaire | Coordinator + track-aware Tutor | **Medium** | Intake form on paper; beginner vs. partial groups |
+| **No-Device user (Carmen)** | Library/housing computers + print summaries | Visual-first PWA, shared-device mode | **Low** | **Strong fit** — community model natively serves Carmen MVP |
+| **24/7 on-demand help** | Not available without staff or AI | Core platform value | **High** | Hybrid GPT/hotline only; or accept office-hours-only pilot |
+| **Personalized step pacing** | Depends on volunteer skill | One-step Tutor + RAG | **High** | Scripts and printed steps standardize; quality varies |
+| **Progress tracking & streaks** | Paper checklist, sign-in sheet | Progress Tracker DB | **Medium** | Manual metrics for pilot; validates demand before building |
+| **Caregiver visibility** | Optional paper progress share | Read-only caregiver link | **Low** | Family can attend workshop; digital link deferred |
+| **Human escalation** | In-room volunteer + referral to AARP Fraud Watch / IC3 | Escalation Handler webhook | **Low** | **Strong fit** — humans primary in community model |
+| **Verified content (no hallucination)** | Fixed printed + licensed curriculum | RAG-only sensitive tasks | **Low** | Free curricula are pre-verified; AI introduces risk if added early |
+| **Bilingual (Carmen P2)** | Bilingual volunteers or partner orgs | i18n + agent localization | **Medium** | Partner with Spanish-language community org before software |
+| **Accessibility (WCAG)** | Large-print handouts, room setup | WCAG 2.1 AA PWA | **Medium** | Print and venue accessibility cheaper; digital a11y deferred |
+| **Scale without linear staff cost** | Does not scale — volunteer constrained | LLM marginal cost | **High** | Community model first; software if waitlists grow |
+| **Founder cash outlay** | ~$0–5K (printing, snacks, liability insurance) | $150–250K MVP engineering | **Critical** | **Primary strategic fork** |
+| **Control & polish** | Low control; slower iteration | Full product control | **Medium** | Acceptable tradeoff for demand testing (Policy Lab Rutgers) |
+
+#### Practical Tradeoffs (Stakeholder Guidance)
+
+- The **cheapest version** will be slower to control and less polished — usually the **right tradeoff** to test demand before capital spend.
+- **Main anti-pattern**: Building custom software or paying for a dedicated venue **before** knowing which support model seniors actually use (workshop vs. 1-on-1 vs. scam-only vs. take-home print).
+- **Alignment with PRD**: PRD pillars (Scam Defense First, learning tracks, emotional safety) can be delivered **non-digitally first**; custom app is an **accelerator**, not a prerequisite for pilot validation.
+
+#### Implications
+
+- **Revise Go/No-Go**: Add **founder budget constraint** as decision gate — "Conditional Go" on custom platform until community pilot metrics met.
+- **Content strategy overlap**: RAG corpus for future AI should **index free curricula** (DigitalLearn, Senior Planet, TechBoomers) — not duplicate authoring.
+- **Carmen persona**: Public housing + library pilot is **better served** by low-cost model initially than by B2C subscription app.
+- **Recommended staged strategy**:
+  - **Phase 0 (0–90 days, ~$0)**: One-site workshop + printed scam guides + volunteer intake by track.
+  - **Phase 1 (optional, low cost)**: Lightweight between-session assistant (guardrailed FAQ / scam check) using existing LLM API — **not** full five-agent crew.
+  - **Phase 2 (if validated)**: Full agentic platform per PRD v1.1 with partner distribution (library/housing white-label).
+
+#### Data Points
+
+| Factor | Low-cost model | Custom platform (prior MRD) |
+|--------|----------------|----------------------------|
+| Founder MVP cash | ~$0–5K | $150–250K |
+| Time to first senior served | Weeks (partner site) | 3–4 months engineering |
+| Content sourcing | Free public libraries | Build/license 50+ RAG guides |
+| Primary moat | Relationships + trust | Software + progression data |
+| Demand validation | Sign-ins, repeat visits, waitlist | Beta activation, retention KPIs |
+
+#### Source Citations (Low-Cost Model)
+
+- Future Insight — community pilot / partner-site sequencing (stakeholder brief, 2026)
+- Senior Planet / OATS — free classes, volunteer-supported tutoring, hybrid program models — https://seniorplanet.org/about
+- ODLAN (Online Digital Literacy Access Network) — partner venue and resource models — https://resources.odlan.org/
+- Harvard GSE Studio — volunteer tutoring and older-adult learning practice — https://studio.gse.harvard.edu/
+- LeadingAge — senior services delivery and low-capital program design (stakeholder brief, 2026)
+- California Department of Aging — refurbished device and digital equity pathways — https://aging.ca.gov/
+- Rutgers Policy Lab — workshop series evaluation and scheduling efficiency (stakeholder brief, 2026)
+- Frontiers in Psychology — peer-to-peer and older-adult learning (stakeholder brief, 2026)
+- City of Detroit / municipal digital equity program listings — plug-in to existing literacy tools (stakeholder brief, 2026)
+- DigitalLearn.org (PLA) — free curriculum backbone — https://www.digitallearn.org/
+- TechBoomers — free senior-friendly tutorials — https://techboomers.com/
+
+---
+
 ## Critical Decision Points
 
 ### Go/No-Go Factors
@@ -246,8 +355,18 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 | Market demand | **Go** | Demographic + fraud + confidence gap validated |
 | Technical feasibility | **Go** | Multi-agent ITS patterns proven; crewai suitable for MVP |
 | Competitive white space | **Conditional Go** | Crowded at edges; differentiation requires execution on UX + safety + progress |
-| Unit economics | **Conditional Go** | LLM costs require B2B2C or premium pricing |
+| Unit economics | **Conditional Go** | LLM costs require B2B2C or premium pricing — **or** defer software and run community model |
 | Regulatory/trust | **Conditional Go** | Must nail privacy and scam-coaching accuracy |
+| **Founder budget / delivery model** | **Conditional Go — unresolved** | §6 gap analysis: custom platform ($150–250K) vs. almost-zero community pilot ($0–5K) — **stakeholder must choose lead track** |
+| **Demand validation before build** | **Go (recommended)** | Best no-cost sequence: partner pilot → free content → volunteers → tooling only if proven |
+
+### Delivery Model Fork (New — Resolve Before Build)
+
+| Path | When to choose | Upfront cost | Primary gap vs. PRD v1.1 |
+|------|----------------|--------------|---------------------------|
+| **A — Community assembly (Phase 0)** | Founder capital constrained; Carmen/library/housing focus; test workshops first | ~$0–5K | No 24/7 AI, weak automated progress, volunteer-dependent emotional safety |
+| **B — Hybrid (Phase 0 + lightweight AI)** | Pilot running; need between-session scam checks | ~$1–10K/mo LLM | Partial PRD; not full five-agent crew |
+| **C — Full agentic platform** | Waitlists, repeat engagement, and partner demand proven; funding available | $150–250K+ | None if executed per PRD — **premature if Path A not validated** |
 
 ### Technical Architecture Choices
 
@@ -267,9 +386,13 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 
 | Phase | Team | Timeline | Budget (indicative) |
 |-------|------|----------|---------------------|
-| MVP | 2 engineers, 1 UX/gerontology advisor, PM | 3–4 months | $150–250K |
-| Pilot | +1 partnerships/sales, +human escalation contractors | +3 months | $100–150K |
+| **Phase 0 — Community pilot** | Founder + 1 partner site + 3–5 volunteers | 4–8 weeks | **$0–5K** (print, insurance, supplies) |
+| **Phase 1 — Hybrid AI supplement** | Founder + part-time dev or no-code LLM wrapper | +4–8 weeks | **$1–10K/mo** LLM + minimal eng |
+| MVP (full platform) | 2 engineers, 1 UX/gerontology advisor, PM | 3–4 months | $150–250K |
+| Pilot (platform + partners) | +1 partnerships/sales, +human escalation contractors | +3 months | $100–150K |
 | Scale | +content, +customer success, compliance | 6–12 months | $500K+ |
+
+*See §6 for gap between Phase 0 and full MVP.*
 
 ---
 
@@ -283,6 +406,8 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 | Elder fraud via impersonation of the product | Strong auth, caller verification education, official comms channel |
 | LLM cost exceeds revenue at scale | Session caps, model tiering, institutional pricing |
 | Low trust / low adoption despite demand | Nonprofit advisory board, AARP-style plain language, free tier, library partnerships |
+| **Building software before demand proof** | **Run Phase 0 community pilot first** (§6); set go/no-go metrics (repeat visits, waitlist, scam questions logged) |
+| **Volunteer quality variance** | Printed scripts, facilitator training aligned with PRD emotional-safety rules, peer lead + staff backup |
 
 ### Medium Risk
 
@@ -307,36 +432,57 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 
 ### Immediate Next Steps (48 hours)
 
-1. **Stakeholder alignment** — Confirm primary persona (65–79 vs 80+), geography (U.S.-only MVP), and B2C vs B2B2C priority.
-2. **Competitive deep-dive** — Hands-on evaluation of TechMaid, TechMentor, GetSetUp Helen, and Senior Planet onboarding flows.
-3. **Content strategy** — Identify licensable tutorial sources (OATS partnership inquiry, public-domain guides, OEM materials).
-4. **Proceed to PRD** — Run `*create-prd` using this MRD as input.
+1. **Delivery model decision** — Choose Path A (community pilot), B (hybrid), or C (full platform) per §6 Delivery Model Fork; **default recommendation: Path A first** unless funding committed.
+2. **If Path A**: Identify one library, senior center, or housing partner with space, Wi‑Fi, and ≥10 interested seniors.
+3. **Stakeholder alignment** — Confirm primary persona (65–79 vs. 80+), geography (U.S.-only MVP), and whether PRD v1.1 should be reframed as Phase 2 after pilot.
+4. **Content strategy** — Map DigitalLearn, TechBoomers, and Senior Planet modules to PRD learning tracks and scam-defense headline (reduce future RAG build).
+5. **Competitive deep-dive** — Hands-on evaluation of TechMaid, TechMentor, GetSetUp Helen, and Senior Planet onboarding flows.
+6. **Proceed to PRD alignment** — Reconcile PRD v1.1 with chosen delivery path; update Assumptions if Phase 0 leads.
 
 ### Short-term Priorities (30 days)
+
+**If Phase 0 (community pilot) leads:**
+
+1. Recruit 3–5 volunteer facilitators; provide emotional-safety and scam-workshop scripts.
+2. Print scam-defense handouts and track-specific intake forms (Beginner / Partial / No-Device).
+3. Run 2–4 drop-in workshops; log attendance, repeats, and scam questions.
+4. Document partner MOU (space, devices, liability).
+5. Set metrics threshold to authorize Phase 1/2 software (e.g., ≥40% repeat attendance, ≥20 scam checks requested).
+
+**If full platform path confirmed:**
 
 1. Define MVP agent roster and learner-state schema (Coordinator, Tutor, Safety Coach, Progress Tracker).
 2. Conduct 8–12 senior user interviews (mix of 65–74 and 75+) on goals, fears, and preferred interaction modes.
 3. Wireframe accessibility-first PWA (large text, voice, one-step-at-a-time flow).
-4. Build RAG corpus pilot: 50 curated tasks (video call, email, banking view-only, scam recognition).
+4. Build RAG corpus pilot from **free curricula first** — 50 tasks (video call, email, banking view-only, scam recognition).
 5. Establish human escalation SLA and partner (even 1 part-time guide).
 
 ### Long-term Strategy (6–12 months)
 
-1. Launch B2C beta in one metro + virtual nationwide.
-2. Pursue senior living and library pilot (10 sites).
-3. Add voice-first phone channel and caregiver dashboard.
-4. Pursue Medicare Advantage or state aging department pilot.
-5. Localize for Spanish (U.S.) and evaluate EU (OLAI competitive set).
-6. Publish outcomes data (task completion, confidence lift) for enterprise sales.
+1. **If Phase 0 succeeded**: Launch Phase 1 lightweight between-session scam assistant OR Phase 2 full platform with library/housing branding.
+2. Launch B2C beta in one metro + virtual nationwide (platform path only).
+3. Pursue senior living, **public housing**, and library pilots (10 sites).
+4. Add voice-first phone channel and caregiver dashboard (platform path).
+5. Pursue Medicare Advantage or state aging department pilot.
+6. Localize for Spanish (U.S.) — **volunteer/partner path may precede software i18n**.
+7. Publish outcomes data (workshop attendance + digital metrics) for enterprise and grant funding.
 
 ---
 
 ## Research Quality Notes
 
-- **Sources cited**: 22 authoritative references (see below).
+- **Sources cited**: 22+ authoritative references (see below) plus §6 low-cost model sources.
 - **Recency**: Majority from 2024–2026; demographic baselines from UN WPP 2024.
 - **Conflicts**: Market size estimates vary widely ($11B senior tech services vs $286B AgeTech vs $15B digital inclusion training) due to segment definitions — financial projections should use the narrowest relevant segment (senior tech services + digital inclusion training) for bottom-up modeling.
-- **Gaps**: Willingness-to-pay primary research not yet conducted; enterprise contract values inferred from adjacent edtech/health engagement benchmarks.
+- **Conflicts (delivery model)**: §2–§5 optimize for **capitalized SaaS**; §6 stakeholder brief optimizes for **$0 founder cost** — both valid; **PRD v1.1 currently assumes SaaS path without Phase 0**.
+- **Gaps identified (§6)**:
+  - **Strategic**: No stakeholder decision on Path A vs. C; PRD/MRD misalignment on launch sequence.
+  - **Product**: 24/7 personalized pacing and automated emotional safety **not achievable** in pure community model without hybrid AI.
+  - **Content**: Free curricula mapping to three learning tracks and scam headline **not yet done**.
+  - **Carmen**: Community model **strong fit**; bilingual still deferred in both paths.
+  - **Metrics**: Phase 0 success thresholds for authorizing software spend **undefined**.
+  - **Legal**: Volunteer liability, insurance, and scam-advice disclaimers for workshops **not researched**.
+  - Willingness-to-pay primary research not yet conducted; enterprise contract values inferred from adjacent edtech/health engagement benchmarks.
 
 ---
 
@@ -371,32 +517,44 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 27. W3C WAI, Older Users and Web Accessibility — https://www.w3.org/WAI/older-users/
 28. W3C, WCAG 2.1 — https://www.w3.org/TR/WCAG21/
 29. ACM Transactions on Accessible Computing, "Accessible Web Design for Older Adults" — https://dl.acm.org/doi/10.1145/3763243
+30. DigitalLearn.org (Public Library Association) — https://www.digitallearn.org/
+31. TechBoomers — https://techboomers.com/
+32. ODLAN, Online Digital Literacy Access Network — https://resources.odlan.org/
+33. Harvard GSE Studio — https://studio.gse.harvard.edu/
+34. California Department of Aging — https://aging.ca.gov/
+35. Stakeholder brief: Low-cost / almost-zero founder cost model (Aug 2026) — Future Insight, LeadingAge, Rutgers Policy Lab, Frontiers, Detroit digital equity patterns (internal)
 
 ---
 
 ## Assumptions
 
 - Research focuses on **English-language, U.S.-centric MVP** unless stakeholder specifies otherwise; global data included for long-term sizing only.
-- No `aamad.config.yml` was present; runtime default `crewai` applied per adapter registry rules.
+- No `aamad.config.yml` was present; runtime default `crewai` applied per adapter registry rules **for Phase 2 software only** — not required for Phase 0 community pilot.
 - Market size figures from syndicated reports (QY Research, FutureDataStats, SilverEconomy) are treated as directional; independent verification via bottom-up TAM/SAM modeling deferred to PRD/financial modeling.
-- Willingness-to-pay inferred from TechMentor ($9.99–$19.99/mo) and TechMaid freemium/paid tiers; no primary WTP survey conducted.
+- Willingness-to-pay inferred from TechMentor ($9.99–$19.99/mo) and TechMaid freemium/paid tiers; **may be N/A if nonprofit/community model leads**.
 - Product scope assumes **digital literacy and safety coaching**, not medical advice, financial product sales, or direct fraud remediation (escalation to humans/authorities only).
-- "Agentic" interpreted as **multi-agent orchestration with specialized roles**, not autonomous action on user devices without explicit consent.
+- "Agentic" interpreted as **multi-agent orchestration with specialized roles**, not autonomous action on user devices without explicit consent — **applies to software path only**.
+- **§6 low-cost brief** treated as stakeholder-authoritative for founder budget constraints; URLs for DigitalLearn, Senior Planet, ODLAN, TechBoomers verified; other citations (Future Insight, LeadingAge, Policy Lab) recorded as stakeholder brief pending primary source fetch.
+- **PRD v1.1** was authored assuming custom platform; **alignment with Phase 0 community pilot not yet updated in PRD**.
 
 ---
 
 ## Open Questions
 
-1. **Primary buyer**: Consumer (senior or caregiver gift), senior living operator, health plan, or public library — which channel leads GTM?
-2. **Device scope**: Web/PWA only for MVP, or native iOS/Android required at launch?
-3. **Human escalation**: Build in-house guide network, partner with existing senior tech support, or hybrid?
-4. **Content licensing**: Partner with OATS/Senior Planet vs. build proprietary curriculum?
-5. **Language**: English-only MVP or Spanish from day one (significant U.S. 65+ demographic)?
-6. **Screen sharing**: Is real-time screen guidance a must-have (TechMentor parity) or Phase 2?
-7. **Privacy model**: Can caregivers view progress by default with senior opt-in, or senior-only by default?
-8. **Nonprofit vs. for-profit**: Does mission alignment require B-Corp or nonprofit partnership for trust?
-9. **Regulatory**: Will any tutorials touch HIPAA-covered workflows (patient portals) requiring BAAs?
-10. **Resolved runtime confirmation**: Does operator accept `crewai` default or prefer `claude-agent-sdk` for voice hooks?
+1. **Delivery model (critical)**: Path A community pilot, Path B hybrid AI, or Path C full platform first?
+2. **Phase 0 go metrics**: What repeat attendance / waitlist / scam-question volume triggers software investment?
+3. **Primary buyer**: Consumer, senior living, housing authority, library, health plan — which channel leads GTM?
+4. **Device scope**: Web/PWA only for MVP, or Phase 0 print-only with no app?
+5. **Human escalation**: Volunteer-only, partner hotline (AARP), or build Escalation Handler webhook?
+6. **Content licensing**: Index DigitalLearn/TechBoomers/Senior Planet in RAG vs. workshop print packs only?
+7. **Language**: English-only MVP or Spanish from day one (volunteer bilingual vs. software i18n)?
+8. **Screen sharing**: Phase 2 or never if community model persists?
+9. **Privacy model**: Caregiver progress sharing defaults (unchanged from prior MRD)?
+10. **Nonprofit vs. for-profit**: Does mission alignment require B-Corp, fiscal sponsor, or housing/library MOU?
+11. **Regulatory**: Workshop scam advice liability insurance and disclaimers?
+12. **Volunteer model**: Peer-to-peer only or trained student/intern facilitators?
+13. **Resolved runtime confirmation**: Is `crewai` build deferred until post-pilot, or proceeding in parallel?
+14. **PRD update**: Should PRD v1.1 be split into Phase 0 (community) and Phase 2 (platform) documents?
 
 ---
 
@@ -404,9 +562,11 @@ Technical feasibility for an agentic tutoring system is strong. Recent multi-age
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-07-30T22:15:00Z |
+| Timestamp | 2026-08-10T16:12:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-mrd` |
-| Resolved runtime | `crewai` (default; no config override) |
-| Model | Composer (research synthesis) |
-| Prompt Trace | Omitted — standard market research task; sources cited inline |
+| Action | `create-mrd` (revision — §6 low-cost model & gap analysis) |
+| Prior audit | 2026-07-30T22:15:00Z |
+| Resolved runtime | `crewai` (default; deferred if Phase 0 community pilot leads) |
+| Model | Composer |
+| Inputs | Prior MRD; stakeholder low-cost options brief (Aug 2026) |
+| Prompt Trace | Omitted — MRD gap analysis revision; sources cited inline |
