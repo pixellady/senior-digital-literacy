@@ -14,7 +14,7 @@ As a senior user who wants to get better at spotting scams, I want to practice r
 ## 3. Acceptance Criteria
 
 1. **Given** I am in Scam Defense, **When** I choose **Practice scams**, **Then** I can access ≥10 scenario drills covering tech support, grandparent, IRS, housing/benefits, romance, and recovery scams.
-2. **Given** I complete a drill, **When** the Safety Coach debriefs, **Then** feedback is calm, educational, and never shaming.
+2. **Given** I complete a drill, **When** Scam Detector debriefs, **Then** feedback is calm, educational, and never shaming.
 3. **Given** I choose **Scam quiz**, **When** I answer ≥5 questions, **Then** I receive a score and Progress Tracker records the result and `scam_defense_level`.
 4. **Given** I engage with Scam Defense on consecutive days, **When** I return to home, **Then** my **Scam Defense streak** is visible.
 5. **Given** I am on the No-Device track (Carmen), **When** I run drills, **Then** scenarios include housing/benefits scam variants where applicable.

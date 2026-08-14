@@ -22,7 +22,7 @@ As a learner whose lessons feel too fast or too slow, I want to switch my learni
 ## 4. Scope Notes
 
 - **In Scope for MVP**: Explicit user-initiated track switch; progress preservation; track_history audit.
-- **Deferred**: Automatic Coordinator downgrade after N failures (heuristic MVP may suggest but not force — see Open Questions).
+- **Deferred**: Automatic Tutor track suggestion after N failures (heuristic MVP may suggest but not force — see Open Questions).
 
 ## 5. Traceability
 
@@ -39,7 +39,7 @@ As a learner whose lessons feel too fast or too slow, I want to switch my learni
 
 ## Open Questions
 
-- Should Coordinator auto-suggest track switch after 3 "I don't understand" responses?
+- Should Tutor auto-suggest track switch after 3 "I don't understand" responses?
 
 ## Audit
 

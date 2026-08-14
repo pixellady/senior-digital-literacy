@@ -17,13 +17,13 @@ As a learner starting the app, I want to choose a learning level that matches my
 2. **Given** I select **No-Device User**, **When** onboarding continues, **Then** `learning_track` is set to `no_device` and visual-first mode is enabled by default.
 3. **Given** I select **Beginner**, **When** I start tutoring, **Then** device basics are included before life-goal tasks.
 4. **Given** I select **Partial User**, **When** I start tutoring, **Then** device basics are skipped by default.
-5. **Given** track selection completes, **When** learner state is saved, **Then** Coordinator and Tutor receive the track for all future sessions.
+5. **Given** track selection completes, **When** learner state is saved, **Then** Tutor and Progress Service receive the track for all future TUTOR-path sessions.
 6. **Given** Carmen selects No-Device, **When** she uses the app in English MVP, **Then** UI is optimized for shared computer/kiosk (see US-014, US-015).
 
 ## 4. Scope Notes
 
 - **In Scope for MVP**: Three tracks, plain-language selection, persistence, track-default behaviors.
-- **Deferred**: Coordinator auto-adjust without user consent (Open Question #2); bilingual onboarding (P2).
+- **Deferred**: Tutor auto-adjust without user consent (Open Question #2); bilingual onboarding (P2).
 
 ## 5. Traceability
 
@@ -40,7 +40,7 @@ As a learner starting the app, I want to choose a learning level that matches my
 
 ## Open Questions
 
-- Should Coordinator suggest track change after first session without explicit user request?
+- Should Tutor suggest track change after first session without explicit user request?
 
 ## Audit
 

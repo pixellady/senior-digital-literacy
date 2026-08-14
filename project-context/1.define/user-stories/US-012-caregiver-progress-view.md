@@ -17,7 +17,7 @@ As a family caregiver, I want to see my parent's learning and scam-defense progr
 2. **Given** sharing is approved, **When** I open progress view, **Then** I see read-only summary: completed goals, step counts, scam milestone counts, and scam streak — **not** chat message content.
 3. **Given** emotional check-in responses exist, **When** caregiver views dashboard, **Then** "Did you feel rushed?" and frustration flags are **not** displayed.
 4. **Given** senior revokes sharing, **When** revocation saves, **Then** caregiver loses access immediately.
-5. **Given** senior enters Extended Help Mode or active-scam flow, **When** caregiver views progress, **Then** only aggregate escalation **event counts** may appear if senior opted in — **no** escalation alerts or human callback status in MVP (**P1**).
+5. **Given** senior enters Patient Mode or active-scam Priority flow, **When** caregiver views progress, **Then** only aggregate escalation **event counts** may appear if senior opted in — **no** escalation alerts or human callback status in MVP (**P1**).
 
 ## 4. Scope Notes
 

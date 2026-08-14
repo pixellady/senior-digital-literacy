@@ -15,13 +15,13 @@ As a senior user who is afraid of online scams, I want scam protection to be the
 
 1. **Given** I am a logged-in or new user on the home screen, **When** the app loads, **Then** **Scam Defense** is displayed with equal or greater visual prominence than "Learn something new."
 2. **Given** I am on the home screen, **When** I tap **"Is this a scam?"**, **Then** I enter a standalone Scam Defense session without completing tutoring onboarding first.
-3. **Given** I start a Scam Defense session, **When** the Safety Coach responds, **Then** the response appears within 5 seconds (p95 target) and uses calm, non-alarmist language.
+3. **Given** I start a Scam Defense session, **When** Scam Detector responds, **Then** the response appears within 5 seconds (p95 target) and uses calm, non-alarmist language.
 4. **Given** any Scam Defense interaction, **When** copy is shown, **Then** it never blames the user for almost falling for a scam.
 5. **Given** I complete onboarding, **When** I return to home, **Then** Scam Defense remains a primary entry point alongside Learn and Continue.
 
 ## 4. Scope Notes
 
-- **In Scope for MVP**: Home layout, one-tap Scam Defense entry, standalone session start, Safety Coach headline flow.
+- **In Scope for MVP**: Home layout, one-tap Scam Defense entry, standalone session start, Scam Detector headline flow.
 - **Deferred**: Email/SMS scam reminders (P1-4); bilingual Scam Defense copy (P2).
 
 ## 5. Traceability

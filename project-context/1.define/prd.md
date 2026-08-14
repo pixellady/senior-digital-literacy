@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | Product Name | Senior Digital Literacy Platform |
-| Version | **2.2 (Final — MVP)** |
+| Version | **2.3 (Final — MVP)** |
 | Status | **Final — Define phase complete** |
 | Primary Input | `project-context/1.define/mrd.md` (incl. §6 low-cost gap analysis) |
 | Related Artifacts | `user-stories/` (US-001–US-021), `mrd.md` |
@@ -19,17 +19,17 @@
 
 | Decision | Resolution | Rationale |
 |----------|------------|-----------|
-| **Delivery path** | Build **full 5-agent text platform** now | No library partner; virtual beta needs a product channel (MRD §6 Path C minus voice) |
+| **Delivery path** | Build **2-agent text platform** with **intent router** (Tutor \| Scam Detector) | Simplifies orchestration; explicit user paths + Flow gate for NL (MRD §6 Path C minus voice) |
 | **Voice** | **Tier A only** — optional browser Web Speech (speak-to-type / read-aloud) | Cloud STT/TTS and phone voice channel **deferred to P2** (`claude-agent-sdk`) — cost and complexity |
 | **Beta audience** | **Margaret-first** — home users with personal smartphone/tablet | Partial User track primary; caregiver-assisted signup (David) |
 | **Carmen / No-Device** | **Build in MVP** (track + visual-first UI); **beta validation deferred** until library/housing partner | No partner site now; design for Carmen, pilot when venue exists (P1-6) |
 | **Community workshop pilot** | **Parallel outreach**, not a build gate | Partner acquisition continues during Build; does not block agentic MVP |
 | **Content** | RAG indexes **free public curricula** first (DigitalLearn, TechBoomers, Senior Planet/OATS) + IC3/AARP scam corpus | Lowers content cost (MRD §6) |
 | **Monetization** | **Free beta**; Stripe subscription **P1** after retention proof | — |
-| **Runtime** | `crewai` sequential multi-agent | AAMAD default; voice Phase 2 may evaluate `claude-agent-sdk` |
+| **Runtime** | `crewai` **Flow** + 2 conversational agents | Intent gate → Tutor **or** Scam Detector; voice Phase 2 may evaluate `claude-agent-sdk` |
 | **LLM cost control** | Session token cap (default 8K agent-side); model tiering; progressive routing **P1** | MRD unit-economics requirement |
 | **Beta tutor session cap** | **5 tutoring sessions per user per week** | Scam Defense checks/drills **unlimited** during beta |
-| **Escalation (MVP)** | **Extended Help Mode** on **Coordinator** (same “Your guide” persona) | Triggered by Get extra help, distress, or Escalation Handler; AI disclosure in UI; no human callback MVP |
+| **Extra help (MVP)** | **Patient Mode** (Tutor) or **Priority Mode** (Scam Detector) — same agent persona | Triggered by Get extra help, distress, low confidence, or active scam; AI disclosure on mode entry; no human callback MVP |
 | **LLM provider (MVP)** | **Anthropic Claude** (Claude API) | Build may use Cursor IDE; runtime inference via Claude |
 | **Visual step cards** | **Illustrated** assets (not icon-only) | No-Device + Beginner tracks; budget for simple senior-friendly illustrations |
 | **Carmen partner pilot** | **Q4 2026** target | First library/housing MOU + No-Device beta cohort (P1-6) |
@@ -48,15 +48,15 @@ Americans aged 60+ reported **$7.75 billion in fraud losses in 2025**, a 59% yea
 
 ### Solution Overview
 
-**Senior Digital Literacy** is a **full text agentic** multi-agent AI platform (no voice channel on MVP) built on three pillars:
+**Senior Digital Literacy** is a **text agentic** platform (no voice channel on MVP) built on three pillars:
 
 1. **Scam Defense First** — Headline home feature: check suspicious messages, drills, quiz, streaks.
 2. **Persona-Specific Learning Tracks** — Beginner, Partial User, No-Device (built; beta emphasizes Partial + Beginner).
 3. **Emotional Safety & Patience** — Product-level pause, frustration check-in, shame-free copy guardrails.
 
-**AI coaches (crewai):** Coordinator *(incl. Extended Help Mode)* · Step-by-Step Tutor · Safety/Scam Coach · Progress Tracker · Escalation Handler *(routing only — not a chat persona)*
+**AI coaches (crewai):** **Intent Router** *(Flow gate — no chat UI)* → **Tutor** **or** **Scam Detector** · **Progress Service** *(backend — not a chat agent)*
 
-**UVP:** *"Your personal team of digital coaches — one guide who never rushes you, one teaches step by step, one protects you from scams, and one remembers what you've learned."*
+**UVP:** *"Two clear paths — learn step by step, or check if it's a scam — with patient coaches who never rush you."*
 
 **MVP pilot targets (virtual beta, n≈200):**
 
@@ -68,7 +68,7 @@ Americans aged 60+ reported **$7.75 billion in fraud losses in 2025**, a 59% yea
 
 ### Strategic Rationale
 
-Multi-agent architecture separates **scam authority**, **pedagogy**, **progress**, and **escalation** — required for PRD pillars and MRD safety analysis. **`crewai`** supports reproducible YAML-defined agents for AAMAD Build.
+Multi-agent architecture separates **scam detection** from **pedagogy** with a deterministic **intent router** — required for PRD pillars, safety, and cost control. **`crewai` Flow** routes each session to exactly one conversational agent (Tutor or Scam Detector); progress persists via a backend service, not a chat persona.
 
 **Delivery vs. MRD §6:** Stakeholder chose **full text agentic MVP** over community-assembly-first because there is **no library partner** and home-based seniors need an on-demand channel. MRD low-cost workshop model remains a **parallel partner strategy**, not the MVP product.
 
@@ -124,13 +124,14 @@ Track assignment, switching, and examples unchanged from v1.1 (see user stories 
 
 ```mermaid
 flowchart TD
-    A[PWA signup at home] --> B[Scam Defense OR Learn]
-    B --> C[Track: Beginner or Partial User]
-    C --> D[Goal or Is this a scam?]
-    D --> E[Multi-agent text session]
-    E --> F[Safety Coach if needed]
-    F --> G[Progress + optional exit survey]
-    G --> H[Return within 7 days]
+    A[PWA signup at home] --> B[Check a scam OR Learn a skill]
+    B --> R[Intent Router]
+    R -->|TUTOR| T[Tutor session]
+    R -->|SCAM| S[Scam Detector session]
+    T -->|scam signal| S
+    S --> P[Progress Service]
+    T --> P
+    P --> H[Return within 7 days]
 ```
 
 ### Competitive Landscape
@@ -146,129 +147,128 @@ Unchanged from v1.1 — differentiation: Scam Defense headline, three tracks, em
 | Parameter | MVP Value |
 |-----------|-----------|
 | Runtime | `crewai` |
-| Process mode | Sequential |
-| Agent config | `config/agents.yaml`, `config/tasks.yaml` |
-| Agents | **5** — see §3 Agent definitions below |
-| Coordinator `max_iter` | ≤ 12 in Extended Help Mode; ≤ 8 in normal routing mode |
+| Process mode | **Flow** (intent gate) → **single-agent crew** per path |
+| Agent config | `config/agents.yaml`, `config/tasks.yaml`, `config/flow.yaml` |
+| Conversational agents | **2** — Tutor, Scam Detector (see §3 below) |
+| Intent Router | **Flow step** — not a chat persona |
+| Progress | **Backend service** — PostgreSQL writes; not a CrewAI agent |
+| Tutor `max_iter` | ≤ 12 in Patient Mode; ≤ 8 in normal tutoring |
+| Scam Detector `max_iter` | ≤ 10 in Priority Mode; ≤ 8 in normal assessment |
 | Memory | `memory=False`; state in PostgreSQL |
 | Session token cap | 8K agent-side (configurable) |
 
+### Architecture Overview (MVP — v2.3)
+
+Every user session follows **one primary path**:
+
+| Path | Entry | Agent | Weekly cap |
+|------|-------|-------|------------|
+| **TUTOR** | Home **Learn a skill**, onboarding goal, or router classification | `step_by_step_tutor` | **5 sessions/week** (includes Patient Mode) |
+| **SCAM** | Home **Check a scam**, Scam Defense hub, or router classification | `scam_detector` | **Unlimited** |
+
+**Intent Router rules (deterministic):**
+
+1. **Explicit UI choice wins** — tapping **Check a scam** or **Learn a skill** sets path for the session (and can be switched via nav).
+2. **Natural language** — lightweight classifier assigns `TUTOR` or `SCAM`; if ambiguous, **one** clarifying question max.
+3. **Safety override** — active-scam keywords, pasted suspicious content, or critical risk signals force **SCAM** path regardless of prior path.
+4. **Cross-path interrupt** — during TUTOR, scam patterns invoke Scam Detector for **one turn**, then resume Tutor at same step (US-020).
+
 ### Agent Definitions (MVP — all AI; Claude API)
 
-Agent definitions (MVP — all **AI**, no human agents). Inference via **Anthropic Claude API**. Orchestration: **sequential** `crewai` process; Coordinator is session entry point.
+Two conversational agents. Inference via **Anthropic Claude API**. Orchestration: **CrewAI Flow** intent gate → kick off Tutor **or** Scam Detector crew.
 
 ---
 
-#### Agent 1: `coordinator`
+#### Flow step: `intent_router`
 
 | Field | Value |
 |-------|-------|
-| **Display name (UI)** | Your guide *(same persona in normal and Extended Help Mode)* |
-| **role** | Session Coordinator, Learning Track Advocate, Emotional Safety Guardian, and **Extended Help provider** |
-| **goal** | Understand the learner's goal; maintain learning track; pace sessions with patience; route to specialists; detect frustration; and when extra support is needed, **stay with the learner** in Extended Help Mode — patient, extended, simplified assistance with honest AI disclosure |
-| **backstory** | A calm community center director who never sighs, never rushes, and checks in before moving on. When you need more time, the same guide slows down further — never hands you to a stranger and **never pretends to be human**. |
-| **tools** | `learner_state_read`, `learner_state_write`, `set_learning_track`, `delegate_to_tutor`, `delegate_to_safety`, `delegate_to_progress`, `detect_frustration_signal`, `offer_pause`, `enter_extended_help_mode`, `exit_extended_help_mode`, `simplify_explanation`, `recommend_ic3_aarp_resources`, `trigger_active_scam_guidance` |
-| **Modes** | **Normal:** route to Tutor / Safety Coach; emotional check-ins; track management. **Extended Help:** longer turns, re-explain, active-scam immediate steps, IC3/AARP links; triggered by Get extra help, Escalation Handler, or Coordinator frustration/distress detection |
-| **Inputs** | User message, session context, learning track, goal, escalation signals |
-| **Outputs** | Routing decisions; pace/check-in messages; **Extended Help responses** when in that mode |
-| **Prohibited** | Giving scam verdicts without Safety Coach in normal mode; impersonating a human; shame language; tutorial step-by-step in normal mode (delegate to Tutor) |
-| **runtime notes** | Session entry point; Extended Help **must disclose AI** on mode entry; Extended Help counts toward **5 tutor sessions/week**; never auto-switches track without user consent |
+| **Display name (UI)** | *(No chat UI — routing only)* |
+| **role** | Session Intent Classifier and Path Gate |
+| **goal** | Route each session to **Tutor** or **Scam Detector** using explicit UI choice, NL classification, and safety overrides |
+| **inputs** | User message, session context, explicit nav choice (`tutor` \| `scam`), learning track, prior path |
+| **outputs** | `route_intent`: `TUTOR` \| `SCAM`; optional one-shot clarifying prompt |
+| **tools** | `classify_intent`, `apply_safety_override`, `read_session_path`, `set_session_path` |
+| **prohibited** | Conversational tutoring or scam verdicts; impersonating either agent |
+| **runtime notes** | Implemented as **CrewAI Flow** entry step; logged for audit; p95 routing ≤500ms excluding LLM |
 
 ---
 
-#### Agent 2: `step_by_step_tutor`
+#### Agent 1: `step_by_step_tutor`
 
 | Field | Value |
 |-------|-------|
 | **Display name (UI)** | Your tutor |
-| **role** | Track-Aware Step-by-Step Technology Tutor |
-| **goal** | Guide the learner through one verified step at a time toward their life goal using RAG-grounded instructions adapted to their track |
-| **backstory** | An experienced community tech volunteer who explains things simply, repeats without judgment, and never skips steps. Adapts pacing and visuals to Beginner, Partial, and No-Device learners. |
-| **tools** | `rag_search_tutorials`, `get_device_context`, `get_learning_track`, `simplify_explanation`, `confirm_step_complete`, `render_visual_step_card` |
-| **Track behavior** | **Beginner:** micro-steps + device basics first. **Partial User:** standard one-step life-goal flow. **No-Device:** illustrated visual step cards, minimal prose, public-computer safety reminders. |
-| **Inputs** | Delegated task from Coordinator, learner goal, track, device context |
-| **Outputs** | Single step per turn (or micro-step for Beginner), verified guide indicator when RAG-sourced, illustrated card payload when No-Device/Beginner |
-| **Prohibited** | Multiple steps in one turn (unless user asks to repeat); generative answers for banking/security-sensitive tasks; shame language |
-| **runtime notes** | RAG-only for sensitive tasks; Task.guardrail for jargon and step count; counts toward 5 tutor sessions/week cap |
+| **role** | Track-Aware Step-by-Step Technology Tutor and Emotional Safety Guardian |
+| **goal** | Guide the learner through one verified step at a time toward their life goal; detect frustration; offer pause; enter **Patient Mode** when extra help is needed |
+| **backstory** | An experienced community tech volunteer who explains things simply, repeats without judgment, and never skips steps. When you need more time, the same tutor slows down — **never pretends to be human**. |
+| **tools** | `rag_search_tutorials`, `get_device_context`, `get_learning_track`, `set_learning_track`, `simplify_explanation`, `confirm_step_complete`, `render_visual_step_card`, `detect_frustration_signal`, `offer_pause`, `enter_patient_mode`, `exit_patient_mode`, `invoke_scam_detector_interrupt`, `learner_state_read`, `learner_state_write` |
+| **modes** | **Normal:** one step per turn, track-aware pacing. **Patient Mode:** longer turns, re-explain, distress handling; triggered by Get extra help, frustration/distress, or 3 failed simplifications |
+| **track behavior** | **Beginner:** micro-steps + device basics first. **Partial User:** standard one-step life-goal flow. **No-Device:** illustrated visual step cards, minimal prose, public-computer safety reminders. |
+| **inputs** | Routed TUTOR intent, learner goal, track, device context |
+| **outputs** | Single step per turn (or micro-step for Beginner), verified guide indicator when RAG-sourced, illustrated card payload when No-Device/Beginner |
+| **prohibited** | Scam verdicts without Scam Detector; multiple steps in one turn (unless repeat); generative answers for banking/security-sensitive tasks; shame language |
+| **runtime notes** | RAG-only for sensitive tasks; Patient Mode **must disclose AI** on entry; counts toward **5 tutor sessions/week**; never auto-switches track without user consent |
 
 ---
 
-#### Agent 3: `safety_scam_coach`
+#### Agent 2: `scam_detector`
 
 | Field | Value |
 |-------|-------|
-| **Display name (UI)** | Safety coach |
-| **role** | Headline Digital Safety and Scam Defense Coach |
-| **goal** | Lead scam recognition, message analysis, scenario drills, and daily defense habits; detect live scam patterns; coach without panic or blame |
-| **backstory** | A retired fraud investigator and community workshop leader. Protects seniors with calm clarity and celebrates every scam they avoid. Never blames the victim. |
-| **tools** | `rag_search_scam_patterns`, `assess_risk_level`, `run_scam_scenario`, `recommend_safe_action`, `signal_escalation`, `record_scam_milestone` |
-| **Inputs** | Suspicious message text, call description, user question, or interrupt signal from tutoring session |
-| **Outputs** | Plain-language risk assessment, recommended actions, drill/quiz content, milestone events |
-| **Prohibited** | Alarmist tone; blaming user; claiming to be law enforcement or a bank |
-| **runtime notes** | First-class Scam Defense hub entry; can interrupt tutoring; IC3/AARP RAG corpus; does not count toward weekly tutor session cap |
+| **Display name (UI)** | Scam checker |
+| **role** | Digital Safety and Scam Detection Specialist |
+| **goal** | Analyze suspicious messages and calls; run drills and quiz; deliver calm risk assessments; handle **active scam in progress** in Priority Mode |
+| **backstory** | A retired fraud investigator who protects seniors with calm clarity. Never blames the victim. Celebrates every scam avoided. |
+| **tools** | `rag_search_scam_patterns`, `assess_risk_level`, `run_scam_scenario`, `recommend_safe_action`, `recommend_ic3_aarp_resources`, `enter_priority_mode`, `exit_priority_mode`, `log_escalation_event`, `record_scam_milestone`, `learner_state_read` |
+| **modes** | **Normal:** check, drill, quiz, streak. **Priority Mode:** immediate safety steps (hang up, do not pay, do not share codes) + IC3/AARP links; triggered by active-scam declaration or critical risk |
+| **inputs** | Routed SCAM intent, suspicious message/call text, interrupt signal from Tutor, user question |
+| **outputs** | Plain-language risk assessment (likely scam / suspicious / likely safe), recommended actions, drill/quiz content, milestone events |
+| **prohibited** | Alarmist tone; blaming user; claiming to be law enforcement or a bank; promising human callback in MVP |
+| **runtime notes** | First-class Scam Defense hub entry; IC3/AARP RAG corpus; **does not count** toward weekly tutor session cap; Priority Mode **must disclose AI** on entry |
 
 ---
 
-#### Agent 4: `progress_tracker`
+#### Backend: `progress_service`
 
 | Field | Value |
 |-------|-------|
-| **Display name (UI)** | Your progress (summary UI only) |
-| **role** | Learning Progress, Scam Defense, and Confidence Milestone Recorder |
-| **goal** | Record completed steps, track changes, scam quiz scores, defense streaks, and session summaries for continuity across visits |
-| **backstory** | An encouraging librarian who remembers what you have learned and celebrates small wins without oversharing to family unless the senior opts in. |
-| **tools** | `learner_state_read`, `learner_state_write`, `record_milestone`, `record_scam_milestone`, `record_track_change`, `generate_session_summary`, `get_scam_streak` |
-| **Inputs** | Step completions, quiz scores, drill results, track changes, session end signal |
-| **Outputs** | Updated learner state, session summary, continue pointers, caregiver-safe aggregate counts (no message content) |
-| **Prohibited** | Long conversational tutoring; storing raw suspicious messages in caregiver-visible fields; logging emotional check-ins for caregivers |
-| **runtime notes** | Runs after tutoring and Scam Defense segments; persists learning_track, track_history, scam_streak_days, scam_defense_level |
-
----
-
-#### Agent 5: `escalation_handler`
-
-| Field | Value |
-|-------|-------|
-| **Display name (UI)** | *(No chat UI — internal routing task)* |
-| **role** | Escalation Assessor and Mode Switch Trigger |
-| **goal** | Evaluate escalation triggers and activate **Coordinator Extended Help Mode** or active-scam safety flow — without introducing a separate chat persona |
-| **backstory** | N/A — non-conversational crew task |
-| **tools** | `assess_escalation_need`, `activate_coordinator_extended_help`, `trigger_active_scam_guidance`, `log_escalation_event` |
-| **Triggers** | User taps Get extra help; Safety Coach critical risk; Tutor low confidence; distress keywords; 3 failed simplifications; active scam in progress |
-| **Outputs** | Signal to Coordinator to enter/exit Extended Help Mode; escalation log (no credentials) |
-| **Prohibited** | Conversational replies to user; promising human callback in MVP; separate “partner tutor” persona |
-| **runtime notes** | Implemented as **CrewAI task** invoked by Coordinator or Safety Coach; not a user-visible agent; human webhook **P1** |
+| **Display name (UI)** | Your progress *(summary UI only)* |
+| **role** | Learning Progress and Scam Defense Milestone Recorder |
+| **goal** | Record completed steps, track changes, scam quiz scores, defense streaks, and session summaries |
+| **implementation** | **Not a CrewAI agent** — invoked by Tutor, Scam Detector, and session-end hooks |
+| **tools** | `record_milestone`, `record_scam_milestone`, `record_track_change`, `generate_session_summary`, `get_scam_streak`, `learner_state_write` |
+| **outputs** | Updated learner state, session summary, continue pointers, caregiver-safe aggregate counts (no message content) |
+| **prohibited** | Conversational replies; storing raw suspicious messages in caregiver-visible fields |
+| **runtime notes** | Persists `learning_track`, `track_history`, `scam_streak_days`, `scam_defense_level` |
 
 ---
 
 ### Agent collaboration flow (MVP)
 
 ```mermaid
-flowchart LR
-    U[Senior user] --> C[1 Coordinator]
-    C -->|normal mode| T[2 Step-by-Step Tutor]
-    C -->|normal mode| S[3 Safety Scam Coach]
-    C -->|Extended Help mode| C
-    C --> P[4 Progress Tracker]
-    T --> S
-    S --> E[5 Escalation task]
-    T --> E
-    E --> C
-    T --> P
+flowchart TD
+    U[Senior user] --> H[Home: Check a scam OR Learn]
+    H --> R[Intent Router Flow]
+    R -->|TUTOR| T[1 Tutor]
+    R -->|SCAM| S[2 Scam Detector]
+    T -->|scam interrupt| S
+    S -->|resume step| T
+    T --> P[Progress Service]
     S --> P
-    C --> P
 ```
 
-| Session type | Primary agents | Weekly cap |
-|--------------|----------------|------------|
-| Learn a skill | Coordinator → Tutor (+ Safety interrupt) → Progress | Counts (5/week) |
-| Scam Defense check/drill/quiz | Coordinator → Safety Coach → Progress | Uncapped |
-| Get extra help | Coordinator → Escalation task → **Coordinator Extended Help Mode** → Progress | Counts (5/week) |
+| Session type | Path | Primary agent | Weekly cap |
+|--------------|------|---------------|------------|
+| Learn a skill | TUTOR | Tutor (+ optional Scam interrupt) | Counts (5/week) |
+| Scam Defense check/drill/quiz | SCAM | Scam Detector | Uncapped |
+| Get extra help (learning) | TUTOR | Tutor **Patient Mode** | Counts (5/week) |
+| Active scam / critical risk | SCAM | Scam Detector **Priority Mode** | Uncapped |
 
 | Role | MVP | P1+ |
 |------|-----|-----|
-| Five agents / tasks | All AI (Claude) | AI |
-| Extended Help | **Coordinator mode** (not separate agent) | Same |
+| Intent Router + 2 agents | All AI (Claude) | AI |
+| Patient / Priority modes | Same agent persona + AI disclosure | Same |
 | Live human callback | None | Optional webhook |
 
 ### Voice & Modality (Final)
@@ -291,7 +291,7 @@ flowchart LR
 | Redis | Optional | Recommended at scale |
 | Browser Web Speech API | Optional (Tier A) | — |
 | **Human escalation webhook** | **❌ Deferred P1** | Live human guide queue |
-| **Extended Help Mode** | **Coordinator** (not separate agent) | May add human handoff P1 |
+| **Extended Help / Patient Mode** | **Tutor Patient Mode** or **Scam Detector Priority Mode** | May add human handoff P1 |
 | Stripe | ❌ | P1 |
 | Spanish i18n | ❌ | P2 |
 | Library/kiosk hardened mode | ❌ | P1 (with partner) |
@@ -320,7 +320,7 @@ Unchanged from v1.1 §3 (p95 ≤5s chat, WCAG 2.1 AA, shared-device mode for No-
 | **F4** | Multi-agent text tutoring | P0 |
 | **F5** | Emotional safety system | P0 |
 | **F6** | Progress + scam streaks | P0 |
-| **F7** | Coordinator Extended Help Mode (+ active-scam safety flow) | P0 |
+| **F7** | Patient Mode (Tutor) + Priority Mode (Scam Detector) | P0 |
 | **F8** | Accessible PWA + **illustrated** visual-first No-Device mode | P0 build; No-Device **beta Q4 2026** |
 | **F9** | RAG corpus (free curricula + scam) | P0 |
 
@@ -399,12 +399,12 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 
 **In MVP — ship:**
 
-- Full **5-agent** text platform (crewai): Coordinator *(incl. Extended Help)*, Tutor, Safety Coach, Progress Tracker, Escalation task
+- Full **2-agent** text platform (`crewai` Flow): Intent Router → Tutor **or** Scam Detector; Progress Service (backend)
 - Scam Defense headline · three tracks · emotional safety
 - Text PWA WCAG 2.1 AA · optional browser speech (Tier A)
 - RAG from free curricula + scam corpus · **Claude API**
 - **Illustrated** visual step cards (No-Device + Beginner)
-- **Get extra help** → Coordinator **Extended Help Mode** (same “Your guide” + AI disclosure); no human callback queue in MVP
+- **Get extra help** → Tutor **Patient Mode** or Scam Detector **Priority Mode** (AI disclosure on entry); no human callback queue in MVP
 - No-Device track in product; **Carmen beta Q4 2026**
 
 **Out of MVP — do not build:**
@@ -431,7 +431,7 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 | No library partner | Virtual beta; David channel; partner outreach parallel |
 | LLM cost | Session caps; beta size limit; tiering P1 |
 | Carmen underserved in beta | Q4 2026 partner pilot; illustrated cards + No-Device track ready at Build |
-| Extended Help trust | Same Coordinator persona; mode-entry AI disclosure; active-scam → IC3/AARP resources |
+| Extended Help trust | Same agent persona per path; mode-entry AI disclosure; active-scam → IC3/AARP resources |
 | Wrong instructions | RAG-only; free verified curricula |
 | Building before demand proof | Beta KPIs gate P1 spend and monetization |
 
@@ -469,7 +469,7 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 - [ ] Emotional safety copy review
 - [ ] WCAG audit on core flows
 - [ ] Scam + tutorial RAG validated (free sources indexed)
-- [ ] Coordinator Extended Help Mode + disclosure copy validated with seniors
+- [ ] Tutor Patient Mode + Scam Detector Priority Mode disclosure copy validated with seniors
 - [ ] Illustrated step card set for Beginner + No-Device sample paths
 - [ ] Claude API integration + session/week caps enforced
 - [ ] QA + security assessments
@@ -505,7 +505,8 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 - **`crewai`** is the Build runtime; **`claude-agent-sdk`** evaluated for P2 voice only.
 - **LLM inference:** **Anthropic Claude API** for all MVP agents; Cursor IDE may be used for development — not a production LLM endpoint.
 - **Beta caps:** **5 tutor sessions/user/week**; Scam Defense checks, drills, and quiz **uncapped** during beta.
-- **Escalation MVP:** **Coordinator Extended Help Mode** (same guide persona); UI discloses AI on mode entry. Live human callback **P1**. Active scam: immediate safety steps + IC3/AARP links.
+- **Escalation MVP:** **Tutor Patient Mode** (learning path) or **Scam Detector Priority Mode** (scam path); UI discloses AI on mode entry. Live human callback **P1**. Active scam: immediate safety steps + IC3/AARP links.
+- **Architecture v2.3:** Intent Router (Flow) → Tutor **or** Scam Detector; Progress Service is backend-only (not a chat agent).
 - **Visual step cards:** **Illustrated** assets required for No-Device and Beginner tracks (not icon-only).
 - **Carmen partner pilot:** target **Q4 2026** (P1-6).
 - **Full text agentic MVP** proceeds without library partner until Q4; virtual beta is valid GTM until then.
@@ -514,7 +515,7 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 - **Free beta** with session caps; monetization P1.
 - **RAG** prioritizes free public curricula; licensing/terms respected per source.
 - **Home screen** shows balanced Scam Defense + Learn at launch (no "remember last" until P1).
-- **Track assignment** is self-select at onboarding; Coordinator **suggests** switch after frustration signals but does not auto-change track without user consent in MVP.
+- **Track assignment** is self-select at onboarding; Tutor **suggests** switch after frustration signals but does not auto-change track without user consent in MVP.
 - **Telehealth tutorials** are navigation-only; no credential entry (HIPAA avoided).
 - **Emotional check-ins** not shared with caregivers.
 - **Phase 0 community-only workshop** is complementary outreach, not a substitute for this PRD scope.
@@ -525,9 +526,10 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 
 *All prior open questions resolved as of v2.1 (2026-08-10). New items for SAD/architect:*
 
-1. **Claude model tier for MVP:** Haiku for Progress vs. Sonnet for Coordinator (incl. Extended Help), Tutor, Safety — confirm in SAD.
+1. **Claude model tier for MVP:** Haiku for intent router + progress hooks vs. Sonnet for Tutor and Scam Detector — confirm in SAD.
 2. **Illustration source:** Custom commission vs. licensed stock vs. generated assets — confirm art pipeline before frontend build.
-3. **Get extra help label:** Confirm copy (e.g., “Get extra help from your guide”) — gerontology review; must not imply human.
+3. **Get extra help label:** Confirm copy (e.g., “Get extra help from your tutor”) — gerontology review; must not imply human.
+4. **Intent router NL fallback:** When classifier confidence is low, default to SCAM if safety keywords present else TUTOR — confirm thresholds in SAD.
 
 *Architect handoff:* `@system.arch` → `*create-sad` using this PRD and user stories.
 
@@ -537,13 +539,14 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:35:00Z |
+| Timestamp | 2026-08-14T14:00:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-prd` — **finalize v2.2** (Partner Tutor merged into Coordinator) |
-| Prior version | 2.1 Final |
-| Resolved runtime | `crewai` |
+| Action | `create-prd` — **finalize v2.3** (simplified intent router → Tutor \| Scam Detector) |
+| Prior version | 2.2 Final |
+| Resolved runtime | `crewai` Flow |
 | LLM provider | Anthropic Claude (API) |
-| Escalation MVP | Coordinator **Extended Help Mode** (5 agents) |
+| Architecture | Intent Router + 2 agents + Progress Service |
+| Escalation MVP | Tutor Patient Mode / Scam Detector Priority Mode |
 | Beta tutor cap | 5 sessions/user/week |
 | Carmen pilot | Q4 2026 |
 | Visual step cards | Illustrated |

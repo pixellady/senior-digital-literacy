@@ -1,8 +1,8 @@
 # User Stories Index — Senior Digital Literacy MVP
 
-Generated from `project-context/1.define/prd.md` **v2.2 Final**. All stories are **Must** priority for MVP unless noted in PRD P1/P2.
+Generated from `project-context/1.define/prd.md` **v2.3 Final**. All stories are **Must** priority for MVP unless noted in PRD P1/P2.
 
-**Runtime (MVP):** 5-agent `crewai` text platform — Coordinator *(incl. Extended Help Mode)*, Step-by-Step Tutor, Safety/Scam Coach, Progress Tracker, Escalation Handler *(internal routing task, no chat UI)*. All agents are **AI** via **Anthropic Claude API**; no human tutors or callback queue in MVP.
+**Runtime (MVP):** `crewai` **Flow** with **Intent Router** → **Tutor** **or** **Scam Detector**; **Progress Service** (backend, not a chat agent). All conversational agents are **AI** via **Anthropic Claude API**; no human tutors or callback queue in MVP.
 
 ## Story Catalog
 
@@ -20,14 +20,14 @@ Generated from `project-context/1.define/prd.md` **v2.2 Final**. All stories are
 | [US-010](US-010-frustration-check-in-survey.md) | Frustration Check-in and Survey | Margaret | F5 |
 | [US-011](US-011-progress-summary-continue.md) | Progress Summary and Continue | Margaret | F6 |
 | [US-012](US-012-caregiver-progress-view.md) | Caregiver Read-Only Progress | David | F6 |
-| [US-013](US-013-get-extra-help-extended-help-mode.md) | Get Extra Help (Extended Help Mode) | Margaret | F7 |
+| [US-013](US-013-get-extra-help-extended-help-mode.md) | Get Extra Help (Patient / Priority Mode) | Margaret | F7 |
 | [US-014](US-014-active-scam-priority-escalation.md) | Active Scam Priority Escalation | Margaret, Carmen | F7 |
 | [US-015](US-015-visual-first-no-device-learning.md) | Visual-First No-Device Learning | Carmen | F2, F8 |
 | [US-016](US-016-public-computer-mode.md) | Public Computer Shared-Device Mode | Carmen | F8 |
 | [US-017](US-017-printable-step-summary.md) | Printable Step Summary | Carmen | F8 |
 | [US-018](US-018-accessible-pwa-speech-input.md) | Accessible PWA and Speech Input | Margaret, Carmen | F8 |
 | [US-019](US-019-senior-owned-account-signup.md) | Senior-Owned Account Sign Up | Margaret, David | Auth, F6 |
-| [US-020](US-020-safety-coach-interrupt-tutoring.md) | Safety Coach Interrupt During Tutoring | Margaret | F1, F4 |
+| [US-020](US-020-safety-coach-interrupt-tutoring.md) | Scam Detector Interrupt During Tutoring | Margaret | F1, F4 |
 | [US-021](US-021-verified-guide-responses.md) | Verified Guide Responses | Margaret | F9 |
 
 ## Coverage by Product Pillar
@@ -39,7 +39,7 @@ US-001, US-002, US-003, US-014, US-020, US-021 (scam corpus)
 US-004, US-005, US-008, US-015
 
 ### Emotional Safety & Patience
-US-009, US-010, US-013 (Extended Help Mode)
+US-009, US-010, US-013 (Tutor Patient Mode)
 
 ## Coverage by Persona
 
@@ -53,8 +53,8 @@ US-009, US-010, US-013 (Extended Help Mode)
 
 | Flow | Weekly cap (MVP) |
 |------|------------------|
-| Tutoring + Extended Help Mode | **5 sessions / user / calendar week** |
-| Scam Defense (check, drill, quiz) | **Unlimited** |
+| Tutoring + Tutor Patient Mode | **5 sessions / user / calendar week** |
+| Scam Defense (check, drill, quiz) + Scam Detector Priority Mode | **Unlimited** |
 
 ## Deferred (P1/P2) — No MVP User Story
 
@@ -67,7 +67,7 @@ US-009, US-010, US-013 (Extended Help Mode)
 
 ## Sources
 
-- `project-context/1.define/prd.md` v2.2 Final
+- `project-context/1.define/prd.md` v2.3 Final
 - `.cursor/templates/user-story-template.md`
 
 ## Assumptions
@@ -77,14 +77,14 @@ US-009, US-010, US-013 (Extended Help Mode)
 
 ## Open Questions
 
-- Consolidated in individual stories; see PRD § Open Questions for GTM, bilingual timing, and Extended Help copy.
+- Consolidated in individual stories; see PRD § Open Questions for GTM, bilingual timing, and Patient Mode copy.
 
 ## Audit
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T20:30:00Z |
+| Timestamp | 2026-08-14T14:00:00Z |
 | Persona id | `product-mgr` |
-| Action | `sync-stories-prd-v2.2` |
-| PRD version | v2.2 Final |
+| Action | `sync-stories-prd-v2.3` |
+| PRD version | v2.3 Final |
 | Story count | 21 |

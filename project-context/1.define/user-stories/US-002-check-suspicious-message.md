@@ -14,8 +14,8 @@ As a senior user who received a strange text or call, I want to paste or describ
 ## 3. Acceptance Criteria
 
 1. **Given** I am in Scam Defense, **When** I choose to check a message, **Then** I can paste text, type a description of a phone call, or enter text from a screenshot (manual paste MVP).
-2. **Given** I submit suspicious content, **When** the Safety Coach analyzes it, **Then** I receive a plain-language assessment (likely scam / suspicious / likely safe) with recommended next steps.
-3. **Given** the Safety Coach detects high risk (e.g., tech-support, grandparent, IRS patterns), **When** results are shown, **Then** I am offered **Get extra help** (Coordinator Extended Help Mode — US-013) and clear do-not-pay / do-not-click guidance; active-scam signals route to US-014.
+2. **Given** I submit suspicious content, **When** Scam Detector analyzes it, **Then** I receive a plain-language assessment (likely scam / suspicious / likely safe) with recommended next steps.
+3. **Given** Scam Detector detects high risk (e.g., tech-support, grandparent, IRS patterns), **When** results are shown, **Then** I am offered **Get extra help** (Priority Mode — US-013) and clear do-not-pay / do-not-click guidance; active-scam signals route to US-014.
 4. **Given** the assessment completes, **When** the session ends, **Then** Progress Tracker records a scam-check milestone (no message content stored in progress summary shown to caregivers).
 5. **Given** sensitive banking or credential requests in the message, **When** the Coach responds, **Then** advice is RAG-grounded from verified scam corpus only.
 
@@ -26,12 +26,12 @@ As a senior user who received a strange text or call, I want to paste or describ
 
 ## 5. Traceability
 
-- **PRD Anchors**: §4 F1; §3 safety_scam_coach agent; §4 F9 scam corpus
+- **PRD Anchors**: §4 F1; §3 `scam_detector` agent; §4 F9 scam corpus
 - **Related SFS**: TBD — `project-context/1.define/sfs/scam-message-check.md`
 
 ## Sources
 
-- `project-context/1.define/prd.md` — §4 F1, §3 Agent: safety_scam_coach
+- `project-context/1.define/prd.md` v2.3 — §4 F1, §3 Agent: scam_detector
 
 ## Assumptions
 

@@ -13,7 +13,7 @@ As a senior user learning a new digital task, I want one clear step at a time fr
 
 ## 3. Acceptance Criteria
 
-1. **Given** I start a tutoring session with a life goal, **When** the Coordinator routes my message, **Then** the Step-by-Step Tutor responds with exactly one step per turn (Partial User track).
+1. **Given** I start a tutoring session with a life goal, **When** Intent Router sends me to the TUTOR path, **Then** Tutor responds with exactly one step per turn (Partial User track).
 2. **Given** a tutor step is shown, **When** content is from RAG, **Then** a **verified guide** indicator is visible.
 3. **Given** any tutor turn, **When** I view actions, **Then** **Explain simpler**, **Pause**, **Start over**, and **Repeat last step** are available.
 4. **Given** I refresh the browser mid-session, **When** I return, **Then** session and step progress are restored from learner state.
