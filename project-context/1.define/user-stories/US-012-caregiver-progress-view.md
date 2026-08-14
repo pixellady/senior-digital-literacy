@@ -17,12 +17,12 @@ As a family caregiver, I want to see my parent's learning and scam-defense progr
 2. **Given** sharing is approved, **When** I open progress view, **Then** I see read-only summary: completed goals, step counts, scam milestone counts, and scam streak — **not** chat message content.
 3. **Given** emotional check-in responses exist, **When** caregiver views dashboard, **Then** "Did you feel rushed?" and frustration flags are **not** displayed.
 4. **Given** senior revokes sharing, **When** revocation saves, **Then** caregiver loses access immediately.
-5. **Given** senior triggers escalation, **When** policy allows, **Then** caregiver may receive escalation alert (optional MVP — confirm in Open Questions).
+5. **Given** senior enters Extended Help Mode or active-scam flow, **When** caregiver views progress, **Then** only aggregate escalation **event counts** may appear if senior opted in — **no** escalation alerts or human callback status in MVP (**P1**).
 
 ## 4. Scope Notes
 
 - **In Scope for MVP**: Invite flow, senior approval, read-only progress summary, privacy boundaries.
-- **Deferred**: Full caregiver dashboard (P1-2); escalation SMS to caregiver (optional MVP).
+- **Deferred**: Full caregiver dashboard (P1-2); escalation SMS/alerts to caregiver (**P1** with human escalation webhook).
 
 ## 5. Traceability
 
@@ -35,16 +35,17 @@ As a family caregiver, I want to see my parent's learning and scam-defense progr
 
 ## Assumptions
 
-- Escalation alerts to caregiver are off by default; senior opts in separately from progress sharing.
+- Escalation alerts to caregiver are **out of MVP**; deferred to P1 with human handoff option.
 
 ## Open Questions
 
-- Should MVP include escalation notifications to approved caregivers?
+- None — caregiver escalation notifications deferred to P1 per PRD v2.2.
 
 ## Audit
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

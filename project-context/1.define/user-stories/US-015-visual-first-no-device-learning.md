@@ -13,7 +13,7 @@ As a learner without my own smartphone, I want large pictures and simple step ca
 
 ## 3. Acceptance Criteria
 
-1. **Given** my track is **No-Device User**, **When** Tutor delivers a step, **Then** visual step cards display (icon + short label) with minimal paragraph text by default.
+1. **Given** my track is **No-Device User**, **When** Tutor delivers a step, **Then** **illustrated** visual step cards display (senior-friendly artwork + short label) with minimal paragraph text by default — not icon-only (PRD §6).
 2. **Given** visual-first mode, **When** I progress through steps, **Then** progress dots or equivalent show where I am in the sequence.
 3. **Given** No-Device tutoring, **When** content is loaded, **Then** RAG corpus uses track-tagged guides including public-computer safety (logout, shoulder surfing, fake Wi‑Fi).
 4. **Given** a housing portal or benefits goal, **When** Carmen completes flow, **Then** at least one supported path exists in MVP corpus (housing portal access, housing scam drill).
@@ -22,8 +22,8 @@ As a learner without my own smartphone, I want large pictures and simple step ca
 
 ## 4. Scope Notes
 
-- **In Scope for MVP**: Visual step cards, progress indicators, No-Device corpus, English UI, housing-relevant goals.
-- **Deferred**: Full Spanish/English bilingual (P2); illustrated custom artwork budget (Open Question #6).
+- **In Scope for MVP**: Illustrated visual step cards, progress indicators, No-Device corpus, English UI, housing-relevant goals. No-Device track **built in product**; Carmen partner beta **Q4 2026** (P1-6).
+- **Deferred**: Full Spanish/English bilingual (P2); illustration source finalization (commission vs. stock vs. generated — PRD Open Question #2).
 
 ## 5. Traceability
 
@@ -36,16 +36,17 @@ As a learner without my own smartphone, I want large pictures and simple step ca
 
 ## Assumptions
 
-- Icons sufficient for MVP if custom illustrations deferred.
+- PRD v2.2 requires **illustrated** step cards for No-Device + Beginner; icon-only is insufficient for MVP acceptance.
 
 ## Open Questions
 
-- Illustration budget vs. icon-only for step cards?
+- Illustration source: commission vs. stock vs. generated (PRD Open Question #2)?
 
 ## Audit
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

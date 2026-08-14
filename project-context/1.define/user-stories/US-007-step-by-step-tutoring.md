@@ -19,10 +19,12 @@ As a senior user learning a new digital task, I want one clear step at a time fr
 4. **Given** I refresh the browser mid-session, **When** I return, **Then** session and step progress are restored from learner state.
 5. **Given** the session runs, **When** steps auto-advance, **Then** no timers or forced progression occur.
 6. **Given** tutoring touches banking or security settings, **When** Tutor responds, **Then** content is RAG-only with no generative fallback.
+7. **Given** my track is **Beginner** or **No-Device**, **When** Tutor delivers a step, **Then** **illustrated** visual step cards are shown (not icon-only) per PRD §6.
+8. **Given** I have used **5 tutor sessions** this calendar week, **When** I start a new tutoring session, **Then** I see a friendly cap message and Scam Defense remains available (unlimited).
 
 ## 4. Scope Notes
 
-- **In Scope for MVP**: Track-aware one-step tutoring, RAG grounding, session persistence, action buttons.
+- **In Scope for MVP**: Track-aware one-step tutoring, RAG grounding, illustrated step cards (Beginner/No-Device), session persistence, action buttons, weekly session cap.
 - **Deferred**: Screen sharing co-browsing (Phase 2); native app tutoring.
 
 ## 5. Traceability
@@ -36,7 +38,7 @@ As a senior user learning a new digital task, I want one clear step at a time fr
 
 ## Assumptions
 
-- Partial User is default path for Margaret; Beginner and No-Device variants covered in US-018 and US-014.
+- Partial User is default path for Margaret; Beginner and No-Device variants covered in US-008 and US-015.
 
 ## Open Questions
 
@@ -46,6 +48,7 @@ As a senior user learning a new digital task, I want one clear step at a time fr
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

@@ -14,7 +14,7 @@ As a senior user following instructions about money or security, I want answers 
 ## 3. Acceptance Criteria
 
 1. **Given** Tutor or Safety Coach answers a supported question, **When** response uses RAG corpus, **Then** UI shows **verified guide** or equivalent trust indicator.
-2. **Given** question matches sensitive category (banking view-only, security settings, scam response), **When** confidence below threshold, **Then** system refuses generative guess and offers escalation or simplified verified snippet only.
+2. **Given** question matches sensitive category (banking view-only, security settings, scam response), **When** confidence below threshold, **Then** system refuses generative guess and offers **Get extra help** (Extended Help Mode — US-013) or simplified verified snippet only.
 3. **Given** MVP launch, **When** corpus is queried, **Then** scam pattern content includes ≥10 scenario drills and IC3/AARP-sourced patterns (operator acceptance).
 4. **Given** MVP launch, **When** tutoring corpus is queried, **Then** ≥50 task guides exist tagged by `learning_track` compatibility.
 5. **Given** content update, **When** operator rolls back corpus version, **Then** feature flag restores prior RAG index without code deploy.
@@ -26,7 +26,7 @@ As a senior user following instructions about money or security, I want answers 
 
 ## 5. Traceability
 
-- **PRD Anchors**: §4 F9; §4 F4 RAG grounding; §4 F7 low-confidence escalation
+- **PRD Anchors**: §4 F9; §4 F4 RAG grounding; §4 F7 low-confidence → Extended Help Mode
 - **Related SFS**: TBD — `project-context/1.define/sfs/rag-content-corpus.md`
 
 ## Sources
@@ -45,6 +45,7 @@ As a senior user following instructions about money or security, I want answers 
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

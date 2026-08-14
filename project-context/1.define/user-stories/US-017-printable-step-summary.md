@@ -13,7 +13,7 @@ As a learner on a shared computer, I want to print or save a simple summary of t
 
 ## 3. Acceptance Criteria
 
-1. **Given** I complete or pause a No-Device tutoring session, **When** I tap **Print summary** or **Save steps**, **Then** a print-friendly view opens with numbered steps and icons.
+1. **Given** I complete or pause a No-Device tutoring session, **When** I tap **Print summary** or **Save steps**, **Then** a print-friendly view opens with numbered steps and **illustrated** step thumbnails where available.
 2. **Given** print view, **When** rendered, **Then** it excludes chat transcript, credentials, and internal session IDs.
 3. **Given** print view, **When** content is generated, **Then** fonts and contrast remain readable (≥16px equivalent in print CSS).
 4. **Given** scam-related session, **When** summary prints, **Then** key safety reminders (do not share codes, verify caller) are included.
@@ -45,6 +45,7 @@ As a learner on a shared computer, I want to print or save a simple summary of t
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

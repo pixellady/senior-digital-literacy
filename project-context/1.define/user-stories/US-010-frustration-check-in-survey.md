@@ -14,16 +14,16 @@ As a senior user who sometimes gets confused or upset during learning, I want th
 ## 3. Acceptance Criteria
 
 1. **Given** I send "I don't understand" or equivalent three times consecutively, **When** the Coordinator detects frustration, **Then** it offers: "Would you like to slow down or take a break?"
-2. **Given** I use distress keywords (e.g., "scared," "upset," "I'm stupid"), **When** detected, **Then** Coordinator offers pause and optional **Talk to a person**.
-3. **Given** Tutor simplifies three times without success, **When** threshold is reached, **Then** escalation to human support is offered.
+2. **Given** I use distress keywords (e.g., "scared," "upset," "I'm stupid"), **When** detected, **Then** Coordinator offers pause and optional **Get extra help** (Extended Help Mode — US-013).
+3. **Given** Tutor simplifies three times without success, **When** threshold is reached, **Then** Escalation Handler offers **Get extra help** with Coordinator Extended Help Mode (not a human callback).
 4. **Given** I end a session, **When** optional emotional check-in appears, **Then** I can answer **"Did you feel rushed?"** (Yes/No) or skip without penalty.
 5. **Given** emotional check-in response, **When** stored, **Then** it is logged for KPIs only and **not** visible to caregivers (US-012).
 6. **Given** frustration or pause events, **When** recorded, **Then** `emotional_safety_flags` updated without storing PII in flag reason text.
 
 ## 4. Scope Notes
 
-- **In Scope for MVP**: Keyword/heuristic frustration detection, check-in prompt, optional exit survey, escalation offer.
-- **Deferred**: ML-based sentiment analysis; real-time human chat.
+- **In Scope for MVP**: Keyword/heuristic frustration detection, check-in prompt, optional exit survey, **Get extra help** offer (Extended Help Mode).
+- **Deferred**: ML-based sentiment analysis; human escalation webhook (**P1**).
 
 ## 5. Traceability
 
@@ -32,7 +32,7 @@ As a senior user who sometimes gets confused or upset during learning, I want th
 
 ## Sources
 
-- `project-context/1.define/prd.md` — §4 F5, §3 Coordinator agent
+- `project-context/1.define/prd.md` v2.2 — §4 F5, §3 Coordinator agent, §3 Escalation Handler triggers
 
 ## Assumptions
 
@@ -46,6 +46,7 @@ As a senior user who sometimes gets confused or upset during learning, I want th
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

@@ -16,7 +16,7 @@ As a senior user, I want to tell the app what I want to accomplish in everyday l
 1. **Given** I finish track selection, **When** onboarding continues, **Then** I choose **Scam Defense first** OR **Learn a skill**.
 2. **Given** I choose Learn a skill, **When** goal picker appears, **Then** I see ≥5 options: video calling, email, banking (view-only), telehealth navigation, housing portal access.
 3. **Given** I am on No-Device track, **When** goals are shown, **Then** housing portal and public-computer-safe tasks are prioritized.
-4. **Given** none of the listed goals fit, **When** I type a custom goal in plain language, **Then** Coordinator accepts and maps to nearest supported path or offers human escalation.
+4. **Given** none of the listed goals fit, **When** I type a custom goal in plain language, **Then** Coordinator accepts and maps to nearest supported path, offers **Get extra help** (Extended Help Mode), or responds with honest limits.
 5. **Given** onboarding flow, **When** I count screens, **Then** completion requires ≤5 screens and ≤3 navigation levels.
 6. **Given** all onboarding screens, **When** audited for accessibility, **Then** they meet WCAG 2.1 AA (contrast, touch targets, font size).
 
@@ -36,16 +36,17 @@ As a senior user, I want to tell the app what I want to accomplish in everyday l
 
 ## Assumptions
 
-- Custom goals outside corpus scope trigger escalation or generic Coordinator response with honest limits.
+- Custom goals outside corpus scope trigger Extended Help offer or generic Coordinator response with honest limits.
 
 ## Open Questions
 
-- Which custom goals must map to human escalation in MVP vs. generic tutoring attempt?
+- Which custom goals must route to Extended Help Mode in MVP vs. generic tutoring attempt?
 
 ## Audit
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

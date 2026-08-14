@@ -22,7 +22,7 @@ As a senior with vision or motor limitations, I want a large, accessible app I c
 
 ## 4. Scope Notes
 
-- **In Scope for MVP**: PWA install, WCAG 2.1 AA core flows, optional speech input, no timed steps.
+- **In Scope for MVP**: PWA install, WCAG 2.1 AA core flows, optional **Tier A** browser Web Speech (dictation only), no timed steps. **No** cloud STT/TTS, phone voice agent, or voice-only mode (PRD v2.2).
 - **Deferred**: Native apps; full screen reader certification audit post-MVP.
 
 ## 5. Traceability
@@ -32,7 +32,7 @@ As a senior with vision or motor limitations, I want a large, accessible app I c
 
 ## Sources
 
-- `project-context/1.define/prd.md` — §4 F8, §5 Security & Compliance WCAG
+- `project-context/1.define/prd.md` v2.2 — §4 F8, §5 Security & Compliance WCAG, §3 Delivery path (text-first)
 
 ## Assumptions
 
@@ -46,6 +46,7 @@ As a senior with vision or motor limitations, I want a large, accessible app I c
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |

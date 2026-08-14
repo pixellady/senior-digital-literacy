@@ -18,6 +18,7 @@ As a beginner who is new to smartphones, I want the smallest possible steps incl
 3. **Given** Beginner track, **When** I complete device basics, **Then** Progress Tracker records basic milestones separately from life-goal milestones.
 4. **Given** Beginner scam content, **When** I access Scam Defense, **Then** foundational content includes "What is a scam?" and common red flags before advanced drills.
 5. **Given** I confirm a step, **When** I tap **Did that work?**, **Then** Tutor waits for Yes/No before advancing (no skip on failed confirmation).
+6. **Given** Beginner track, **When** Tutor delivers a step, **Then** **illustrated** visual step cards are shown via `render_visual_step_card` (PRD §6).
 
 ## 4. Scope Notes
 
@@ -45,6 +46,7 @@ As a beginner who is new to smartphones, I want the smallest possible steps incl
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-10T16:00:00Z |
+| Timestamp | 2026-08-10T20:30:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-stories` |
+| Action | `sync-stories-prd-v2.2` |
+| PRD version | v2.2 Final |
