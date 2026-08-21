@@ -189,3 +189,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `develop-fe` — prove scam path on `/`; no extra routes |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | VerifiedGuideBadge; SafetyBar; large-type verdict; Pause |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T21:18:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `c9686f6` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend-funcional-spec.md S8 + Last synced commit |

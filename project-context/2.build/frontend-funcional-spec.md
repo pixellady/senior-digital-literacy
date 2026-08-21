@@ -432,14 +432,14 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | `text-4xl` heading; **Verified guide** badge; `verified_guide: true`. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
 | S7 | Run, Reset, Retry; client Pause always visible | synced | Pause does not cancel in-flight stub; blocks new Run until Resume. |
-| S8 | `frontend.md` Audit records this FE change | pending-commit | Logged no-route-growth + Pause + RAG badge. |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded SAD chat stub + single-route scam proof commit `c9686f6`. |
 | S9 | SAD extra routes and Tutor step not implemented | synced | Tutor step waits until this path talks to Flow. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Restored original `Crew:` labels. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | Unchanged. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | Wire JSON unchanged; fixtures now `verified_guide: true`. |
 
-**Last synced commit:** `bd799b4`  
-**Last synced at:** 2026-08-21T21:14:00Z (SHA updates after commit)
+**Last synced commit:** `c9686f6`  
+**Last synced at:** 2026-08-21T21:18:00Z
 
 ---
 
@@ -566,3 +566,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `develop-fe` — prove scam path on `/`; client Pause; no extra routes |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | VerifiedGuideBadge; SafetyBar Pause; large-type verdict; tutor step deferred |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T21:18:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `c9686f6` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | S8 synced; Last synced commit `c9686f6` |
