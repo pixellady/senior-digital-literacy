@@ -5,6 +5,7 @@ import { HistorySection } from "@/components/HistorySection";
 import { InputsSection } from "@/components/InputsSection";
 import { ResultsSection } from "@/components/ResultsSection";
 import { RunSection } from "@/components/RunSection";
+import { SafetyBar } from "@/components/SafetyBar";
 import { useCriticalResearchRun } from "@/lib/hooks/useCriticalResearchRun";
 
 export function CriticalResearchWorkflow() {
@@ -20,6 +21,11 @@ export function CriticalResearchWorkflow() {
       </a>
 
       <CrewStatusBanner phase={workflow.phase} lastUpdated={workflow.lastUpdated} />
+      <SafetyBar
+        paused={workflow.paused}
+        onPause={workflow.pause}
+        onResume={workflow.resume}
+      />
 
       <div
         id="workflow-main"
@@ -56,6 +62,7 @@ export function CriticalResearchWorkflow() {
               input={workflow.input}
               errorMessage={workflow.errorMessage}
               retryable={workflow.retryable}
+              paused={workflow.paused}
               onReset={workflow.reset}
               onRetry={workflow.retry}
             />
@@ -67,8 +74,9 @@ export function CriticalResearchWorkflow() {
 
         <footer className="border-t-2 border-slate-300 pt-4 text-base text-slate-700">
           <p>
-            Future work (not working yet): Pause, cancel, retry-diff, Extra
-            Guidance, Learn a skill, account signup, and progress for caregivers.
+            Future work (not working yet): Extra Guidance, Learn a skill,
+            account signup, and progress for caregivers. Extra routes wait until
+            this scam check talks to Flow.
           </p>
         </footer>
       </div>

@@ -27,7 +27,7 @@ export function HistorySection({ entries }: HistorySectionProps) {
         <ol className="mt-4 space-y-4">
           {entries.map((entry, index) => (
             <li
-              key={`${entry.runId}-${entry.completedAt}-${index}`}
+              key={`${entry.sessionId}-${entry.completedAt}-${index}`}
               className="rounded-lg border border-slate-700 p-4"
             >
               <p className="text-base text-slate-700">

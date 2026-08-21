@@ -2,9 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { CREW_ERROR_DETAIL } from "@/lib/copy/crewStatus";
+import { selectStubFixturePath } from "@/lib/fixtures/chatFixtures";
 import { canReset, transition } from "@/lib/fsm/runFsm";
-import { getRunStatus, startRun } from "@/lib/services/runService";
-import type { HistoryEntry, RunInput, RunPhase, RunResult } from "@/lib/types/run";
+import { sendChat, toChatRequest } from "@/lib/services/chatService";
+import type { ChatResponse } from "@/lib/types/chat";
+import type { HistoryEntry, RunInput, RunPhase } from "@/lib/types/run";
 import { previewMessage, validateRunInput } from "@/lib/validation/runInput";
 
 const EMPTY_INPUT: RunInput = {
@@ -16,10 +18,12 @@ export function useCriticalResearchRun() {
   const [phase, setPhase] = useState<RunPhase>("idle");
   const [lastUpdated, setLastUpdated] = useState(() => new Date());
   const [input, setInput] = useState<RunInput>(EMPTY_INPUT);
-  const [result, setResult] = useState<RunResult | null>(null);
+  const [result, setResult] = useState<ChatResponse | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [retryable, setRetryable] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const updateMessageText = useCallback((messageText: string) => {
     setInput((current) => ({ ...current, messageText }));
@@ -30,6 +34,7 @@ export function useCriticalResearchRun() {
   }, []);
 
   const run = useCallback(async () => {
+    if (paused) return;
     if (phase === "running" || phase === "done") return;
 
     const validationError = validateRunInput(input);
@@ -52,20 +57,18 @@ export function useCriticalResearchRun() {
     };
 
     try {
-      const { runId } = await startRun(payload);
-      const status = await getRunStatus(runId);
-      if (status.status !== "done" || !status.result) {
-        throw new Error(CREW_ERROR_DETAIL);
-      }
-
-      const completed = status.result;
-      setResult(completed);
+      const response = await sendChat(
+        toChatRequest(payload, sessionId),
+        selectStubFixturePath(payload.activeScamNow),
+      );
+      setResult(response);
+      setSessionId(response.session_id);
       setHistory((previous) => [
         {
-          runId,
+          sessionId: response.session_id,
           completedAt: new Date().toISOString(),
           inputPreview: previewMessage(payload.messageText),
-          riskLevel: completed.riskLevel,
+          riskLevel: response.content.risk_level,
           activeScamNow: payload.activeScamNow,
         },
         ...previous,
@@ -78,22 +81,34 @@ export function useCriticalResearchRun() {
       setPhase((current) => transition(current, "RESET"));
       setLastUpdated(new Date());
     }
-  }, [input, phase]);
+  }, [input, paused, phase, sessionId]);
 
   const reset = useCallback(() => {
     if (!canReset(phase)) return;
     setPhase((current) => transition(current, "RESET"));
     setResult(null);
+    setSessionId(null);
     setErrorMessage(null);
     setRetryable(false);
+    setPaused(false);
     setInput(EMPTY_INPUT);
     setLastUpdated(new Date());
   }, [phase]);
 
   const retry = useCallback(() => {
-    if (!retryable) return;
+    if (paused || !retryable) return;
     void run();
-  }, [retryable, run]);
+  }, [paused, retryable, run]);
+
+  const pause = useCallback(() => {
+    setPaused(true);
+    setLastUpdated(new Date());
+  }, []);
+
+  const resume = useCallback(() => {
+    setPaused(false);
+    setLastUpdated(new Date());
+  }, []);
 
   return {
     phase,
@@ -103,10 +118,13 @@ export function useCriticalResearchRun() {
     history,
     errorMessage,
     retryable,
+    paused,
     updateMessageText,
     updateActiveScamNow,
     run,
     reset,
     retry,
+    pause,
+    resume,
   };
 }

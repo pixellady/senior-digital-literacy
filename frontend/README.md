@@ -16,4 +16,4 @@ npm run dev
 
 Open `http://localhost:3000`. There is one route: `/`.
 
-`startRun` and `getRunStatus` are in-memory stubs. Do not point this client at a live API in the frontend epic.
+`sendChat` is an in-memory stub for SAD `POST /api/v1/chat`. It returns named fixtures (Path A gift-card `likely_scam`, or Path B happening-now `critical` + Priority Mode). Do not point this client at a live API in the frontend epic.

@@ -1,14 +1,18 @@
+import { AI_DISCLOSURE_COPY, modeLabel } from "@/lib/copy/chatCopy";
 import { crewStatusLabel } from "@/lib/copy/crewStatus";
 import { riskHeading } from "@/lib/copy/riskCopy";
-import type { RunPhase, RunResult } from "@/lib/types/run";
+import { VerifiedGuideBadge } from "@/components/VerifiedGuideBadge";
+import type { ChatResponse } from "@/lib/types/chat";
+import type { RunPhase } from "@/lib/types/run";
 
 type ResultsSectionProps = {
   phase: RunPhase;
-  result: RunResult | null;
+  result: ChatResponse | null;
 };
 
 export function ResultsSection({ phase, result }: ResultsSectionProps) {
-  const visible = phase === "done" && result;
+  const showResult = phase === "done" && result !== null;
+  const links = result?.content.resource_links ?? [];
 
   return (
     <section
@@ -19,36 +23,38 @@ export function ResultsSection({ phase, result }: ResultsSectionProps) {
         Results
       </h2>
 
-      {!visible ? (
-        <p className="mt-4 text-lg text-slate-800">
+      {!showResult || !result ? (
+        <p className="mt-4 text-xl text-slate-800">
           Results will appear here when {crewStatusLabel("done")}.
         </p>
       ) : (
         <div className="mt-4 space-y-4">
-          <p className="text-lg font-semibold text-slate-800">
+          <p className="text-xl font-semibold text-slate-800">
             {crewStatusLabel("done")}
           </p>
-          <p className="text-xl font-semibold text-slate-900">
-            {riskHeading(result.riskLevel)}
+          <p className="text-xl font-medium text-slate-900">
+            {result.agent_display_name}
           </p>
-          <p className="text-lg text-slate-900">{result.summary}</p>
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900">
-              Suggested next steps
-            </h3>
-            <ul className="mt-2 list-disc space-y-2 pl-6 text-lg text-slate-900">
-              {result.recommendedActions.map((action) => (
-                <li key={action}>{action}</li>
-              ))}
-            </ul>
-          </div>
-          {result.resourceLinks.length > 0 ? (
+          <VerifiedGuideBadge visible={result.content.verified_guide} />
+          <p className="text-4xl font-bold leading-tight text-slate-950">
+            {riskHeading(result.content.risk_level)}
+          </p>
+          <p className="text-xl text-slate-900">{modeLabel(result.mode)}</p>
+          {result.ai_disclosure ? (
+            <p role="status" className="text-xl text-slate-900">
+              {AI_DISCLOSURE_COPY}
+            </p>
+          ) : null}
+          <p className="text-xl leading-relaxed text-slate-900">
+            {result.content.text}
+          </p>
+          {links.length > 0 ? (
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">
+              <h3 className="text-xl font-semibold text-slate-900">
                 Official resources
               </h3>
-              <ul className="mt-2 space-y-2 text-lg">
-                {result.resourceLinks.map((link) => (
+              <ul className="mt-2 space-y-2 text-xl">
+                {links.map((link) => (
                   <li key={link.url}>
                     <a
                       href={link.url}

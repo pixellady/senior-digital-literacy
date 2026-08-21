@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented a Next.js App Router (TypeScript + Tailwind) app at `frontend/` with **one route** (`/`). Form + results workflow (Inputs, Run, Results, History), FSM **idle → running → done**, controls **Run** and **Reset**, stub `startRun` / `getRunStatus` with **fixed mock payloads** (no streaming, tools, or costs). Stub errors return to idle with an inline **Retry**.
+Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path on that route: paste → `explicit_path: "scam"` → Scam Detector fixture + RAG `verified_guide` → large-type verdict. Client **Pause** is always visible. No `/onboarding`, `/learn`, or `/caregiver`. Tutor step not added yet (waits for live Flow).
 
 No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 
@@ -21,6 +21,11 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 7. Added sticky Crew status banner (pills + last updated) and canonical `Crew:` phrasing.
 8. Stubbed backend with fixed mocks; Run/Reset only; three-state FSM; Retry on stub error; skip link + semantic headings.
 9. Spec-to-impl pass: Contracts section; Spec Sync item/status/note; `CrewStatusBanner.phase`; History **Happening now**.
+10. Aligned stub envelope to SAD §4: `toChatRequest` / `sendChat`; Results read `content.risk_level`, `content.text`, `content.resource_links`, `mode`, `ai_disclosure`.
+11. Pasted SAD §4 JSON + TypeScript into spec Contracts; `ChatRequest` is the full envelope; poller allowed later only if mapped 1:1.
+12. Path-honest fixtures: Path A gift-card `likely_scam`; Path B `activeScamNow` → `critical` + Priority disclosure. No client keyword rules.
+13. Softened ICP copy then restored original `Crew:` labels and title per operator.
+14. Held route map: proved scam path on `/` (large-type verdict, Verified guide, Scam checker). Client Pause. Tutor step deferred until Flow.
 
 ## Application map
 
@@ -29,10 +34,13 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 | `frontend/app/page.tsx` | Single route `/` |
 | `frontend/components/CriticalResearchWorkflow.tsx` | Compose banner + Inputs / Run / Results / History |
 | `frontend/components/CrewStatusBanner.tsx` | Sticky `Crew:` banner, pill, last updated |
+| `frontend/components/SafetyBar.tsx` | Always-visible Pause / Resume (client, US-009) |
+| `frontend/components/VerifiedGuideBadge.tsx` | RAG trust indicator when `verified_guide` |
 | `frontend/lib/copy/crewStatus.ts` | Canonical status labels and inline copy |
 | `frontend/lib/fsm/runFsm.ts` | `idle` \| `running` \| `done` |
-| `frontend/lib/fixtures/runFixtures.ts` | Fixed `STUB_START_PAYLOAD` / `STUB_RESULT_PAYLOAD` |
-| `frontend/lib/services/runService.ts` | Stub `startRun`, `getRunStatus` |
+| `frontend/lib/types/chat.ts` | SAD `ChatRequest` / `ChatResponse` / error envelope |
+| `frontend/lib/fixtures/chatFixtures.ts` | Path A `likely_scam` / Path B `critical`+Priority named fixtures |
+| `frontend/lib/services/chatService.ts` | Stub `sendChat` (`POST /api/v1/chat`, no fetch) |
 | `frontend/lib/hooks/useCriticalResearchRun.ts` | Client orchestration |
 
 ## UI notes (SAD / PRD)
@@ -40,18 +48,21 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 - Calm “Crew: running. Working on this…” loading copy; non-streaming wait (AD-5).
 - Sticky Crew status banner: `Crew: idle|running|done`, gray/blue/green pills, Last updated (seconds).
 - Same `Crew: …` phrase in banner, Run, and Results.
-- Controls: **Run** and **Reset** only. Pause, cancel, retry-diff, Extra Guidance deferred.
+- Controls: **Run**, **Reset**, **Pause**. Pause is client-side and does not cancel an in-flight stub.
+- Results proof: **Scam checker** + **Verified guide** + `text-4xl` verdict.
 - Stub errors: inline message + **Retry** (same inputs); FSM stays three states.
 - Basic a11y: skip link, h1/h2, native keyboard/focus. Advanced a11y deferred.
 - No modals (`prefer_modals: false`).
 - Body ≥16px (18px root); primary controls `min-h-11` (44px).
 - Light high-contrast palette (no dark-mode inversion in this slice).
 - Shame-free copy; no blame on stub failure.
+- Stub envelope is SAD §4: one `sendChat` with full `ChatRequest`. Stub-only `stubPath` selects Path A (`likely_scam`, gift-card) or Path B (`critical`, `mode: priority`, `ai_disclosure: true`) from `activeScamNow`. Message text is never scored.
 
 ## Future Work placeholders (visible, non-functional)
 
-- Learn a skill, Pause / cancel / retry-diff, Extra Guidance, signup, caregiver progress (footer only).
-- SAD routes `/onboarding`, `/learn`, `/scam`, `/progress`, `/caregiver`, `/settings` — not created (operator: single route).
+- Extra Guidance, Learn a skill, signup, caregiver progress (footer only).
+- SAD routes `/onboarding`, `/learn`, `/scam`, `/progress`, `/caregiver`, `/settings` — **not created**. Do not add them until this scam path talks to Flow.
+- One Tutor step — next after Integration wires `POST /api/v1/chat` to CrewAI Flow.
 
 ## How to run
 
@@ -86,10 +97,10 @@ After **every commit** that changes this UI or the spec, update the checklist in
 
 ## Open Questions
 
-1. Expand to full SAD route map in a later FE epic, or grow `/` in place?
-2. Keep `startRun`/`getRunStatus` as the Integration anti-corruption layer?
-3. Pause / cancel / retry-diff deferred until later (operator).
-4. `@project.mgr` still needs to produce `setup.md` and `.env.example`.
+1. Is 4000-character paste limit acceptable vs a SAD/security numeric cap still TBD?
+2. `@project.mgr` still needs to produce `setup.md` and `.env.example`.
+
+*Resolved:* Do not grow the SAD route map before live Flow on the scam path. Client Pause is on `/`. Tutor step is next after Integration, not extra routes now.
 
 ## Audit
 
@@ -138,3 +149,43 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `sync-docs` — Spec Sync S8 SHA `bd799b4` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend-funcional-spec.md S8 + Last synced commit |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T20:33:00Z |
+| Persona id | `frontend-eng` |
+| Action | `develop-fe` — SAD §4 ChatRequest/ChatResponse stub envelope |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `chat.ts`; `chatService.postChat`; Results nested content; spec Contracts |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T20:49:00Z |
+| Persona id | `frontend-eng` |
+| Action | `document-frontend` — SAD §4 JSON/TS in Contracts; `sendChat` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | spec Contracts verbatim SAD; `sendChat`; full `ChatRequest` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T20:53:00Z |
+| Persona id | `frontend-eng` |
+| Action | `develop-fe` — path-honest Path A/B fixtures |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `STUB_PATH_A_GIFT_CARD_BAIL`; `STUB_PATH_B_ACTIVE_SCAM`; `selectStubFixturePath` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T21:05:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — ICP status copy; on-page title Check a message or call |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | Ready / Checking this… / Check finished; h1; `data-phase` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T21:14:00Z |
+| Persona id | `frontend-eng` |
+| Action | `develop-fe` — prove scam path on `/`; no extra routes |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | VerifiedGuideBadge; SafetyBar; large-type verdict; Pause |

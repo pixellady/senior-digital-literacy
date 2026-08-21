@@ -10,6 +10,7 @@ type RunSectionProps = {
   input: RunInput;
   errorMessage: string | null;
   retryable: boolean;
+  paused: boolean;
   onReset: () => void;
   onRetry: () => void;
 };
@@ -19,11 +20,13 @@ export function RunSection({
   input,
   errorMessage,
   retryable,
+  paused,
   onReset,
   onRetry,
 }: RunSectionProps) {
   const runEnabled =
-    canRun(phase, input.messageText) || Boolean(retryable && phase === "idle");
+    !paused &&
+    (canRun(phase, input.messageText) || Boolean(retryable && phase === "idle"));
   const resetEnabled = canReset(phase);
 
   return (
