@@ -130,3 +130,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `document-frontend` — spec-to-impl pass; Contracts; Spec Sync notes |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | spec Contracts + S1–S12; banner `phase`; History “Happening now” |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T12:22:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `bd799b4` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend-funcional-spec.md S8 + Last synced commit |

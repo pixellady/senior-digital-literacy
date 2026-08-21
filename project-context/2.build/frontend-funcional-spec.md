@@ -258,14 +258,14 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S5 | Results render `RunResult`; `extraGuidanceOffered` is not a control | synced | Unchanged — Extra Guidance button stays omitted. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Copy aligned: marker is **Happening now**; list key uses `runId-completedAt-index` because stub `runId` is fixed. |
 | S7 | Controls Run and Reset only; Retry only when `retryable`; no pause/cancel/retry-diff | synced | Unchanged — `RunSection` props `onReset` / `onRetry`. |
-| S8 | `frontend.md` Audit records this FE change | pending | FE tree is still uncommitted (`?? frontend/`); fill SHA on first workflow commit. |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded first workflow commit `bd799b4` (frontend slice + spec). |
 | S9 | SAD extra routes remain Future Work, not implemented | synced | Unchanged — footer still names deferred Pause/cancel/Extra Guidance. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Banner prop renamed `status` → `phase` so it matches FSM/`RunPhase`. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | Unchanged — advanced a11y still deferred. |
 | S12 | Contracts match `lib/types/run.ts`, stub fixtures, and component props | synced | Added Contracts; `runId` documented as stub string not UUID; `CrewStatusBanner.phase` documented. |
 
-**Last synced commit:** _(none — workflow files are untracked; set SHA after first FE commit)_  
-**Last synced at:** 2026-08-21T12:19:00Z (spec-to-impl pass: Contracts + Spec Sync notes)
+**Last synced commit:** `bd799b4`  
+**Last synced at:** 2026-08-21T12:22:00Z (set S8 SHA after first FE commit)
 
 ---
 
@@ -342,3 +342,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `document-frontend` — spec-to-impl pass; Contracts; Spec Sync item/status/note |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | Contracts section; S1–S12 notes; `CrewStatusBanner.phase`; History “Happening now” |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-21T12:22:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `bd799b4` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | S8 synced; Last synced commit `bd799b4` |
