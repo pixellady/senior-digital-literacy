@@ -1,0 +1,29 @@
+[project]
+name = "senior_digital_literacy"
+version = "0.1.0"
+description = "senior_digital_literacy using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[anthropic,tools]>=1.15.17,<2.0.0",
+    "fastapi>=0.141.1",
+]
+
+[project.scripts]
+senior_digital_literacy = "senior_digital_literacy.main:kickoff"
+kickoff = "senior_digital_literacy.main:kickoff"
+run_crew = "senior_digital_literacy.main:kickoff"
+plot = "senior_digital_literacy.main:plot"
+train = "senior_digital_literacy.main:train"
+replay = "senior_digital_literacy.main:replay"
+test = "senior_digital_literacy.main:test"
+run_with_trigger = "senior_digital_literacy.main:run_with_trigger"
+serve = "senior_digital_literacy.api:serve"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "flow"
+project_id = "43bf7993-eb59-419f-8301-8f2d5e96c09e"

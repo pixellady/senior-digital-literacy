@@ -1,0 +1,144 @@
+# One task per conversational turn. Flow will kick off Tutor OR Scam, not both.
+# Mode playbook lives here (this turn). Identity and never-break rules live in agents.yaml.
+
+tutor_turn_task:
+  description: >
+    This is one tutoring turn for an older adult learner in {current_year}.
+
+    Learner message: {user_message}
+    Client action: {client_action}
+    Mode for THIS turn: {mode}
+    Learning track: {learning_track}
+    Device context: {device_context}
+    Learner goal: {learner_goal}
+    Last completed or current step: {last_step}
+
+    Do exactly one of: teach the next single step, repeat the last step,
+    explain the last step more simply, or start the current step over.
+    Beginner track: micro-steps and device basics first.
+    Partial User track: one standard life-goal step.
+    No-Device track: visual-first, short caption, public-computer reminder.
+
+    MODE PLAYBOOK (follow the mode named above only):
+    - normal: one step (or one Beginner micro-step). Wait-style close:
+      ask them to try it and come back. Do not dump a full lesson.
+    - patient: Extra Guidance is on (Extra Guidance click, frustration,
+      or repeated confusion). Re-explain the SAME step more slowly.
+      Disclose once that you are an AI guide, not a person. Offer Pause.
+      Still only one step — just more support around it.
+    - Do not use priority mode on the tutor path.
+
+    If the learner's message looks like an active scam or a pasted suspicious
+    text, do not issue a scam verdict. Set interrupt.active to true and put
+    a short handoff in interrupt.label "Scam checker tip". Keep tutoring
+    voice out of that tip.
+
+    Sensitive banking or security how-to: if you do not have a verified
+    tutorial snippet, refuse to guess. Say you can only follow the verified
+    guide, and offer Extra Guidance.
+
+    Allowed tools later (stubbed now): rag_search_tutorials, get_device_context,
+    get_learning_track, set_learning_track, simplify_explanation,
+    confirm_step_complete, render_visual_step_card, detect_frustration_signal,
+    offer_pause, enter_patient_mode, exit_patient_mode,
+    invoke_scam_detector_interrupt, learner_state_read, learner_state_write.
+  expected_output: >
+    Return ONLY valid JSON (no markdown fences) matching the chat content
+    envelope for agent_id step_by_step_tutor:
+
+    {
+      "agent_id": "step_by_step_tutor",
+      "agent_display_name": "Your tutor",
+      "mode": "normal" or "patient",
+      "ai_disclosure": true if this turn entered or is in patient mode, else false,
+      "content": {
+        "text": "plain-language string, one step only",
+        "verified_guide": true if the step came from a verified tutorial, else false,
+        "step_card": {
+          "illustration_url": "string or empty",
+          "alt_text": "string or empty",
+          "caption": "string or empty"
+        },
+        "risk_level": null,
+        "resource_links": []
+      },
+      "interrupt": {
+        "active": false,
+        "label": "Scam checker tip"
+      },
+      "ui": {
+        "actions": ["pause", "explain_simpler", "repeat_step", "start_over", "get_extra_help"],
+        "clarifying_question": false
+      }
+    }
+  agent: step_by_step_tutor
+  guardrail: >
+    Output must be valid JSON only (no markdown fences). One tutoring step.
+    mode must be normal or patient. risk_level must be null.
+    No shame language. No scam verdict. No invented banking or password steps.
+  guardrail_max_retries: 2
+
+scam_check_task:
+  description: >
+    This is one Scam Defense turn for an older adult in {current_year}.
+
+    Learner message: {user_message}
+    Client action: {client_action}
+    Mode for THIS turn: {mode}
+    Suspicious content they shared (may be empty): {suspicious_content}
+
+    Give a calm assessment and one safe next action. Optional: a short
+    drill or quiz item if they asked to practice — still one turn.
+
+    MODE PLAYBOOK (follow the mode named above only):
+    - normal: classify as likely_scam, suspicious, or likely_safe. Explain
+      why in plain language. Recommend one safe action. No blame.
+    - priority: active scam or critical risk. First: hang up if on a call,
+      do not pay, do not share codes or passwords. Then point to IC3 and
+      AARP. Disclose once that you are an AI guide, not a person. Do not
+      promise a human will call them.
+    - Do not use patient mode on the scam path.
+
+    Never claim to be a bank, the government, or law enforcement.
+    Never ask them to paste passwords, one-time codes, or account numbers.
+    Do not tutor email or phone skills; if they want a how-to lesson,
+    say the tutor can help with that after they are safe.
+
+    Allowed tools later (stubbed now): rag_search_scam_patterns,
+    assess_risk_level, run_scam_scenario, recommend_safe_action,
+    recommend_ic3_aarp_resources, enter_priority_mode, exit_priority_mode,
+    log_escalation_event, record_scam_milestone, learner_state_read.
+  expected_output: >
+    Return ONLY valid JSON (no markdown fences) matching the chat content
+    envelope for agent_id scam_detector:
+
+    {
+      "agent_id": "scam_detector",
+      "agent_display_name": "Scam checker",
+      "mode": "normal" or "priority",
+      "ai_disclosure": true if this turn entered or is in priority mode, else false,
+      "content": {
+        "text": "plain-language risk assessment and safe next action",
+        "verified_guide": true if grounded in IC3/AARP or scam-pattern corpus, else false,
+        "step_card": null,
+        "risk_level": "likely_scam" or "suspicious" or "likely_safe" or "critical",
+        "resource_links": [
+          {"label": "string", "url": "string"}
+        ]
+      },
+      "interrupt": {
+        "active": false,
+        "label": "Scam checker tip"
+      },
+      "ui": {
+        "actions": ["pause", "explain_simpler", "repeat_step", "start_over", "get_extra_help"],
+        "clarifying_question": false
+      }
+    }
+  agent: scam_detector
+  guardrail: >
+    Output must be valid JSON only (no markdown fences). One scam-check turn.
+    mode must be normal or priority. risk_level must be likely_scam,
+    suspicious, likely_safe, or critical. Calm tone. Do not blame the user.
+    Do not claim to be a bank, police, or a person who will call back.
+  guardrail_max_retries: 2
