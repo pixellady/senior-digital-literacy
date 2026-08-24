@@ -3,7 +3,7 @@
  * project-context/2.build/frontend-funcional-spec.md Contracts.
  * Endpoint: POST /api/v1/chat (non-streaming, AD-5).
  * Do not invent a second request/response shape.
- * This epic uses typed fixtures only — no live fetch.
+ * Live fetch is opt-in via NEXT_PUBLIC_API_BASE_URL; otherwise fixtures.
  */
 
 export const CHAT_ENDPOINT = "/api/v1/chat";

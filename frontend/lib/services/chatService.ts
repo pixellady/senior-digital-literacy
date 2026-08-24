@@ -3,7 +3,7 @@ import {
   STUB_SESSION_ID,
   type StubFixturePath,
 } from "@/lib/fixtures/chatFixtures";
-import type { ChatRequest, ChatResponse } from "@/lib/types/chat";
+import { CHAT_ENDPOINT, type ChatRequest, type ChatResponse } from "@/lib/types/chat";
 import type { RunInput } from "@/lib/types/run";
 import { MESSAGE_MAX_LENGTH } from "@/lib/validation/runInput";
 
@@ -41,8 +41,9 @@ function validateChatRequest(request: ChatRequest): string | null {
 }
 
 /**
- * Stub for one non-streaming POST /api/v1/chat (SAD §4, AD-5).
- * Returns a named fixture ChatResponse. Never inspects request.message
+ * One non-streaming POST /api/v1/chat (SAD §4, AD-5).
+ * When NEXT_PUBLIC_API_BASE_URL is set, fetch the live Flow API.
+ * Otherwise return a named fixture. Never inspects request.message
  * for keywords. stubPath is stub-only (not a ChatRequest field).
  */
 export async function sendChat(
@@ -52,6 +53,20 @@ export async function sendChat(
   const validationError = validateChatRequest(request);
   if (validationError) {
     throw new Error(validationError);
+  }
+
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (apiBase) {
+    const response = await fetch(`${apiBase.replace(/\/$/, "")}${CHAT_ENDPOINT}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    const payload: unknown = await response.json();
+    if (!response.ok) {
+      throw new Error("The helper could not finish this check. Please try again.");
+    }
+    return payload as ChatResponse;
   }
 
   const fixture = STUB_FIXTURES[stubPath];
