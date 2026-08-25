@@ -1,0 +1,59 @@
+{
+  "catalog_links": [
+    {
+      "label": "FTC: How to avoid a gift card scam",
+      "url": "https://consumer.ftc.gov/articles/how-avoid-gift-card-scam"
+    },
+    {
+      "label": "AARP Fraud Watch",
+      "url": "https://www.aarp.org/money/scams-fraud/"
+    },
+    {
+      "label": "IC3 (FBI Internet Crime Complaint Center)",
+      "url": "https://www.ic3.gov/"
+    }
+  ],
+  "patterns": [
+    {
+      "id": "gift_card_jail",
+      "title": "Grandparent gift-card bail",
+      "risk_level": "likely_scam",
+      "sample_text": "A text says my grandson is in jail and I must buy Apple gift cards and send the codes to keep him from staying overnight.",
+      "markers": [
+        "gift card",
+        "gift cards",
+        "apple gift",
+        "itunes",
+        "jail",
+        "bail",
+        "grandson",
+        "granddaughter",
+        "grandchild"
+      ],
+      "guidance": "This matches a gift-card bail pattern we keep in our own library. Real jails and police do not ask families to buy gift cards. Do not buy cards, do not read numbers off a card, and do not send photos of receipts. Hang up or stop the text. Call your family on a number you already have.",
+      "resource_link_ids": [
+        "https://consumer.ftc.gov/articles/how-avoid-gift-card-scam",
+        "https://www.aarp.org/money/scams-fraud/"
+      ]
+    },
+    {
+      "id": "account_closed_maybe",
+      "title": "Account closed unless you tap a link",
+      "risk_level": "suspicious",
+      "sample_text": "Your bank account will be closed today unless you tap this link and confirm your password.",
+      "markers": [
+        "account will be closed",
+        "verify your account",
+        "confirm your password",
+        "tap this link",
+        "click this link",
+        "unusual sign-in"
+      ],
+      "guidance": "This looks like a maybe-scam from our library: a text that rushes you to tap a link to keep an account open. Banks and real companies do not usually ask you to confirm a password from a text link. Do not tap the link. Do not type a password. Use a number or app you already trust, or wait and ask someone you know.",
+      "resource_link_ids": [
+        "https://www.ic3.gov/",
+        "https://www.aarp.org/money/scams-fraud/"
+      ]
+    }
+  ]
+}

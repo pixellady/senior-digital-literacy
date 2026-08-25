@@ -37,14 +37,10 @@ tutor_turn_task:
     tutorial snippet, refuse to guess. Say you can only follow the verified
     guide, and offer Extra Guidance.
 
-    Allowed tools later (stubbed now): rag_search_tutorials, get_device_context,
-    get_learning_track, set_learning_track, simplify_explanation,
-    confirm_step_complete, render_visual_step_card, detect_frustration_signal,
-    offer_pause, enter_patient_mode, exit_patient_mode,
-    invoke_scam_detector_interrupt, learner_state_read, learner_state_write.
+    Tutorial RAG is not wired. Set content.verified_guide to false.
+    Fill the named TutorTurnForm: risk_level null, resource_links [].
   expected_output: >
-    Return ONLY valid JSON (no markdown fences) matching the chat content
-    envelope for agent_id step_by_step_tutor:
+    Fill the named form TutorTurnForm (Pydantic). JSON fields:
 
     {
       "agent_id": "step_by_step_tutor",
@@ -53,7 +49,7 @@ tutor_turn_task:
       "ai_disclosure": true if this turn entered or is in patient mode, else false,
       "content": {
         "text": "plain-language string, one step only",
-        "verified_guide": true if the step came from a verified tutorial, else false,
+        "verified_guide": false,
         "step_card": {
           "illustration_url": "string or empty",
           "alt_text": "string or empty",
@@ -73,7 +69,7 @@ tutor_turn_task:
     }
   agent: step_by_step_tutor
   guardrail: >
-    Output must be valid JSON only (no markdown fences). One tutoring step.
+    Must fill named form TutorTurnForm. Valid JSON. One tutoring step.
     mode must be normal or patient. risk_level must be null.
     No shame language. No scam verdict. No invented banking or password steps.
   guardrail_max_retries: 2
@@ -104,13 +100,14 @@ scam_check_task:
     Do not tutor email or phone skills; if they want a how-to lesson,
     say the tutor can help with that after they are safe.
 
-    Allowed tools later (stubbed now): rag_search_scam_patterns,
-    assess_risk_level, run_scam_scenario, recommend_safe_action,
-    recommend_ic3_aarp_resources, enter_priority_mode, exit_priority_mode,
-    log_escalation_event, record_scam_milestone, learner_state_read.
+    You have exactly one tool: search_scam_library. Call it with the
+    learner message before you answer. Use only that library. Do not
+    search the open web. If the tool matches, use its risk_level,
+    guidance, and resource_links; set verified_guide true. If it does
+    not match, set verified_guide false, pick suspicious or likely_safe,
+    and use only catalog links the tool returned (often none).
   expected_output: >
-    Return ONLY valid JSON (no markdown fences) matching the chat content
-    envelope for agent_id scam_detector:
+    Fill the named form ScamTurnForm (Pydantic). JSON fields:
 
     {
       "agent_id": "scam_detector",
@@ -119,7 +116,7 @@ scam_check_task:
       "ai_disclosure": true if this turn entered or is in priority mode, else false,
       "content": {
         "text": "plain-language risk assessment and safe next action",
-        "verified_guide": true if grounded in IC3/AARP or scam-pattern corpus, else false,
+        "verified_guide": true only if search_scam_library matched, else false,
         "step_card": null,
         "risk_level": "likely_scam" or "suspicious" or "likely_safe" or "critical",
         "resource_links": [
@@ -137,7 +134,7 @@ scam_check_task:
     }
   agent: scam_detector
   guardrail: >
-    Output must be valid JSON only (no markdown fences). One scam-check turn.
+    Must fill named form ScamTurnForm. Valid JSON. One scam-check turn.
     mode must be normal or priority. risk_level must be likely_scam,
     suspicious, likely_safe, or critical. Calm tone. Do not blame the user.
     Do not claim to be a bank, police, or a person who will call back.

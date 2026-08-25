@@ -11,6 +11,10 @@ from pydantic import BaseModel, Field
 from crewai.flow import Flow, listen, or_, router, start
 
 from senior_digital_literacy.crew import SeniorDigitalLiteracy
+from senior_digital_literacy.scam_library import (
+    filter_links_to_catalog,
+    match_scam_library,
+)
 
 # SAD AD-8: explicit UI path wins, then safety override, else TUTOR.
 _SCAM_SAFETY_MARKERS = (
@@ -43,6 +47,7 @@ class ChatTurnState(BaseModel):
     agent_id: str = ""
     agent_display_name: str = ""
     agent_raw: str = ""
+    library_pattern_id: str | None = None
     final_output: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -83,15 +88,17 @@ class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
         self.state.agent_id = "step_by_step_tutor"
         self.state.agent_display_name = "Your tutor"
         result = SeniorDigitalLiteracy().tutor_crew().kickoff(inputs=_crew_inputs(self.state))
-        self.state.agent_raw = result.raw
+        self.state.agent_raw = _result_payload(result)
         return "tutor_done"
 
     @listen("SCAM")
     def run_scam(self) -> str:
         self.state.agent_id = "scam_detector"
         self.state.agent_display_name = "Scam checker"
+        hit = match_scam_library(self.state.user_message)
+        self.state.library_pattern_id = hit.pattern_id if hit else None
         result = SeniorDigitalLiteracy().scam_crew().kickoff(inputs=_crew_inputs(self.state))
-        self.state.agent_raw = result.raw
+        self.state.agent_raw = _result_payload(result)
         return "scam_done"
 
     @listen(or_(run_tutor, run_scam))
@@ -106,6 +113,14 @@ class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
                 "risk_level": None,
                 "resource_links": [],
             }
+
+        if self.state.route_intent == "SCAM":
+            content = _ground_scam_content(content, self.state.user_message)
+        else:
+            content["verified_guide"] = False
+            content["risk_level"] = None
+            content["resource_links"] = []
+
         interrupt = parsed.get("interrupt") if isinstance(parsed.get("interrupt"), dict) else {
             "active": False,
             "label": "Scam checker tip",
@@ -144,6 +159,36 @@ class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
             },
         }
         return self.state.final_output
+
+
+def _result_payload(result: Any) -> str:
+    pydantic_out = getattr(result, "pydantic", None)
+    if pydantic_out is not None:
+        return json.dumps(pydantic_out.model_dump())
+    json_out = getattr(result, "json_dict", None)
+    if isinstance(json_out, dict):
+        return json.dumps(json_out)
+    return getattr(result, "raw", "") or ""
+
+
+def _ground_scam_content(content: dict[str, Any], message: str) -> dict[str, Any]:
+    """Badge and links come from the owned library, never the open web."""
+    hit = match_scam_library(message)
+    text = str(content.get("text") or "").strip()
+    if hit:
+        content["verified_guide"] = True
+        content["risk_level"] = hit.risk_level
+        content["resource_links"] = hit.resource_links
+        if not text:
+            content["text"] = hit.guidance
+        return content
+
+    content["verified_guide"] = False
+    risk = content.get("risk_level")
+    if risk not in {"likely_scam", "suspicious", "likely_safe", "critical"}:
+        content["risk_level"] = "suspicious"
+    content["resource_links"] = filter_links_to_catalog(content.get("resource_links"))
+    return content
 
 
 def _parse_agent_payload(raw: str) -> dict[str, Any]:

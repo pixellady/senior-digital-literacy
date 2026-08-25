@@ -18,9 +18,9 @@ Copy secrets into a gitignored `.env` in this folder. Required names:
 - `ANTHROPIC_API_KEY`
 - `MODEL` (Anthropic model id used by the agents)
 
-Optional: `SERPER_API_KEY`, `CORS_ORIGIN` (default `http://localhost:3000`), `PORT` (default `8000`).
+Optional: `CORS_ORIGIN` (default `http://localhost:3000`), `PORT` (default `8000`).
 
-Do not commit `.env`.
+Do not commit `.env`. Open-web search is off; `SERPER_API_KEY` is not used.
 
 ## Run the API
 
@@ -51,6 +51,8 @@ Plot (HTML, gitignored): `uv run plot` or `crewai flow plot`.
 | `src/senior_digital_literacy/crew.py` | `tutor_crew()` / `scam_crew()` |
 | `src/senior_digital_literacy/config/agents.yaml` | Tutor and Scam checker |
 | `src/senior_digital_literacy/config/tasks.yaml` | One task each, with guardrails |
-| `src/senior_digital_literacy/api.py` | FastAPI |
+| `src/senior_digital_literacy/schemas.py` | Named Tutor/Scam output forms |
+| `src/senior_digital_literacy/scam_library.py` | Local pattern match |
+| `knowledge/scam_library.json` | Owned gift-card + maybe-scam samples |
 
 Agents: `allow_delegation: false`. Crews: sequential, `memory=False`. See `project-context/2.build/backend.md`.

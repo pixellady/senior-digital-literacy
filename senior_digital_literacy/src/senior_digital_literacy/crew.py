@@ -1,9 +1,11 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from crewai_tools import SerperDevTool
 
-# Name contract (same rule as researcher / reporting_analyst in the CrewAI example):
+from senior_digital_literacy.schemas import ScamTurnForm, TutorTurnForm
+from senior_digital_literacy.tools.scam_library_tool import SearchScamLibraryTool
+
+# Name contract:
 #   @agent method name  ==  agents.yaml key  ==  tasks.yaml `agent:` value
 #   @task  method name  ==  tasks.yaml key
 # Role, goal, backstory, llm, max_iter, allow_delegation come from YAML via config=.
@@ -28,19 +30,21 @@ class SeniorDigitalLiteracy():
         return Agent(
             config=self.agents_config["scam_detector"],
             verbose=True,
-            tools=[SerperDevTool()],
+            tools=[SearchScamLibraryTool()],
         )
 
     @task
     def tutor_turn_task(self) -> Task:
         return Task(
             config=self.tasks_config["tutor_turn_task"],
+            output_pydantic=TutorTurnForm,
         )
 
     @task
     def scam_check_task(self) -> Task:
         return Task(
             config=self.tasks_config["scam_check_task"],
+            output_pydantic=ScamTurnForm,
         )
 
     def tutor_crew(self) -> Crew:

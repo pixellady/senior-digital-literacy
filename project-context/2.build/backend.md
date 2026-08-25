@@ -1,14 +1,18 @@
 # Backend Build Log — Senior Digital Literacy
 
 **Persona:** `@backend.eng`  
-**Action:** `*develop-be` / `*define-agents` / `*implement-endpoint` / `*document-backend`  
-**Slice:** CrewAI Flow + FastAPI chat
+**Action:** `*develop-be` / `*define-agents` / `*document-backend`  
+**Slice:** CrewAI Flow + FastAPI chat; owned scam library; named output forms
 
 ## Status
 
-Implemented the MVP backend under `senior_digital_literacy/` as a CrewAI **Flow** (not a two-agent sequential crew). One HTTP turn: ingest → Intent Router → **Tutor or** Scam Detector → SAD chat envelope.
+Implemented the MVP backend under `senior_digital_literacy/` as a CrewAI **Flow**. One HTTP turn: ingest → Intent Router → **Tutor or** Scam Detector → SAD chat envelope.
 
-Live locally: `GET /health` and `POST /api/v1/chat`. A gift-card scam paste on the PWA returned a live Scam checker envelope (not the frontend fixture).
+**This increment (demo trust):**
+- Scam checker uses a **local pattern library** only (`knowledge/scam_library.json`). `SerperDevTool` / open-web search is **off**.
+- `content.verified_guide` is **true only** when Flow matches that library. Links and risk on a match come from the library, not the web.
+- Tutor and Scam tasks fill named Pydantic forms (`TutorTurnForm`, `ScamTurnForm`) via `Task.output_pydantic`.
+- Deleted unused CrewAI starter `tools/custom_tool.py` and `knowledge/user_preference.txt`. Gift-card safety markers in `flow.py` are unchanged. `activeScamNow` was **not** added.
 
 ## Runtime
 
@@ -24,23 +28,46 @@ Live locally: `GET /health` and `POST /api/v1/chat`. A gift-card scam paste on t
 
 | Path | Role |
 |------|------|
-| `src/senior_digital_literacy/flow.py` | `SeniorDigitalLiteracyFlow`: ingest, route, one crew, emit JSON |
-| `src/senior_digital_literacy/crew.py` | `tutor_crew()` / `scam_crew()`; YAML-backed agents and tasks |
+| `src/senior_digital_literacy/flow.py` | Ingest, route, one crew, emit JSON; library grounding; gift-card safety markers |
+| `src/senior_digital_literacy/crew.py` | `tutor_crew()` / `scam_crew()`; `output_pydantic` forms |
+| `src/senior_digital_literacy/schemas.py` | `TutorTurnForm`, `ScamTurnForm` (risk, text, links, verified_guide) |
+| `src/senior_digital_literacy/scam_library.py` | Load and match owned patterns |
+| `src/senior_digital_literacy/tools/scam_library_tool.py` | `search_scam_library` (no web) |
+| `knowledge/scam_library.json` | Gift-card/jail sample; maybe-scam sample; FTC/AARP/IC3 catalog |
 | `src/senior_digital_literacy/config/agents.yaml` | `step_by_step_tutor`, `scam_detector` |
-| `src/senior_digital_literacy/config/tasks.yaml` | `tutor_turn_task`, `scam_check_task` (playbooks + JSON guardrails) |
+| `src/senior_digital_literacy/config/tasks.yaml` | Playbooks; named-form expected_output |
 | `src/senior_digital_literacy/api.py` | `GET /health`, `POST /api/v1/chat` |
-| `src/senior_digital_literacy/main.py` | CLI Flow kickoff (`crewai run` / `kickoff`) |
+| `src/senior_digital_literacy/main.py` | CLI Flow kickoff |
 
 ## Agents (SAD §2)
 
-Intent Router is a **Flow `@router`**, not an agent. Progress is a stub object on the envelope, not an agent.
+Intent Router is a **Flow `@router`**, not an agent. Progress remains a stub object on the envelope.
 
 | Agent | UI name | Crew | Tools now |
 |-------|---------|------|-----------|
-| `step_by_step_tutor` | Your tutor | `tutor_crew` — one task | none (RAG later) |
-| `scam_detector` | Scam checker | `scam_crew` — one task | `SerperDevTool` |
+| `step_by_step_tutor` | Your tutor | `tutor_crew` — one task | none |
+| `scam_detector` | Scam checker | `scam_crew` — one task | `search_scam_library` only |
 
-`allow_delegation` stays **false**. Extra help is Patient/Priority Mode in task YAML, not CrewAI human-feedback or delegation. US-020 tutor→scam interrupt is not implemented.
+`allow_delegation` stays **false**. Extra help is Patient/Priority Mode in task YAML. US-020 interrupt is not implemented.
+
+## Owned scam library
+
+Two operator-owned samples (not live search):
+
+| Pattern id | Sample | `risk_level` | Links |
+|------------|--------|--------------|-------|
+| `gift_card_jail` | Grandson in jail / buy gift cards | `likely_scam` | FTC gift-card, AARP |
+| `account_closed_maybe` | Account closed unless you tap a link | `suspicious` | IC3, AARP |
+
+Flow `_ground_scam_content` **overwrites** `verified_guide`, matched `risk_level`, and `resource_links` from this file. Unmatched pastes: `verified_guide` false; any agent links filtered to the catalog allowlist.
+
+Gift-card **safety markers** in `_SCAM_SAFETY_MARKERS` (including `"gift card"`) still force SCAM route and Priority Mode. That is separate from the badge.
+
+## Named output forms
+
+`Task.output_pydantic` is `TutorTurnForm` / `ScamTurnForm`. Required screen fields: `content.risk_level`, `content.text`, `content.resource_links`, `content.verified_guide`. YAML `expected_output` is not the contract; the Pydantic class is.
+
+Tutor path: Flow forces `verified_guide` false until tutorial RAG exists.
 
 ## Intent Router (SAD AD-8, partial)
 
@@ -48,9 +75,7 @@ Intent Router is a **Flow `@router`**, not an agent. Progress is a stub object o
 2. Else safety override → `SCAM` (keyword markers and/or `suspicious_content`).
 3. Else `TUTOR`.
 
-Natural-language `classify_intent` with confidence 0.65 is **not** implemented. Cross-path interrupt (US-020) is **not** implemented.
-
-If the route is `SCAM` and safety override fires, Flow sets `mode` to `priority`. Gift-card wording matches a safety marker, so a gift-card paste often returns Priority even when the UI checkbox is off. `activeScamNow` is not a `ChatRequest` field.
+NL `classify_intent` and US-020 are **not** implemented. `activeScamNow` is **not** a request field (deferred).
 
 ## API
 
@@ -58,15 +83,11 @@ If the route is `SCAM` and safety override fires, Flow sets `mode` to `priority`
 
 **`POST /api/v1/chat`** — SAD ChatRequest in, ChatResponse-shaped dict out. Local/dev: no auth.
 
-Request fields: `session_id`, `message`, `explicit_path` (`tutor` \| `scam` \| omitted), `client_action`, `track_override`.
-
-Response includes `session_id`, `route_intent`, `agent_id`, `agent_display_name`, `mode`, `ai_disclosure`, `content` (text, risk_level, resource_links, …), `interrupt`, `ui`, plus **stubbed** `caps` and `progress_hint`.
-
-Not implemented (404 / not in this app): magic-link, `/me`, progress, caregiver, survey, print.
+Response still includes stubbed `caps` and `progress_hint` (zeros). Frontend should hide weekly limits until they are real (`@frontend.eng`).
 
 ## How to run
 
-Secrets live in `senior_digital_literacy/.env` (gitignored). Required names: `ANTHROPIC_API_KEY`, `MODEL`. Optional: `SERPER_API_KEY`, `CORS_ORIGIN`, `PORT`.
+Secrets live in `senior_digital_literacy/.env` (gitignored). Required names: `ANTHROPIC_API_KEY`, `MODEL`. Optional: `CORS_ORIGIN`, `PORT`. `SERPER_API_KEY` is unused.
 
 ```bash
 cd senior_digital_literacy
@@ -74,37 +95,39 @@ uv sync
 uv run uvicorn senior_digital_literacy.api:app --host 127.0.0.1 --port 8000
 ```
 
-PWA optional: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000` in `frontend/.env.local`. Without it, the frontend still uses named fixtures.
+Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000` in `frontend/.env.local`.
 
 ## Gaps (visible, not fake-complete)
 
-- RAG / `verified_guide` grounding is not wired; the model may still set the flag.
-- Caps and progress are zeros/false stubs.
-- Scaffold leftovers: `tools/custom_tool.py`, CLI train/replay/test, CrewAI `AGENTS.md`.
-- `setup.md` still missing.
-- Frontend live `fetch` in `chatService.ts` is a local Integration change; it is **not** in this backend commit.
+- Tutorial RAG still absent; tutor `verified_guide` is always false.
+- Caps and progress are still zeros/false stubs (do not show in the demo UI).
+- CrewAI `AGENTS.md` and CLI train/replay/test remain scaffold leftovers (ignored for the demo).
+- Haiku router vs Sonnet conversational agents — still deferred.
 
 ## Sources
 
 - `project-context/1.define/prd.md` v2.3 — agent defs, F1/F7
 - `project-context/1.define/sad.md` v1.0 §2, §4, AD-5, AD-8
-- User stories US-002, US-007, US-014, US-020
+- `project-context/2.build/setup.md` (catch-up)
+- User stories US-002, US-007, US-014, US-021
 - `.cursor/agents/backend-eng.md`
 - `.cursor/rules/adapter-crewai.mdc`
+- Operator 2026-08-25: owned library, named forms, no Serper, no `activeScamNow`
 
 ## Assumptions
 
-- `setup.md` missing; backend lives in `senior_digital_literacy/` via `crewai create crew --classic`, then Flow + FastAPI were added in-repo (no second `crewai create flow` folder).
 - `AAMAD_TARGET_RUNTIME` unset → `crewai`.
 - Local/dev API is unauthenticated; CORS locked to the Next origin by default.
-- Serper is bound on Scam Detector only; Tutor stays tool-free until RAG.
 - Patient/Priority playbooks live in tasks; backstory holds identity + hard limits only.
+- Catalog URLs (FTC, AARP, IC3) are curated in-repo, not fetched at runtime.
+- Integration live `fetch` already committed (`7c42dc1`); this increment does not change the PWA.
 
 ## Open Questions
 
-1. Should `activeScamNow` become a request field so Priority Mode is UI-driven rather than keyword-driven?
-2. When does Integration commit the PWA `fetch` and `integration.md`?
-3. Haiku for the router vs Sonnet for conversational agents — still deferred.
+1. Expand the library beyond two demo patterns before beta?
+2. Haiku for the router vs Sonnet for conversational agents — still deferred.
+
+*Resolved:* `activeScamNow` is not added this week. Open-web search is off for the demo.
 
 ## Audit
 
@@ -116,6 +139,15 @@ PWA optional: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000` in `frontend/.env
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | `senior_digital_literacy/`; `project-context/2.build/backend.md` |
 | Model | Cursor Grok 4.6 |
-| Temperature / max_tokens | N/A — implementation/docs, not a CrewAI artifact-generation kickoff |
 | Prompt Trace | Omitted — no production prompt write; runtime prompts live in YAML |
-| Tools used | Read/Glob/Grep; Write; uv/uvicorn; local health + chat click-through |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-25T23:30:00Z |
+| Persona id | `backend-eng` |
+| Action | `define-agents` — local scam library, `output_pydantic` forms, remove Serper, delete starters |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `scam_library.json`; `schemas.py`; `scam_library.py`; `scam_library_tool.py`; `crew.py`; `flow.py`; `tasks.yaml`; this file |
+| Model | Cursor Grok 4.6 |
+| Prompt Trace | Omitted — implementation; library and forms are the contract |
+| Tools used | Read/Grep/Write/Delete; uv run matcher check |

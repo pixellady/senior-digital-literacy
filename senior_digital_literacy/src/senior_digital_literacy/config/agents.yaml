@@ -1,6 +1,6 @@
 # MVP conversational agents (SAD §2 / PRD §3).
 # Intent router is a Flow step, not an agent. Progress is a backend service, not an agent.
-# Tools are stubbed until RAG and learner_state exist — do not bind tools here yet.
+# Scam checker tools are bound in crew.py (local library only). No open-web search.
 
 step_by_step_tutor:
   llm: anthropic/claude-sonnet-4-5-20250929
