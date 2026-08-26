@@ -437,13 +437,13 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps still hidden (`WEEKLY_CAPS_ARE_REAL` false); no CapMessage. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
 | S7 | Run, Reset, Retry; client Pause always visible | synced | Idle copy: “Pause is always here, waiting for you.” |
-| S8 | `frontend.md` Audit records this FE change | synced | Recorded on-page title and Pause/subtitle copy. |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded on-page title and Pause/subtitle copy, commit `3541b06`. |
 | S9 | SAD extra routes and Tutor step not implemented | synced | Unchanged. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | h1 is **Learn the Signs, Protect Yourself**. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** pending this change  
+**Last synced commit:** `3541b06`  
 **Last synced at:** 2026-08-26T15:30:00Z
 
 ---
@@ -608,3 +608,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `style-ui` — on-page title Learn the Signs, Protect Yourself; Pause/subtitle copy |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | spec h1, Pause idle copy, subtitle; Spec Sync S8/S11 |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T15:31:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `3541b06` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | S8 synced; Last synced commit `3541b06` |

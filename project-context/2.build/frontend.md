@@ -234,3 +234,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `style-ui` — on-page title and Pause/subtitle copy |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | h1 Learn the Signs, Protect Yourself; SafetyBar idle copy; subtitle |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T15:31:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `3541b06` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend-funcional-spec.md S8 + Last synced commit |
