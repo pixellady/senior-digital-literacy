@@ -93,6 +93,7 @@ This SAD is the blueprint for Build-phase personas (`@project.mgr`, `@frontend.e
 | **AD-10** | US **single-region** compose (API + PWA + Postgres); HTTPS; smallest hosting that meets 100 concurrent sessions | PRD §3 / §5; MRD §4. Multi-region, IaC, APM = Future Work. |
 | **AD-11** | Visible extra-help control label = **Extra Guidance**; API/action id remains `get_extra_help` | Operator resolution 2026-08-20 (PRD OQ #3). Does not imply a human. Patient/Priority Mode behavior unchanged (US-013). |
 | **AD-12** | **Magic link** is the primary beta signup/login; simple password is secondary fallback only | Operator resolution 2026-08-20 (US-019). Signup UI defaults to email magic link; password is not the default path. |
+| **AD-13** | Scam check surface copy is fixed MVP UI text (see §3 Interface Requirements table) | Operator resolution 2026-08-26. Heading/tab **Learn the Signs, Protect Yourself**; subtitle and Pause idle line per PRD §6. Supports F1, US-002, US-009 emotional safety. |
 
 ---
 
@@ -283,7 +284,7 @@ User-visible p95 ≤5s (US-001, PRD §3) is the product SLO. If Sonnet latency m
 - `HomeHero` — Scam Defense + Learn equal weight (no “remember last” until P1).
 - `ChatTranscript` — one complete bubble per turn; distinct visual role for **Your tutor** vs **Scam checker tip**.
 - `StepCard` — licensed-stock illustrated asset + alt text for Beginner and No-Device (US-007, US-015, AD-9).
-- `SafetyBar` — **Pause** always visible; **Explain simpler**, **Repeat last step**, **Start over**, **Extra Guidance**.
+- `SafetyBar` — **Pause** always visible; idle copy **Pause is always here, waiting for you.** (AD-13); **Explain simpler**, **Repeat last step**, **Start over**, **Extra Guidance**.
 - `VerifiedGuideBadge` — when RAG-sourced (US-021).
 - `ModeDisclosure` — AI disclosure banner on Patient / Priority Mode entry (US-013).
 - `CapMessage` — friendly weekly tutor cap; Scam Defense still available (US-007).
@@ -292,6 +293,14 @@ User-visible p95 ≤5s (US-001, PRD §3) is the product SLO. If Sonnet latency m
 **Interface Requirements**
 
 - Primary surfaces: home two-path entry + path-specific chat (not a generic chatbot shell).
+- **Canonical copy — scam check surface (AD-13 / PRD §6):** use exactly as written for the F1 checker entry. Build slice ships these on `/` before `/scam` exists.
+
+| Element | Copy | Notes |
+|---------|------|-------|
+| Page `h1` / `<title>` | **Learn the Signs, Protect Yourself** | US-001, US-002 |
+| Subtitle | Check a suspicious message or call. You're safe here, and you're never wrong to ask. | Shame-free; US-009 |
+| Pause idle (`SafetyBar`, not paused) | Pause is always here, waiting for you. | US-009; client-side; does not cancel in-flight LLM (AD-5) |
+
 - Loading: calm “working on this…” state for the ≤5s wait; no auto-advancing timers or auto-dismiss modals (US-018).
 - Errors: plain-language message + retry; never blame the user (US-001, US-009).
 - Accessibility: body ≥16px, contrast ≥4.5:1, targets ≥44×44px, logical focus/ARIA, WCAG 2.1 AA on core flows, 0 critical scan findings pre-beta (US-018).
@@ -686,6 +695,7 @@ QA maps tests to user-story acceptance criteria (`testing.map_to_acceptance_crit
 - **Illustration source (PRD OQ #2):** licensed stock (AD-9). Operator 2026-08-20.
 - **Extra-help label (PRD OQ #3):** visible copy **Extra Guidance**; action id `get_extra_help` (AD-11). Operator 2026-08-20.
 - **Signup default (US-019):** magic link primary; password secondary fallback (AD-12). Operator 2026-08-20.
+- **Scam check surface copy (PRD §6):** heading/tab **Learn the Signs, Protect Yourself**; subtitle and Pause idle line as specified (AD-13). Operator 2026-08-26.
 
 ---
 
@@ -693,9 +703,10 @@ QA maps tests to user-story acceptance criteria (`testing.map_to_acceptance_crit
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-21T01:10:00Z |
+| Timestamp | 2026-08-26T15:45:00Z |
 | Persona id | `system-arch` |
-| Action | `update-sad` — single SAD file at 1.define; remove 2.build duplicate |
+| Action | `update-sad` — AD-13 scam-check surface copy (PRD §6 sync) |
+| Prior action | `update-sad` — single SAD file at 1.define (2026-08-21) |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset; PRD + adapter registry default) |
 | Adapter rule | `.cursor/rules/adapter-crewai.mdc` |
 | LLM for generated app | Anthropic Claude API (Haiku router / Sonnet tutors) |

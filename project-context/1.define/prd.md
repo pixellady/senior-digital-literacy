@@ -33,6 +33,7 @@
 | **LLM provider (MVP)** | **Anthropic Claude** (Claude API) | Build may use Cursor IDE; runtime inference via Claude |
 | **Visual step cards** | **Illustrated** assets (not icon-only) | No-Device + Beginner tracks; budget for simple senior-friendly illustrations |
 | **Carmen partner pilot** | **Q4 2026** target | First library/housing MOU + No-Device beta cohort (P1-6) |
+| **Scam check surface copy** | Heading **Learn the Signs, Protect Yourself**; shame-free subtitle and Pause idle line (§6) | Operator-finalized MVP strings for F1 / US-002 / US-009; SAD AD-13 |
 
 ---
 
@@ -354,9 +355,21 @@ Unchanged from v1.1: performance targets, emotional safety NFRs, WCAG 2.1 AA, CC
 
 ## 6. User Experience Design
 
-Unchanged pillars: Scam Defense hero, track badge, pause always visible.
+**Pillars:** Scam Defense hero, track badge, pause always visible, shame-free copy (US-009).
 
 **Beta UX default:** Mobile-first PWA on personal phone; home screen **Scam Defense + Learn** equal weight; remember last entry **P1** (default: balanced home for all users at launch).
+
+### Canonical copy — Scam check surface (MVP)
+
+Operator-finalized strings for the primary scam-check entry (F1, US-002, US-009). Use **exactly** as written unless gerontology review supersedes (Open Questions).
+
+| Element | Copy |
+|---------|------|
+| **Page heading / document tab title** | Learn the Signs, Protect Yourself |
+| **Subtitle** (below heading) | Check a suspicious message or call. You're safe here, and you're never wrong to ask. |
+| **Pause idle line** (`SafetyBar`, session not paused) | Pause is always here, waiting for you. |
+
+Build note: the first frontend slice implements these on route `/` before the full two-path home route map ships (SAD §3).
 
 **Visual step cards (Final):** **Illustrated** senior-friendly artwork per step (No-Device + Beginner); not icon-only. Simple, high-contrast, minimal text overlay; alt text for accessibility.
 
@@ -530,6 +543,7 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 2. **Illustration source:** Custom commission vs. licensed stock vs. generated assets — confirm art pipeline before frontend build.
 3. **Get extra help label:** Confirm copy (e.g., “Get extra help from your tutor”) — gerontology review; must not imply human.
 4. **Intent router NL fallback:** When classifier confidence is low, default to SCAM if safety keywords present else TUTOR — confirm thresholds in SAD.
+5. **Scam check copy review:** Confirm heading/subtitle/Pause idle strings with gerontology advisor (§6 table is operator default).
 
 *Architect handoff:* `@system.arch` → `*create-sad` using this PRD and user stories.
 
@@ -539,10 +553,10 @@ Technical metrics unchanged (p95 latency, 0 critical scam misses on audit sample
 
 | Field | Value |
 |-------|-------|
-| Timestamp | 2026-08-14T14:00:00Z |
+| Timestamp | 2026-08-26T15:45:00Z |
 | Persona id | `product-mgr` |
-| Action | `create-prd` — **finalize v2.3** (simplified intent router → Tutor \| Scam Detector) |
-| Prior version | 2.2 Final |
+| Action | `update-prd` — §6 canonical scam-check surface copy (operator) |
+| Prior version | 2.3 Final |
 | Resolved runtime | `crewai` Flow |
 | LLM provider | Anthropic Claude (API) |
 | Architecture | Intent Router + 2 agents + Progress Service |
