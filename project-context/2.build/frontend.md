@@ -214,3 +214,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Outputs | `caps.ts` (`WEEKLY_CAPS_ARE_REAL=false`); Results gated CapMessage; spec S5/S12 |
 | Model | Cursor Grok 4.6 |
 | Prompt Trace | Omitted — UI hide of stub caps; did not invoke `@backend.eng` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T00:10:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `d9e7d76` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend-funcional-spec.md S8 + Last synced commit |

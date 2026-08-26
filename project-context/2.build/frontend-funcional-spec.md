@@ -435,14 +435,14 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps still hidden (`WEEKLY_CAPS_ARE_REAL` false); no CapMessage. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
 | S7 | Run, Reset, Retry; client Pause always visible | synced | Unchanged. |
-| S8 | `frontend.md` Audit records this FE change | pending-commit | Logged hide weekly caps until backend counts for real. |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded hide weekly caps until they are real, commit `d9e7d76`. |
 | S9 | SAD extra routes and Tutor step not implemented | synced | Unchanged. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | Unchanged. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** `c9686f6`  
-**Last synced at:** 2026-08-26T00:01:00Z (SHA updates after commit)
+**Last synced commit:** `d9e7d76`  
+**Last synced at:** 2026-08-26T00:10:00Z
 
 ---
 
@@ -589,3 +589,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `style-ui` — hide weekly-limit / cap numbers until they are real |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | Results gate `shouldShowWeeklyCaps`; `WEEKLY_CAPS_ARE_REAL=false`; no `@backend.eng` session counter |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T00:10:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `d9e7d76` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | S8 synced; Last synced commit `d9e7d76` |
