@@ -1,4 +1,5 @@
 import { AI_DISCLOSURE_COPY, modeLabel } from "@/lib/copy/chatCopy";
+import { shouldShowWeeklyCaps } from "@/lib/copy/caps";
 import { crewStatusLabel } from "@/lib/copy/crewStatus";
 import { riskHeading } from "@/lib/copy/riskCopy";
 import { VerifiedGuideBadge } from "@/components/VerifiedGuideBadge";
@@ -68,6 +69,12 @@ export function ResultsSection({ phase, result }: ResultsSectionProps) {
                 ))}
               </ul>
             </div>
+          ) : null}
+          {shouldShowWeeklyCaps(result.caps) ? (
+            <p className="text-xl text-slate-900">
+              Tutor sessions this week: {result.caps.tutor_sessions_used_this_week}{" "}
+              of {result.caps.tutor_sessions_limit}
+            </p>
           ) : null}
         </div>
       )}

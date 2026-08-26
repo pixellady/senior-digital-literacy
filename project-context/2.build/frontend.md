@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path on that route: paste → `explicit_path: "scam"` → Scam Detector fixture + RAG `verified_guide` → large-type verdict. Client **Pause** is always visible. No `/onboarding`, `/learn`, or `/caregiver`. Tutor step not added yet (waits for live Flow).
+Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path on that route: paste → `explicit_path: "scam"` → Scam Detector fixture + RAG `verified_guide` → large-type verdict. Client **Pause** is always visible. Weekly cap numbers stay on the SAD envelope but are **hidden** (`WEEKLY_CAPS_ARE_REAL = false`). No `/onboarding`, `/learn`, or `/caregiver`. Tutor step not added yet (waits for live Flow).
 
 No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 
@@ -26,6 +26,7 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 12. Path-honest fixtures: Path A gift-card `likely_scam`; Path B `activeScamNow` → `critical` + Priority disclosure. No client keyword rules.
 13. Softened ICP copy then restored original `Crew:` labels and title per operator.
 14. Held route map: proved scam path on `/` (large-type verdict, Verified guide, Scam checker). Client Pause. Tutor step deferred until Flow.
+15. Hid weekly-limit / cap numbers until they are real. Did **not** ask `@backend.eng` to count sessions.
 
 ## Application map
 
@@ -37,6 +38,7 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 | `frontend/components/SafetyBar.tsx` | Always-visible Pause / Resume (client, US-009) |
 | `frontend/components/VerifiedGuideBadge.tsx` | RAG trust indicator when `verified_guide` |
 | `frontend/lib/copy/crewStatus.ts` | Canonical status labels and inline copy |
+| `frontend/lib/copy/caps.ts` | `WEEKLY_CAPS_ARE_REAL` gate; hide stub 0/5 until backend counts |
 | `frontend/lib/fsm/runFsm.ts` | `idle` \| `running` \| `done` |
 | `frontend/lib/types/chat.ts` | SAD `ChatRequest` / `ChatResponse` / error envelope |
 | `frontend/lib/fixtures/chatFixtures.ts` | Path A `likely_scam` / Path B `critical`+Priority named fixtures |
@@ -57,6 +59,7 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 - Light high-contrast palette (no dark-mode inversion in this slice).
 - Shame-free copy; no blame on stub failure.
 - Stub envelope is SAD §4: one `sendChat` with full `ChatRequest`. Stub-only `stubPath` selects Path A (`likely_scam`, gift-card) or Path B (`critical`, `mode: priority`, `ai_disclosure: true`) from `activeScamNow`. Message text is never scored.
+- `ChatResponse.caps` stays on the wire (stub `0` / `5` / `false`). Results do not show used/limit. Flip `WEEKLY_CAPS_ARE_REAL` only after `@backend.eng` counts real weekly sessions. No CapMessage.
 
 ## Future Work placeholders (visible, non-functional)
 
@@ -85,6 +88,8 @@ After **every commit** that changes this UI or the spec, update the checklist in
 - User stories US-001, US-002, US-014, US-009, US-013, US-018
 - `.cursor/agents/frontend-eng.md`
 - `project-context/2.build/frontend-funcional-spec.md`
+- `project-context/2.build/backend.md` — hide weekly limits until they are real
+- Operator request: hide weekly-limit / cap numbers until they are real; talk to `@backend.eng` only if counting sessions for real
 
 ## Assumptions
 
@@ -101,6 +106,8 @@ After **every commit** that changes this UI or the spec, update the checklist in
 2. `@project.mgr` still needs to produce `setup.md` and `.env.example`.
 
 *Resolved:* Do not grow the SAD route map before live Flow on the scam path. Client Pause is on `/`. Tutor step is next after Integration, not extra routes now.
+
+*Resolved:* Hide weekly cap numbers rather than asking `@backend.eng` to count sessions. Envelope stubs remain; UI gate is `WEEKLY_CAPS_ARE_REAL`.
 
 ## Audit
 
@@ -197,3 +204,13 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `sync-docs` — Spec Sync S8 SHA `c9686f6` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend-funcional-spec.md S8 + Last synced commit |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T00:01:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — hide weekly-limit / cap numbers until they are real |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `caps.ts` (`WEEKLY_CAPS_ARE_REAL=false`); Results gated CapMessage; spec S5/S12 |
+| Model | Cursor Grok 4.6 |
+| Prompt Trace | Omitted — UI hide of stub caps; did not invoke `@backend.eng` |

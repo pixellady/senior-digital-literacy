@@ -85,6 +85,7 @@ export interface ChatUi {
   clarifying_question: boolean;
 }
 
+/** SAD envelope fields. Stub values until @backend.eng counts real weekly sessions — do not render. */
 export interface ChatCaps {
   tutor_sessions_used_this_week: number;
   tutor_sessions_limit: number;

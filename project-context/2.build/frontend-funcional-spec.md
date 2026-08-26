@@ -148,12 +148,14 @@ Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice 
 | `mode` | `normal` \| `patient` \| `priority` | Label `Mode: {mode}` |
 | `ai_disclosure` | boolean | “This check uses AI.” when `true` |
 | `session_id` | UUID string | Not shown on Results; History key prefix |
+| `caps.tutor_sessions_*` / `tutor_capped` | number / boolean | **Hidden.** Stub zeros until `@backend.eng` counts real weekly sessions (`WEEKLY_CAPS_ARE_REAL`). No CapMessage. |
 
 **Fixture rules (stub only)**
 
 - Successful `sendChat` returns `STUB_FIXTURES[stubPath]` only. Both paths set `explicit_path: "scam"`, `route_intent: "SCAM"`, `agent_id: "scam_detector"`, `content.verified_guide: true`. Path A: gift-card, `likely_scam`. Path B: happening-now, `critical` + Priority disclosure.
 - `activeScamNow` selects the fixture id. `message` is not used to vary the verdict.
 - `ui.actions` is present on both fixtures; **Pause** is rendered from the SafetyBar (client), not from `ui.actions`. Extra Guidance is not rendered.
+- `caps` stay on the envelope (SAD). Do **not** show used/limit/capped numbers. `WEEKLY_CAPS_ARE_REAL` is false; do not ask backend to count sessions until that flag flips.
 - No streaming chunks, tool-call traces, or cost fields.
 
 Errors from stubs: return to **Crew: idle**, keep inputs, inline message + **Retry**.
@@ -398,6 +400,7 @@ This slice still only **sends** `explicit_path: "scam"` and `client_action: "non
 | `STUB_PATH_A_GIFT_CARD_BAIL` | SAD `ChatResponse`; `risk_level: "likely_scam"`; `mode: "normal"`; `ai_disclosure: false` |
 | `STUB_PATH_B_ACTIVE_SCAM` | SAD `ChatResponse`; `risk_level: "critical"`; `mode: "priority"`; `ai_disclosure: true` |
 | `STUB_FIXTURES` | `{ path_a_gift_card_bail, path_b_active_scam }` |
+| `WEEKLY_CAPS_ARE_REAL` | `false` — hide `caps.*` in UI; do not invent a live counter |
 
 `sendChat(request, stubPath)` → `STUB_FIXTURES[stubPath]` with `session_id` copied. `stubPath` is stub-only. No `fetch`, streaming, tool-call, cost fields, or message-keyword scoring.
 
@@ -429,17 +432,17 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S2 | Inputs `messageText`, `activeScamNow`; max 4000; form locked when `running`/`done` | synced | `activeScamNow` selects Path B; still not a `ChatRequest` field. |
 | S3 | FSM `idle` → `running` → `done`; events START / COMPLETE / RESET | synced | Unchanged. Pause is a UX freeze, not a fourth FSM state. |
 | S4 | Stub is one non-streaming `POST /api/v1/chat`; `explicit_path: "scam"` | synced | `toChatRequest` always sets scam path; `agent_id` scam_detector on fixtures. |
-| S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | `text-4xl` heading; **Verified guide** badge; `verified_guide: true`. |
+| S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps still hidden (`WEEKLY_CAPS_ARE_REAL` false); no CapMessage. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
-| S7 | Run, Reset, Retry; client Pause always visible | synced | Pause does not cancel in-flight stub; blocks new Run until Resume. |
-| S8 | `frontend.md` Audit records this FE change | synced | Recorded SAD chat stub + single-route scam proof commit `c9686f6`. |
-| S9 | SAD extra routes and Tutor step not implemented | synced | Tutor step waits until this path talks to Flow. |
-| S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Restored original `Crew:` labels. |
+| S7 | Run, Reset, Retry; client Pause always visible | synced | Unchanged. |
+| S8 | `frontend.md` Audit records this FE change | pending-commit | Logged hide weekly caps until backend counts for real. |
+| S9 | SAD extra routes and Tutor step not implemented | synced | Unchanged. |
+| S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | Unchanged. |
-| S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | Wire JSON unchanged; fixtures now `verified_guide: true`. |
+| S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
 **Last synced commit:** `c9686f6`  
-**Last synced at:** 2026-08-21T21:18:00Z
+**Last synced at:** 2026-08-26T00:01:00Z (SHA updates after commit)
 
 ---
 
@@ -462,7 +465,8 @@ Update this checklist **in the same change as each commit** that touches Critica
 - Operator request (follow-up): align stub envelope to SAD §4 ChatRequest/ChatResponse; one non-streaming POST /api/v1/chat
 - Operator request (follow-up): poller only if 1:1 onto chat envelope, or `sendChat` JSON; paste SAD JSON/TS into Contracts
 - Operator request (follow-up): path-honest fixtures Path A likely_scam / Path B critical+Priority; fixture-driven, no keyword rules
-- Operator request (follow-up): do not grow route map; prove paste → scam → Scam Detector + RAG → large-type verdict; Tutor + Pause if time
+- Operator request (follow-up): hide weekly-limit / cap numbers until they are real; talk to backend only if counting sessions for real
+- `project-context/2.build/backend.md` — frontend should hide weekly limits until they are real
 
 ## Assumptions
 
@@ -474,12 +478,15 @@ Update this checklist **in the same change as each commit** that touches Critica
 - History persistence via Progress Service is Integration/Backend work; this slice is in-memory only.
 - Stub verdicts are **named fixtures** (`STUB_PATH_A_GIFT_CARD_BAIL`, `STUB_PATH_B_ACTIVE_SCAM`). `activeScamNow` selects the id. `message` is never scored on the client.
 - Single-route scope is an operator override of SAD’s multi-route PWA map for this epic increment only.
+- Weekly `caps` on the stub envelope are not real session counts. Hide them rather than inventing a client counter or asking `@backend.eng` to count yet.
 
 ## Open Questions
 
 1. Is 4000-character paste limit acceptable vs a SAD/security numeric cap still TBD?
 
 *Resolved:* Do **not** grow the route map (`/onboarding`, `/learn`, `/caregiver`, …) until paste → `explicit_path=scam` → Scam Detector + RAG → large-type verdict is proven with live Flow. One Tutor step waits until after that. Client Pause is on `/` now (US-009). `Crew: idle|running|done` remains the on-page status copy. Wire contract is SAD §4.
+
+*Resolved:* Hide weekly cap numbers (`WEEKLY_CAPS_ARE_REAL = false`) instead of asking `@backend.eng` to count sessions.
 
 ## Audit
 
@@ -574,3 +581,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `sync-docs` — Spec Sync S8 SHA `c9686f6` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | S8 synced; Last synced commit `c9686f6` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T00:01:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — hide weekly-limit / cap numbers until they are real |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | Results gate `shouldShowWeeklyCaps`; `WEEKLY_CAPS_ARE_REAL=false`; no `@backend.eng` session counter |

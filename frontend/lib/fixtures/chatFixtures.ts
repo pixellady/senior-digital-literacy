@@ -28,6 +28,7 @@ const SCAM_ENVELOPE: Omit<ChatResponse, "mode" | "ai_disclosure" | "content"> = 
     clarifying_question: false,
   },
   caps: {
+    // Envelope-only stubs. UI must not show these until WEEKLY_CAPS_ARE_REAL.
     tutor_sessions_used_this_week: 0,
     tutor_sessions_limit: 5,
     tutor_capped: false,
