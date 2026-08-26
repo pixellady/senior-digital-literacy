@@ -255,3 +255,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `document-frontend` — live `sendChat` + fixture fallback (not stub-only) |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend.md; frontend-funcional-spec.md; frontend/README.md |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T16:30:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `7c8b535` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend-funcional-spec.md S8 + Last synced commit |
