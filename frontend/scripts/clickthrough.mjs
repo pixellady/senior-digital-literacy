@@ -19,7 +19,7 @@ const MESSAGE =
   const errors = [];
   try {
     await page.goto("http://localhost:3000/", { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "Critical Research Workflow" }).waitFor();
+    await page.getByRole("heading", { name: "Learn the Signs, Protect Yourself" }).waitFor();
     const heading = await page.locator("h1").innerText();
 
     await page.getByRole("button", { name: "Pause" }).click();

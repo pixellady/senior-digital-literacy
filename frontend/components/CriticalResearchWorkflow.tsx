@@ -36,11 +36,11 @@ export function CriticalResearchWorkflow() {
             Scam Defense
           </p>
           <h1 className="mt-2 text-4xl font-bold text-slate-950">
-            Critical Research Workflow
+            Learn the Signs, Protect Yourself
           </h1>
           <p className="mt-3 text-lg text-slate-900">
-            Check a suspicious message or call. We will not rush you, and we will
-            not blame you.
+            Check a suspicious message or call. You&apos;re safe here, and
+            you&apos;re never wrong to ask.
           </p>
         </header>
 

@@ -2,7 +2,7 @@
 
 **Persona:** `@frontend.eng`  
 **Action:** `*develop-fe`  
-**Slice:** Critical Research Workflow (single route)
+**Slice:** Critical Research Workflow (single route; on-page title **Learn the Signs, Protect Yourself**)
 
 ## Status
 
@@ -27,6 +27,7 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 13. Softened ICP copy then restored original `Crew:` labels and title per operator.
 14. Held route map: proved scam path on `/` (large-type verdict, Verified guide, Scam checker). Client Pause. Tutor step deferred until Flow.
 15. Hid weekly-limit / cap numbers until they are real. Did **not** ask `@backend.eng` to count sessions.
+16. Operator copy: h1 **Learn the Signs, Protect Yourself**; subtitle “You're safe here, and you're never wrong to ask.”; Pause idle “Pause is always here, waiting for you.”
 
 ## Application map
 
@@ -50,6 +51,8 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 - Calm “Crew: running. Working on this…” loading copy; non-streaming wait (AD-5).
 - Sticky Crew status banner: `Crew: idle|running|done`, gray/blue/green pills, Last updated (seconds).
 - Same `Crew: …` phrase in banner, Run, and Results.
+- On-page `h1` and document title: **Learn the Signs, Protect Yourself**. Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
+- Pause idle copy: “Pause is always here, waiting for you.” Paused hint is unchanged (`PAUSE_HINT`).
 - Controls: **Run**, **Reset**, **Pause**. Pause is client-side and does not cancel an in-flight stub.
 - Results proof: **Scam checker** + **Verified guide** + `text-4xl` verdict.
 - Stub errors: inline message + **Retry** (same inputs); FSM stays three states.
@@ -90,11 +93,12 @@ After **every commit** that changes this UI or the spec, update the checklist in
 - `project-context/2.build/frontend-funcional-spec.md`
 - `project-context/2.build/backend.md` — hide weekly limits until they are real
 - Operator request: hide weekly-limit / cap numbers until they are real; talk to `@backend.eng` only if counting sessions for real
+- Operator request: replace on-page title and Pause/subtitle copy (Learn the Signs, Protect Yourself)
 
 ## Assumptions
 
 - `setup.md` missing; FE created `frontend/` without `@project.mgr` scaffold.
-- Operator “Critical Research Workflow” = US-002/US-014 check slice, not a new PRD feature.
+- Operator “Critical Research Workflow” = US-002/US-014 check slice, not a new PRD feature. Visible `h1` / tab title is **Learn the Signs, Protect Yourself**.
 - `AAMAD_TARGET_RUNTIME` unset → `crewai`.
 - No `aamad.config.yml`; example config for type checking, no modals, 400-line file cap.
 - Next.js 15.4.x patched to **15.4.10** and React to **19.1.2** for CVE-2025-66478 / CVE-2025-55182 and the 2025-12-11 RSC follow-ups (create-next-app 15.4.6 was vulnerable).
@@ -222,3 +226,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `sync-docs` — Spec Sync S8 SHA `d9e7d76` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend-funcional-spec.md S8 + Last synced commit |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T15:30:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — on-page title and Pause/subtitle copy |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | h1 Learn the Signs, Protect Yourself; SafetyBar idle copy; subtitle |

@@ -1,6 +1,6 @@
 # Senior Digital Literacy — frontend
 
-Single-route Next.js App Router app for the **Critical Research Workflow**.
+Single-route Next.js App Router app. On-page title: **Learn the Signs, Protect Yourself** (internal slice name: Critical Research Workflow).
 
 ## Spec
 

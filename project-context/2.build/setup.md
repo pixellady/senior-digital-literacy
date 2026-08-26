@@ -161,7 +161,7 @@ cd frontend
 npm run dev
 ```
 
-Open **http://localhost:3000** — single route `/` (Critical Research Workflow).
+Open **http://localhost:3000** — single route `/`. Visible title: **Learn the Signs, Protect Yourself** (internal slice: Critical Research Workflow).
 
 Other scripts:
 

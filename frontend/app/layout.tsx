@@ -8,9 +8,9 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Critical Research Workflow",
+  title: "Learn the Signs, Protect Yourself",
   description:
-    "Check a suspicious message or call with a calm, step-by-step research workflow.",
+    "Check a suspicious message or call. You're safe here, and you're never wrong to ask.",
 };
 
 export default function RootLayout({

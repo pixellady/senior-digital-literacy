@@ -8,7 +8,7 @@
 
 ## Context & Instructions
 
-This spec describes the first frontend slice: a **single-route** form + results page for checking a message or call (internal epic name **Critical Research Workflow**). It is derived from PRD F1 / US-002 / US-014 and SAD frontend contracts. Backend wiring is owned by `@integration.eng`; this slice uses **stub services** only.
+This spec describes the first frontend slice: a **single-route** form + results page for checking a message or call (internal epic name **Critical Research Workflow**). Visible `h1` / document title: **Learn the Signs, Protect Yourself**. It is derived from PRD F1 / US-002 / US-014 and SAD frontend contracts. Backend wiring is owned by `@integration.eng`; this slice uses **stub services** only.
 
 **PRD Document**: `project-context/1.define/prd.md` (v2.3 Final — MVP)  
 **SAD**: `project-context/1.define/sad.md` (v1.0)  
@@ -56,6 +56,8 @@ All inputs are collected on route `/` while the FSM is `idle` (form enabled). Th
 - Labels in plain language; no shame language (US-009).
 - Prefer in-page form, not a modal (`prefer_modals: false`).
 - Form editable in `idle` only; read-only in `running` and `done` until **Reset**.
+- Page `h1` / document title: **Learn the Signs, Protect Yourself**.
+- Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
 
 ---
 
@@ -89,7 +91,7 @@ done --RESET--> idle      (Reset control; inputs cleared)
 | `running` | Banner **Crew: running** (blue); Inputs locked | None (no pause / cancel / retry-diff) |
 | `done` | Banner **Crew: done** (green); Results visible; Inputs locked | **Reset** → `idle` |
 
-**Controls (this slice):** **Run**, **Reset**, and always-visible client **Pause** / **Resume** (US-009; does not cancel an in-flight stub). On stub/runtime failure: return to `idle`, keep the same inputs, show an inline alert and a **Retry** button. Validation errors show the alert **without** Retry. **Pause** blocks a new Run until Resume.
+**Controls (this slice):** **Run**, **Reset**, and always-visible client **Pause** / **Resume** (US-009; does not cancel an in-flight stub). Idle Pause copy: “Pause is always here, waiting for you.” Paused hint: `PAUSE_HINT` in `frontend/lib/copy/safetyBar.ts`. On stub/runtime failure: return to `idle`, keep the same inputs, show an inline alert and a **Retry** button. Validation errors show the alert **without** Retry. **Pause** blocks a new Run until Resume.
 
 Illegal transitions are no-ops (`frontend/lib/fsm/runFsm.ts`).
 
@@ -126,7 +128,7 @@ On stub throw: `RESET` → `idle`, inline error, **Retry**. Reset also clears `s
 
 ### Accessibility (this slice)
 
-- One `h1` (page title); section `h2`s: Inputs, Run, Results, History
+- One `h1` (**Learn the Signs, Protect Yourself**); section `h2`s: Inputs, Run, Results, History
 - Native form controls; Tab order follows the page; visible focus rings
 - Skip link to `#workflow-main`
 - `lang="en"` on the document
@@ -434,15 +436,15 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S4 | Stub is one non-streaming `POST /api/v1/chat`; `explicit_path: "scam"` | synced | `toChatRequest` always sets scam path; `agent_id` scam_detector on fixtures. |
 | S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps still hidden (`WEEKLY_CAPS_ARE_REAL` false); no CapMessage. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
-| S7 | Run, Reset, Retry; client Pause always visible | synced | Unchanged. |
-| S8 | `frontend.md` Audit records this FE change | synced | Recorded hide weekly caps until they are real, commit `d9e7d76`. |
+| S7 | Run, Reset, Retry; client Pause always visible | synced | Idle copy: “Pause is always here, waiting for you.” |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded on-page title and Pause/subtitle copy. |
 | S9 | SAD extra routes and Tutor step not implemented | synced | Unchanged. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
-| S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | Unchanged. |
+| S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | h1 is **Learn the Signs, Protect Yourself**. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** `d9e7d76`  
-**Last synced at:** 2026-08-26T00:10:00Z
+**Last synced commit:** pending this change  
+**Last synced at:** 2026-08-26T15:30:00Z
 
 ---
 
@@ -466,11 +468,12 @@ Update this checklist **in the same change as each commit** that touches Critica
 - Operator request (follow-up): poller only if 1:1 onto chat envelope, or `sendChat` JSON; paste SAD JSON/TS into Contracts
 - Operator request (follow-up): path-honest fixtures Path A likely_scam / Path B critical+Priority; fixture-driven, no keyword rules
 - Operator request (follow-up): hide weekly-limit / cap numbers until they are real; talk to backend only if counting sessions for real
+- Operator request (follow-up): on-page title **Learn the Signs, Protect Yourself**; Pause idle “waiting for you”; subtitle “You're safe here, and you're never wrong to ask.”
 - `project-context/2.build/backend.md` — frontend should hide weekly limits until they are real
 
 ## Assumptions
 
-- Operator name **Critical Research Workflow** is the FE slice name for US-002/US-014 scam-check research; it is not a new PRD feature ID.
+- Operator name **Critical Research Workflow** is the FE slice name for US-002/US-014 scam-check research; it is not a new PRD feature ID. Visible `h1` / tab title is **Learn the Signs, Protect Yourself**.
 - Filename uses operator spelling `funcional` (not “functional”).
 - `project-context/2.build/setup.md` was **missing** at start; FE scaffolded `frontend/` directly. `@project.mgr` should still produce setup.md.
 - No `aamad.config.yml`; example config used for `prefer_modals: false`, type checking, `max_file_lines: 400`.
@@ -597,3 +600,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `sync-docs` — Spec Sync S8 SHA `d9e7d76` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | S8 synced; Last synced commit `d9e7d76` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T15:30:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — on-page title Learn the Signs, Protect Yourself; Pause/subtitle copy |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | spec h1, Pause idle copy, subtitle; Spec Sync S8/S11 |

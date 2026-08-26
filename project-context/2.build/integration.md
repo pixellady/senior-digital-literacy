@@ -8,7 +8,7 @@
 
 **Confirmed, not rebuilt.** The PWA ↔ Flow wire landed in `7c42dc1` (`sendChat` live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set). `chatService.ts` is unchanged since that commit. This increment does **not** add a second app, route, or API.
 
-Operator constraint honored: same `/` (Critical Research Workflow) → one non-streaming JSON POST (SAD §4, AD-5, Pattern 1) → Results. `@project.mgr` **not** invoked — `setup.md` already exists and already documents how to run both sides.
+Operator constraint honored: same `/` (**Learn the Signs, Protect Yourself**; internal slice Critical Research Workflow) → one non-streaming JSON POST (SAD §4, AD-5, Pattern 1) → Results. `@project.mgr` **not** invoked — `setup.md` already exists and already documents how to run both sides.
 
 Without `NEXT_PUBLIC_API_BASE_URL`, `sendChat` still returns named Path A/B fixtures.
 

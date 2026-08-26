@@ -28,7 +28,7 @@ export function SafetyBar({ paused, onPause, onResume }: SafetyBarProps) {
           <p className="text-lg text-slate-900">{PAUSE_HINT}</p>
         ) : (
           <p className="text-lg text-slate-800">
-            Pause is always here. It does not rush you.
+            Pause is always here, waiting for you.
           </p>
         )}
       </div>
