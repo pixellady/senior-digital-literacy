@@ -4,11 +4,11 @@
 **Product:** Senior Digital Literacy Platform  
 **Workflow:** Critical Research Workflow  
 **Owner:** `@frontend.eng`  
-**Status:** Implemented as a single-route UI slice (fixtures only; no live API)
+**Status:** Implemented as a single-route UI slice. `sendChat` uses live `POST /api/v1/chat` when `NEXT_PUBLIC_API_BASE_URL` is set; named fixtures when unset.
 
 ## Context & Instructions
 
-This spec describes the first frontend slice: a **single-route** form + results page for checking a message or call (internal epic name **Critical Research Workflow**). Visible `h1` / document title: **Learn the Signs, Protect Yourself**. It is derived from PRD F1 / US-002 / US-014 and SAD frontend contracts. Backend wiring is owned by `@integration.eng`; this slice uses **stub services** only.
+This spec describes the first frontend slice: a **single-route** form + results page for checking a message or call (internal epic name **Critical Research Workflow**). Visible `h1` / document title: **Learn the Signs, Protect Yourself**. It is derived from PRD F1 / US-002 / US-014 and SAD frontend contracts. `@integration.eng` wired live `fetch` in `7c42dc1`. This spec records that wire and the fixture fallback; it does **not** claim stub-only.
 
 **PRD Document**: `project-context/1.define/prd.md` (v2.3 Final — MVP)  
 **SAD**: `project-context/1.define/sad.md` (v1.0)  
@@ -22,8 +22,8 @@ This spec describes the first frontend slice: a **single-route** form + results 
 
 - **Feature ID**: `CRW-001` (Critical Research Workflow) — maps to PRD **F1** Scam Defense Hub + US-002 check flow; critical/active-scam path from US-014
 - **Purpose**: Let a senior (Margaret) paste or describe a suspicious message or call, start a check, wait calmly, read a plain-language result, and review earlier checks from this browser session
-- **In Scope**: Single route `/` only. Proof path: paste → `explicit_path: "scam"` → Scam Detector fixture (`agent_id: scam_detector`) → RAG `verified_guide` → large-type verdict. FSM `idle → running → done`; `sendChat` stub; Crew banner; client **Pause** (US-009, no in-flight cancel); History; basic keyboard + headings
-- **Out of Scope**: Extra SAD routes (`/onboarding`, `/learn`, `/scam`, `/caregiver`, …); live Flow / `fetch`; streaming; Tutor step on this page; Extra Guidance; auth; OCR; retry-diff
+- **In Scope**: Single route `/` only. Proof path: paste → `explicit_path: "scam"` → `sendChat` (`POST /api/v1/chat`) → large-type verdict. Live Flow when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset. FSM `idle → running → done`; Crew banner; client **Pause** (US-009, no in-flight cancel); History; basic keyboard + headings
+- **Out of Scope**: Extra SAD routes (`/onboarding`, `/learn`, `/scam`, `/caregiver`, …); streaming; Tutor step on this page; Extra Guidance; auth; OCR; retry-diff
 
 ---
 
@@ -33,7 +33,7 @@ This spec describes the first frontend slice: a **single-route** form + results 
 |--------|-----------|
 | PRD | §4 F1 Scam Defense; §3 `scam_detector`; §6 UX (no auto-dismiss modals; calm loading) |
 | Stories | US-001 entry, US-002 paste/describe + assessment, US-014 active-scam / critical, US-009 Pause, US-013 Extra Guidance later, US-018 large type / 44px targets, US-021 verified guide |
-| SAD | §3 Frontend (Next.js + Tailwind, single chat bubble later); §4 `ChatRequest`/`ChatResponse` (fixtures only); AD-3, AD-5 non-streaming; AD-11 Extra Guidance label |
+| SAD | §3 Frontend (Next.js + Tailwind, single chat bubble later); §4 `ChatRequest`/`ChatResponse` (live JSON or fixture fallback); AD-3, AD-5 non-streaming; AD-11 Extra Guidance label |
 | Conflict | SAD §3 lists many PWA routes. Operator: **do not grow the route map** until paste → `explicit_path=scam` → Scam Detector + RAG → large-type verdict is proven. Tutor step after that if time. |
 
 ---
@@ -45,9 +45,9 @@ All inputs are collected on route `/` while the FSM is `idle` (form enabled). Th
 | Input name | Type / format | Required | Source | Validation |
 |------------|---------------|----------|--------|------------|
 | `messageText` | string, plain text | Yes | User paste or typed description of a text/call | Trimmed; min 1 character after trim; max 4000 characters (SAD length-limit intent for pasted scam text) |
-| `activeScamNow` | boolean | No (default `false`) | Checkbox: “I think this is happening right now” | Collected; stub-only selector for Path B (not a `ChatRequest` field; **never** inferred from message keywords) |
+| `activeScamNow` | boolean | No (default `false`) | Checkbox: “I think this is happening right now” | Collected; **fixture-only** selector for Path B (not a `ChatRequest` field; **never** inferred from message keywords). Live Priority Mode comes from Flow, not this checkbox. |
 
-**Stub envelope mapping (SAD §4):** `toChatRequest` builds the **full** `ChatRequest`: `message` from the form; `explicit_path: "scam"`; `session_id` is `null` on the first Run, then echoed from `ChatResponse.session_id` until Reset; `client_action: "none"`; `track_override: null`. `activeScamNow` is **not** on `ChatRequest`. It only picks which named fixture `sendChat` returns (`selectStubFixturePath`). `request.message` is never scanned for keywords.
+**Envelope mapping (SAD §4):** `toChatRequest` builds the **full** `ChatRequest`: `message` from the form; `explicit_path: "scam"`; `session_id` is `null` on the first Run, then echoed from `ChatResponse.session_id` until Reset; `client_action: "none"`; `track_override: null`. `activeScamNow` is **not** on `ChatRequest`. On the fixture path it only picks which named response `sendChat` returns (`selectStubFixturePath`). On the live path Flow scores the message. The client never scans `request.message` for keywords.
 
 **Not collected in this slice (deferred):** screenshot/OCR, account identity, Tutor `explicit_path`.
 
@@ -91,30 +91,33 @@ done --RESET--> idle      (Reset control; inputs cleared)
 | `running` | Banner **Crew: running** (blue); Inputs locked | None (no pause / cancel / retry-diff) |
 | `done` | Banner **Crew: done** (green); Results visible; Inputs locked | **Reset** → `idle` |
 
-**Controls (this slice):** **Run**, **Reset**, and always-visible client **Pause** / **Resume** (US-009; does not cancel an in-flight stub). Idle Pause copy: “Pause is always here, waiting for you.” Paused hint: `PAUSE_HINT` in `frontend/lib/copy/safetyBar.ts`. On stub/runtime failure: return to `idle`, keep the same inputs, show an inline alert and a **Retry** button. Validation errors show the alert **without** Retry. **Pause** blocks a new Run until Resume.
+**Controls (this slice):** **Run**, **Reset**, and always-visible client **Pause** / **Resume** (US-009; does not cancel an in-flight request). Idle Pause copy: “Pause is always here, waiting for you.” Paused hint: `PAUSE_HINT` in `frontend/lib/copy/safetyBar.ts`. On send/runtime failure: return to `idle`, keep the same inputs, show an inline alert and a **Retry** button. Validation errors show the alert **without** Retry. **Pause** blocks a new Run until Resume.
 
 Illegal transitions are no-ops (`frontend/lib/fsm/runFsm.ts`).
 
-### Stub services (no network)
+### Chat transport (`sendChat`)
 
-One non-streaming `sendChat` matching SAD §4 `POST /api/v1/chat`. Returns a **named** `ChatResponse` fixture from `frontend/lib/fixtures/chatFixtures.ts`. No `fetch`, streaming, tool-call details, or cost fields.
+One non-streaming `sendChat` matching SAD §4 `POST /api/v1/chat`. No streaming, tool-call details, or cost fields.
 
-Verdicts are fixture-driven. Do **not** add client keyword rules on `message` (no “if text contains gift card…”). Before live crew, success is one of two frozen paths:
+- **Live:** if `NEXT_PUBLIC_API_BASE_URL` is set, `fetch(`${apiBase}/api/v1/chat`)` with the SAD JSON body (Integration `7c42dc1`).
+- **Fixtures:** if that variable is unset, return a named `ChatResponse` from `frontend/lib/fixtures/chatFixtures.ts` after a short delay.
 
-| Stub path | When | `content.risk_level` | `mode` | `ai_disclosure` |
-|-----------|------|----------------------|--------|-----------------|
+On the fixture path, verdicts are fixture-driven. Do **not** add client keyword rules on `message` (no “if text contains gift card…”). Fixture success is one of two frozen paths:
+
+| Stub path | When (fixtures only) | `content.risk_level` | `mode` | `ai_disclosure` |
+|-----------|----------------------|----------------------|--------|-----------------|
 | `path_a_gift_card_bail` | `activeScamNow === false` | `likely_scam` | `normal` | `false` |
 | `path_b_active_scam` | `activeScamNow === true` | `critical` | `priority` | `true` |
 
-Operator paste examples (documentation only; **not** matched in code): Path A gift-card bail (“grandson in jail, buy gift cards”); Path B ambiguous / happening-now (“still on the phone, they want a code”).
+Operator paste examples (documentation only; **not** matched in client code): Path A gift-card bail (“grandson in jail, buy gift cards”); Path B ambiguous / happening-now (“still on the phone, they want a code”). Live Flow may use similar markers server-side.
 
 `startRun` / `getRunStatus` is **not** the wire contract. A poller is allowed later only as a temporary anti-corruption layer if Integration maps each call **1:1** onto `ChatRequest` / `ChatResponse` (no second payload shape). This slice uses `sendChat` instead.
 
 | Function | Signature | Behavior |
 |----------|-----------|----------|
 | `toChatRequest` | `(input: RunInput, sessionId: string \| null) => ChatRequest` | Full SAD request: `message`, `explicit_path: "scam"`, `session_id`, `client_action: "none"`, `track_override: null` |
-| `selectStubFixturePath` | `(activeScamNow: boolean) => StubFixturePath` | Checkbox → named fixture id. Does not read `message`. |
-| `sendChat` | `(request: ChatRequest, stubPath: StubFixturePath) => Promise<ChatResponse>` | After a short delay returns `STUB_FIXTURES[stubPath]`, copying `session_id` when present |
+| `selectStubFixturePath` | `(activeScamNow: boolean) => StubFixturePath` | Checkbox → named fixture id. Used only when the API base is unset. Does not read `message`. |
+| `sendChat` | `(request: ChatRequest, stubPath: StubFixturePath) => Promise<ChatResponse>` | Live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set; otherwise `STUB_FIXTURES[stubPath]` with `session_id` copied |
 
 Client sequence:
 
@@ -122,7 +125,7 @@ Client sequence:
 2. `await sendChat(toChatRequest(input, sessionId), selectStubFixturePath(input.activeScamNow))`
 3. `COMPLETE` → phase `done`; store `session_id`; append History row
 
-On stub throw: `RESET` → `idle`, inline error, **Retry**. Reset also clears `session_id`.
+On send throw: `RESET` → `idle`, inline error, **Retry**. Reset also clears `session_id`.
 
 **Runtime note (SAD AD-5):** Non-streaming JSON. Pause / cancel / Extra Guidance are Future Work.
 
@@ -138,7 +141,7 @@ On stub throw: `RESET` → `idle`, inline error, **Retry**. Reset also clears `s
 
 ## Results
 
-Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice **renders** nested `content.risk_level`, `content.text`, `content.resource_links`, plus `mode` and `ai_disclosure`. Other envelope fields are typed on the fixture for Integration but are not controls.
+Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice **renders** nested `content.risk_level`, `content.text`, `content.resource_links`, plus `mode` and `ai_disclosure`. Other envelope fields are typed for Integration but are not controls.
 
 | Field | Type | UI |
 |-------|------|-----|
@@ -150,17 +153,17 @@ Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice 
 | `mode` | `normal` \| `patient` \| `priority` | Label `Mode: {mode}` |
 | `ai_disclosure` | boolean | “This check uses AI.” when `true` |
 | `session_id` | UUID string | Not shown on Results; History key prefix |
-| `caps.tutor_sessions_*` / `tutor_capped` | number / boolean | **Hidden.** Stub zeros until `@backend.eng` counts real weekly sessions (`WEEKLY_CAPS_ARE_REAL`). No CapMessage. |
+| `caps.tutor_sessions_*` / `tutor_capped` | number / boolean | **Hidden.** Fixture zeros until `@backend.eng` counts real weekly sessions (`WEEKLY_CAPS_ARE_REAL`). No CapMessage. |
 
-**Fixture rules (stub only)**
+**Fixture rules (when API base is unset)**
 
-- Successful `sendChat` returns `STUB_FIXTURES[stubPath]` only. Both paths set `explicit_path: "scam"`, `route_intent: "SCAM"`, `agent_id: "scam_detector"`, `content.verified_guide: true`. Path A: gift-card, `likely_scam`. Path B: happening-now, `critical` + Priority disclosure.
-- `activeScamNow` selects the fixture id. `message` is not used to vary the verdict.
+- Successful fixture `sendChat` returns `STUB_FIXTURES[stubPath]` only. Both paths set `explicit_path: "scam"`, `route_intent: "SCAM"`, `agent_id: "scam_detector"`, `content.verified_guide: true`. Path A: gift-card, `likely_scam`. Path B: happening-now, `critical` + Priority disclosure.
+- `activeScamNow` selects the fixture id. `message` is not used to vary the fixture verdict.
 - `ui.actions` is present on both fixtures; **Pause** is rendered from the SafetyBar (client), not from `ui.actions`. Extra Guidance is not rendered.
 - `caps` stay on the envelope (SAD). Do **not** show used/limit/capped numbers. `WEEKLY_CAPS_ARE_REAL` is false; do not ask backend to count sessions until that flag flips.
 - No streaming chunks, tool-call traces, or cost fields.
 
-Errors from stubs: return to **Crew: idle**, keep inputs, inline message + **Retry**.
+Errors from `sendChat` (live or fixture): return to **Crew: idle**, keep inputs, inline message + **Retry**.
 
 ---
 
@@ -180,16 +183,16 @@ Session-scoped list of completed runs (React state only). **Not** written to `lo
 
 - Newest first.
 - Empty state: “No checks yet in this visit.”
-- List key: `` `${sessionId}-${completedAt}-${index}` `` (stub `session_id` is fixed, so it is not unique alone).
+- List key: `` `${sessionId}-${completedAt}-${index}` `` (fixture `session_id` is fixed, so it is not unique alone).
 - Caregiver-visible Progress Service fields are **out of scope**; this list is senior-session only and must not be treated as the caregiver API.
 
 ---
 
 ## Contracts
 
-**Wire contract = SAD §4.** Copied below so Backend / Integration do not invent a second shape. Source files: `project-context/1.define/sad.md` §4 and `frontend/lib/types/chat.ts`. UI FSM/form types are **not** the wire envelope (`frontend/lib/types/run.ts`). Stub fixture: `frontend/lib/fixtures/chatFixtures.ts`. If the wire payload changes, update this section, `chat.ts`, and the SAD together.
+**Wire contract = SAD §4.** Copied below so Backend / Integration do not invent a second shape. Source files: `project-context/1.define/sad.md` §4 and `frontend/lib/types/chat.ts`. UI FSM/form types are **not** the wire envelope (`frontend/lib/types/run.ts`). Fixture fallback: `frontend/lib/fixtures/chatFixtures.ts`. If the wire payload changes, update this section, `chat.ts`, and the SAD together.
 
-**Anti-corruption rule:** `startRun` / `getRunStatus` is allowed only as a **temporary** layer, and only if each call maps **1:1** onto `ChatRequest` / `ChatResponse`. Do not add `runId`, `summary`, `recommendedActions`, `status: running|done`, or any other wrapper as a second API. This slice uses `sendChat(request: ChatRequest): Promise<ChatResponse>` (one non-streaming JSON POST `/api/v1/chat`).
+**Anti-corruption rule:** `startRun` / `getRunStatus` is allowed only as a **temporary** layer, and only if each call maps **1:1** onto `ChatRequest` / `ChatResponse`. Do not add `runId`, `summary`, `recommendedActions`, `status: running|done`, or any other wrapper as a second API. This slice uses `sendChat(request: ChatRequest, stubPath: StubFixturePath): Promise<ChatResponse>` (one non-streaming JSON POST `/api/v1/chat`; live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set).
 
 `client_action` / `ui.actions` value `get_extra_help` is the machine id; the visible button label is **Extra Guidance** (AD-11). This slice does not render those actions.
 
@@ -404,7 +407,7 @@ This slice still only **sends** `explicit_path: "scam"` and `client_action: "non
 | `STUB_FIXTURES` | `{ path_a_gift_card_bail, path_b_active_scam }` |
 | `WEEKLY_CAPS_ARE_REAL` | `false` — hide `caps.*` in UI; do not invent a live counter |
 
-`sendChat(request, stubPath)` → `STUB_FIXTURES[stubPath]` with `session_id` copied. `stubPath` is stub-only. No `fetch`, streaming, tool-call, cost fields, or message-keyword scoring.
+`sendChat(request, stubPath)` → live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set; otherwise `STUB_FIXTURES[stubPath]` with `session_id` copied. `stubPath` is fixture-only. No streaming, tool-call, cost fields, or client message-keyword scoring.
 
 ### Component props
 
@@ -431,20 +434,20 @@ Update this checklist **in the same change as each commit** that touches Critica
 | # | Item | Status | Note |
 |---|------|--------|------|
 | S1 | Single App Router route `/` (`frontend/app/page.tsx`) | synced | No `/onboarding`, `/learn`, `/caregiver`. Proof stays on `/`. |
-| S2 | Inputs `messageText`, `activeScamNow`; max 4000; form locked when `running`/`done` | synced | `activeScamNow` selects Path B; still not a `ChatRequest` field. |
+| S2 | Inputs `messageText`, `activeScamNow`; max 4000; form locked when `running`/`done` | synced | `activeScamNow` selects Path B on fixtures only; still not a `ChatRequest` field. |
 | S3 | FSM `idle` → `running` → `done`; events START / COMPLETE / RESET | synced | Unchanged. Pause is a UX freeze, not a fourth FSM state. |
-| S4 | Stub is one non-streaming `POST /api/v1/chat`; `explicit_path: "scam"` | synced | `toChatRequest` always sets scam path; `agent_id` scam_detector on fixtures. |
+| S4 | One non-streaming `POST /api/v1/chat`; `explicit_path: "scam"` | synced | Live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset (`7c42dc1`). |
 | S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps still hidden (`WEEKLY_CAPS_ARE_REAL` false); no CapMessage. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
 | S7 | Run, Reset, Retry; client Pause always visible | synced | Idle copy: “Pause is always here, waiting for you.” |
-| S8 | `frontend.md` Audit records this FE change | synced | Recorded on-page title and Pause/subtitle copy, commit `3541b06`. |
-| S9 | SAD extra routes and Tutor step not implemented | synced | Unchanged. |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded live `sendChat` + fixture fallback (not stub-only). |
+| S9 | SAD extra routes and Tutor step not implemented | synced | Tutor still deferred; live Flow on `/` already wired. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | h1 is **Learn the Signs, Protect Yourself**. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** `3541b06`  
-**Last synced at:** 2026-08-26T15:30:00Z
+**Last synced commit:** pending this docs change  
+**Last synced at:** 2026-08-26T16:25:00Z
 
 ---
 
@@ -459,7 +462,7 @@ Update this checklist **in the same change as each commit** that touches Critica
 - `project-context/1.define/user-stories/US-013-get-extra-help-extended-help-mode.md`
 - `project-context/1.define/user-stories/US-018-accessible-pwa-speech-input.md`
 - `.cursor/templates/sfs-template.md` (section taxonomy adapted; operator required Inputs / Run / Results / History)
-- `.cursor/agents/frontend-eng.md` — UI only; no backend connection
+- `.cursor/agents/frontend-eng.md` — UI only; live `fetch` owned by `@integration.eng` (`7c42dc1`)
 - Operator request: Critical Research Workflow; filename `frontend-funcional-spec.md`; FSM; stubs; Spec Sync
 - Operator request (follow-up): obvious Crew status banner, colored pills, last updated, consistent `Crew:` phrasing
 - Operator request (follow-up): stubbed backend, Run/Reset only, three-state FSM, Retry on error, basic a11y
@@ -469,25 +472,27 @@ Update this checklist **in the same change as each commit** that touches Critica
 - Operator request (follow-up): path-honest fixtures Path A likely_scam / Path B critical+Priority; fixture-driven, no keyword rules
 - Operator request (follow-up): hide weekly-limit / cap numbers until they are real; talk to backend only if counting sessions for real
 - Operator request (follow-up): on-page title **Learn the Signs, Protect Yourself**; Pause idle “waiting for you”; subtitle “You're safe here, and you're never wrong to ask.”
+- Operator request (follow-up): stop describing spec / frontend.md / README as stub-only
+- `project-context/2.build/integration.md` — live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set
 - `project-context/2.build/backend.md` — frontend should hide weekly limits until they are real
 
 ## Assumptions
 
 - Operator name **Critical Research Workflow** is the FE slice name for US-002/US-014 scam-check research; it is not a new PRD feature ID. Visible `h1` / tab title is **Learn the Signs, Protect Yourself**.
 - Filename uses operator spelling `funcional` (not “functional”).
-- `project-context/2.build/setup.md` was **missing** at start; FE scaffolded `frontend/` directly. `@project.mgr` should still produce setup.md.
+- `project-context/2.build/setup.md` was **missing** at first FE scaffold; `@project.mgr` later produced it.
 - No `aamad.config.yml`; example config used for `prefer_modals: false`, type checking, `max_file_lines: 400`.
 - `AAMAD_TARGET_RUNTIME` unset → **`crewai`** (PRD + adapter registry).
 - History persistence via Progress Service is Integration/Backend work; this slice is in-memory only.
-- Stub verdicts are **named fixtures** (`STUB_PATH_A_GIFT_CARD_BAIL`, `STUB_PATH_B_ACTIVE_SCAM`). `activeScamNow` selects the id. `message` is never scored on the client.
+- Fixture verdicts are **named fixtures** (`STUB_PATH_A_GIFT_CARD_BAIL`, `STUB_PATH_B_ACTIVE_SCAM`) when the API base is unset. `activeScamNow` selects the id. `message` is never scored on the client.
 - Single-route scope is an operator override of SAD’s multi-route PWA map for this epic increment only.
-- Weekly `caps` on the stub envelope are not real session counts. Hide them rather than inventing a client counter or asking `@backend.eng` to count yet.
+- Weekly `caps` on the envelope are not shown until `@backend.eng` counts real weekly sessions.
 
 ## Open Questions
 
 1. Is 4000-character paste limit acceptable vs a SAD/security numeric cap still TBD?
 
-*Resolved:* Do **not** grow the route map (`/onboarding`, `/learn`, `/caregiver`, …) until paste → `explicit_path=scam` → Scam Detector + RAG → large-type verdict is proven with live Flow. One Tutor step waits until after that. Client Pause is on `/` now (US-009). `Crew: idle|running|done` remains the on-page status copy. Wire contract is SAD §4.
+*Resolved:* Do **not** grow the route map (`/onboarding`, `/learn`, `/caregiver`, …). One Tutor step is still not on this page. Client Pause is on `/` now (US-009). `Crew: idle|running|done` remains the on-page status copy. Wire contract is SAD §4. Live Flow is already used when `NEXT_PUBLIC_API_BASE_URL` is set.
 
 *Resolved:* Hide weekly cap numbers (`WEEKLY_CAPS_ARE_REAL = false`) instead of asking `@backend.eng` to count sessions.
 
@@ -616,3 +621,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `sync-docs` — Spec Sync S8 SHA `3541b06` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | S8 synced; Last synced commit `3541b06` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T16:25:00Z |
+| Persona id | `frontend-eng` |
+| Action | `document-frontend` — live `sendChat` + fixture fallback (not stub-only) |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | Status, Chat transport, S4/S8/S9; README + frontend.md aligned |

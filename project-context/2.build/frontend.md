@@ -6,9 +6,9 @@
 
 ## Status
 
-Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path on that route: paste → `explicit_path: "scam"` → Scam Detector fixture + RAG `verified_guide` → large-type verdict. Client **Pause** is always visible. Weekly cap numbers stay on the SAD envelope but are **hidden** (`WEEKLY_CAPS_ARE_REAL = false`). No `/onboarding`, `/learn`, or `/caregiver`. Tutor step not added yet (waits for live Flow).
+Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path: paste → `explicit_path: "scam"` → `POST /api/v1/chat` → large-type verdict. Client **Pause** is always visible. Weekly cap numbers stay on the SAD envelope but are **hidden** (`WEEKLY_CAPS_ARE_REAL = false`). No `/onboarding`, `/learn`, or `/caregiver`. Tutor step is still not on this page.
 
-No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
+`sendChat` is **not stub-only**. Integration (`7c42dc1`) wired live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set. When it is unset, `sendChat` still returns named Path A/B fixtures. Live Flow owns Priority Mode from the message; `activeScamNow` only selects a fixture.
 
 ## Steps taken
 
@@ -28,6 +28,7 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 14. Held route map: proved scam path on `/` (large-type verdict, Verified guide, Scam checker). Client Pause. Tutor step deferred until Flow.
 15. Hid weekly-limit / cap numbers until they are real. Did **not** ask `@backend.eng` to count sessions.
 16. Operator copy: h1 **Learn the Signs, Protect Yourself**; subtitle “You're safe here, and you're never wrong to ask.”; Pause idle “Pause is always here, waiting for you.”
+17. Documented live `sendChat` (`NEXT_PUBLIC_API_BASE_URL` → `fetch`) plus fixture fallback. Did not change application code. US-001 / US-002 owned by `@product-mgr`.
 
 ## Application map
 
@@ -43,7 +44,7 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 | `frontend/lib/fsm/runFsm.ts` | `idle` \| `running` \| `done` |
 | `frontend/lib/types/chat.ts` | SAD `ChatRequest` / `ChatResponse` / error envelope |
 | `frontend/lib/fixtures/chatFixtures.ts` | Path A `likely_scam` / Path B `critical`+Priority named fixtures |
-| `frontend/lib/services/chatService.ts` | Stub `sendChat` (`POST /api/v1/chat`, no fetch) |
+| `frontend/lib/services/chatService.ts` | `sendChat`: live `POST /api/v1/chat` when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures otherwise |
 | `frontend/lib/hooks/useCriticalResearchRun.ts` | Client orchestration |
 
 ## UI notes (SAD / PRD)
@@ -53,22 +54,22 @@ No live backend, CrewAI, Anthropic, or `fetch` to `/api/v1`.
 - Same `Crew: …` phrase in banner, Run, and Results.
 - On-page `h1` and document title: **Learn the Signs, Protect Yourself**. Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
 - Pause idle copy: “Pause is always here, waiting for you.” Paused hint is unchanged (`PAUSE_HINT`).
-- Controls: **Run**, **Reset**, **Pause**. Pause is client-side and does not cancel an in-flight stub.
-- Results proof: **Scam checker** + **Verified guide** + `text-4xl` verdict.
-- Stub errors: inline message + **Retry** (same inputs); FSM stays three states.
+- Controls: **Run**, **Reset**, **Pause**. Pause is client-side and does not cancel an in-flight request.
+- Results proof: **Scam checker** + **Verified guide** + `text-4xl` verdict (live envelope or fixture).
+- Send errors (live or fixture): inline message + **Retry** (same inputs); FSM stays three states.
 - Basic a11y: skip link, h1/h2, native keyboard/focus. Advanced a11y deferred.
 - No modals (`prefer_modals: false`).
 - Body ≥16px (18px root); primary controls `min-h-11` (44px).
 - Light high-contrast palette (no dark-mode inversion in this slice).
-- Shame-free copy; no blame on stub failure.
-- Stub envelope is SAD §4: one `sendChat` with full `ChatRequest`. Stub-only `stubPath` selects Path A (`likely_scam`, gift-card) or Path B (`critical`, `mode: priority`, `ai_disclosure: true`) from `activeScamNow`. Message text is never scored.
-- `ChatResponse.caps` stays on the wire (stub `0` / `5` / `false`). Results do not show used/limit. Flip `WEEKLY_CAPS_ARE_REAL` only after `@backend.eng` counts real weekly sessions. No CapMessage.
+- Shame-free copy; no blame on send failure.
+- Wire is SAD §4: one `sendChat` with full `ChatRequest`. Live path uses `fetch`. When the API base is unset, `stubPath` selects Path A (`likely_scam`, gift-card) or Path B (`critical`, `mode: priority`, `ai_disclosure: true`) from `activeScamNow`. The client never scores `message` keywords.
+- `ChatResponse.caps` stays on the wire. Results do not show used/limit. Flip `WEEKLY_CAPS_ARE_REAL` only after `@backend.eng` counts real weekly sessions. No CapMessage.
 
 ## Future Work placeholders (visible, non-functional)
 
 - Extra Guidance, Learn a skill, signup, caregiver progress (footer only).
-- SAD routes `/onboarding`, `/learn`, `/scam`, `/progress`, `/caregiver`, `/settings` — **not created**. Do not add them until this scam path talks to Flow.
-- One Tutor step — next after Integration wires `POST /api/v1/chat` to CrewAI Flow.
+- SAD routes `/onboarding`, `/learn`, `/scam`, `/progress`, `/caregiver`, `/settings` — **not created**.
+- One Tutor step — still deferred; the scam check on `/` already posts to Flow when `NEXT_PUBLIC_API_BASE_URL` is set (`7c42dc1`).
 
 ## How to run
 
@@ -79,6 +80,8 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+For a live check, set `NEXT_PUBLIC_API_BASE_URL` in `frontend/.env.local` and run the API as in `setup.md` § “Run both sides together”. Omit that variable to use Path A/B fixtures.
 
 ## Spec Sync
 
@@ -94,10 +97,12 @@ After **every commit** that changes this UI or the spec, update the checklist in
 - `project-context/2.build/backend.md` — hide weekly limits until they are real
 - Operator request: hide weekly-limit / cap numbers until they are real; talk to `@backend.eng` only if counting sessions for real
 - Operator request: replace on-page title and Pause/subtitle copy (Learn the Signs, Protect Yourself)
+- Operator request: stop describing frontend.md / spec / README as stub-only (`sendChat` live when API base is set)
+- `project-context/2.build/integration.md` — live `fetch` in `7c42dc1`
 
 ## Assumptions
 
-- `setup.md` missing; FE created `frontend/` without `@project.mgr` scaffold.
+- `setup.md` was missing at first FE scaffold; `@project.mgr` later produced `project-context/2.build/setup.md`.
 - Operator “Critical Research Workflow” = US-002/US-014 check slice, not a new PRD feature. Visible `h1` / tab title is **Learn the Signs, Protect Yourself**.
 - `AAMAD_TARGET_RUNTIME` unset → `crewai`.
 - No `aamad.config.yml`; example config for type checking, no modals, 400-line file cap.
@@ -107,11 +112,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 ## Open Questions
 
 1. Is 4000-character paste limit acceptable vs a SAD/security numeric cap still TBD?
-2. `@project.mgr` still needs to produce `setup.md` and `.env.example`.
+2. Should committed `.env.example` files (names only) land under `frontend/` and `senior_digital_literacy/`?
 
-*Resolved:* Do not grow the SAD route map before live Flow on the scam path. Client Pause is on `/`. Tutor step is next after Integration, not extra routes now.
+*Resolved:* Do not grow the SAD route map. Client Pause is on `/`. Tutor step is still not on this page. Live Flow on the scam check is already wired when `NEXT_PUBLIC_API_BASE_URL` is set.
 
-*Resolved:* Hide weekly cap numbers rather than asking `@backend.eng` to count sessions. Envelope stubs remain; UI gate is `WEEKLY_CAPS_ARE_REAL`.
+*Resolved:* Hide weekly cap numbers rather than asking `@backend.eng` to count sessions. Envelope `caps` may still be stub zeros on fixtures and unused on Results; UI gate is `WEEKLY_CAPS_ARE_REAL`.
 
 ## Audit
 
@@ -242,3 +247,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `sync-docs` — Spec Sync S8 SHA `3541b06` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend-funcional-spec.md S8 + Last synced commit |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-26T16:25:00Z |
+| Persona id | `frontend-eng` |
+| Action | `document-frontend` — live `sendChat` + fixture fallback (not stub-only) |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend.md; frontend-funcional-spec.md; frontend/README.md |

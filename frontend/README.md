@@ -16,4 +16,7 @@ npm run dev
 
 Open `http://localhost:3000`. There is one route: `/`.
 
-`sendChat` is an in-memory stub for SAD `POST /api/v1/chat`. It returns named fixtures (Path A gift-card `likely_scam`, or Path B happening-now `critical` + Priority Mode). Do not point this client at a live API in the frontend epic.
+`sendChat` posts SAD `ChatRequest` to `POST /api/v1/chat` (non-streaming JSON, AD-5).
+
+- **Live:** set `NEXT_PUBLIC_API_BASE_URL` in gitignored `frontend/.env.local` (for example `http://127.0.0.1:8000`). See `project-context/2.build/setup.md` § “Run both sides together”.
+- **Fixtures:** if that variable is unset, `sendChat` returns named Path A / Path B responses (gift-card `likely_scam`, or happening-now `critical` + Priority Mode). The checkbox `activeScamNow` only selects the fixture; it is not on `ChatRequest`.
