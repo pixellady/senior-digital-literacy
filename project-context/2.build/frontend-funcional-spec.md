@@ -71,7 +71,7 @@ A sticky **status banner** at the top of `/` shows:
 |---------|------|
 | Label | Always `Crew: idle`, `Crew: running`, or `Crew: done` — same words in the banner, Run section, and Results |
 | Pill | Colored pill + dot (color is **not** the only cue): **gray** idle, **blue** running, **green** done |
-| Last updated | `Last updated: {locale date + time with seconds}` next to the label |
+| Last updated | `Last updated: {locale date + time with seconds}` next to the label. Format on the client after mount so SSR and hydration text match. |
 
 Copy source of truth: `frontend/lib/copy/crewStatus.ts`.
 

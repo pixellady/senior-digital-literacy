@@ -6,7 +6,7 @@ from typing import Type
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
-from senior_digital_literacy.scam_library import match_scam_library
+from senior_digital_literacy.scam_library import lookup_payload
 
 
 class SearchScamLibraryInput(BaseModel):
@@ -28,26 +28,4 @@ class SearchScamLibraryTool(BaseTool):
     args_schema: Type[BaseModel] = SearchScamLibraryInput
 
     def _run(self, message: str) -> str:
-        hit = match_scam_library(message)
-        if hit is None:
-            return json.dumps(
-                {
-                    "matched": False,
-                    "verified_guide": False,
-                    "risk_level": None,
-                    "guidance": "",
-                    "resource_links": [],
-                }
-            )
-        return json.dumps(
-            {
-                "matched": True,
-                "verified_guide": True,
-                "pattern_id": hit.pattern_id,
-                "title": hit.title,
-                "risk_level": hit.risk_level,
-                "guidance": hit.guidance,
-                "sample_text": hit.sample_text,
-                "resource_links": hit.resource_links,
-            }
-        )
+        return json.dumps(lookup_payload(message))

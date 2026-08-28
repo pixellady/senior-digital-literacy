@@ -1,8 +1,22 @@
 from __future__ import annotations
 
-from typing import Literal
+import json
+import re
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
+
+
+def parse_json_object(raw: str) -> dict[str, Any]:
+    """Parse a JSON object, including markdown-fenced model output."""
+    text = (raw or "").strip()
+    fenced = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
+    if fenced:
+        text = fenced.group(1).strip()
+    data = json.loads(text)
+    if not isinstance(data, dict):
+        raise ValueError("JSON payload must be an object")
+    return data
 
 RiskLevel = Literal["likely_scam", "suspicious", "likely_safe", "critical"]
 TutorMode = Literal["normal", "patient"]

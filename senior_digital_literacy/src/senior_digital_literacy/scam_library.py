@@ -45,6 +45,29 @@ def _links_for_pattern(pattern: dict[str, Any]) -> list[dict[str, str]]:
     return [link for link in catalog_links() if link.get("url") in wanted]
 
 
+def lookup_payload(message: str) -> dict[str, Any]:
+    """JSON-shaped library result for the crew (and the search tool)."""
+    hit = match_scam_library(message)
+    if hit is None:
+        return {
+            "matched": False,
+            "verified_guide": False,
+            "risk_level": None,
+            "guidance": "",
+            "resource_links": [],
+        }
+    return {
+        "matched": True,
+        "verified_guide": True,
+        "pattern_id": hit.pattern_id,
+        "title": hit.title,
+        "risk_level": hit.risk_level,
+        "guidance": hit.guidance,
+        "sample_text": hit.sample_text,
+        "resource_links": hit.resource_links,
+    }
+
+
 def match_scam_library(message: str) -> LibraryHit | None:
     """Best local pattern whose markers appear in the pasted text. No web."""
     blob = (message or "").strip().lower()

@@ -1,5 +1,6 @@
 import {
   PAUSE_HINT,
+  PAUSE_IDLE,
   PAUSE_LABEL,
   RESUME_LABEL,
 } from "@/lib/copy/safetyBar";
@@ -28,7 +29,7 @@ export function SafetyBar({ paused, onPause, onResume }: SafetyBarProps) {
           <p className="text-lg text-slate-900">{PAUSE_HINT}</p>
         ) : (
           <p className="text-lg text-slate-800">
-            Pause is always here, waiting for you.
+            {PAUSE_IDLE}
           </p>
         )}
       </div>

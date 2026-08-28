@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import datetime
 import json
-import re
 from typing import Any, Literal
 from uuid import uuid4
 
@@ -13,8 +12,10 @@ from crewai.flow import Flow, listen, or_, router, start
 from senior_digital_literacy.crew import SeniorDigitalLiteracy
 from senior_digital_literacy.scam_library import (
     filter_links_to_catalog,
+    lookup_payload,
     match_scam_library,
 )
+from senior_digital_literacy.schemas import parse_json_object
 
 # SAD AD-8: explicit UI path wins, then safety override, else TUTOR.
 _SCAM_SAFETY_MARKERS = (
@@ -54,6 +55,10 @@ class ChatTurnState(BaseModel):
 class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
     """Product turn: start → route → one crew → final JSON output."""
 
+    def __init__(self, **kwargs):
+        kwargs.setdefault("tracing", True)
+        super().__init__(**kwargs)
+
     @start()
     def ingest_turn(self) -> str:
         if not self.state.session_id:
@@ -64,23 +69,9 @@ class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
 
     @router(ingest_turn, emit=["TUTOR", "SCAM"])
     def intent_router(self) -> Literal["TUTOR", "SCAM"]:
-        path = (self.state.explicit_path or "").strip().lower()
-        if path == "scam":
-            self.state.route_intent = "SCAM"
-        elif path == "tutor":
-            self.state.route_intent = "TUTOR"
-        elif _safety_override(self.state):
-            self.state.route_intent = "SCAM"
-        else:
-            self.state.route_intent = "TUTOR"
-
-        if self.state.route_intent == "SCAM" and _safety_override(self.state):
-            self.state.mode = "priority"
-        elif self.state.route_intent == "TUTOR" and self.state.client_action == "get_extra_help":
-            self.state.mode = "patient"
-        elif self.state.mode not in {"normal", "patient", "priority"}:
-            self.state.mode = "normal"
-
+        route, mode = decide_route_and_mode(self.state)
+        self.state.route_intent = route
+        self.state.mode = mode
         return self.state.route_intent  # type: ignore[return-value]
 
     @listen("TUTOR")
@@ -192,15 +183,30 @@ def _ground_scam_content(content: dict[str, Any], message: str) -> dict[str, Any
 
 
 def _parse_agent_payload(raw: str) -> dict[str, Any]:
-    text = (raw or "").strip()
-    fenced = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
-    if fenced:
-        text = fenced.group(1).strip()
     try:
-        data = json.loads(text)
-    except json.JSONDecodeError:
+        return parse_json_object(raw)
+    except (json.JSONDecodeError, ValueError):
         return {}
-    return data if isinstance(data, dict) else {}
+
+
+def decide_route_and_mode(state: ChatTurnState) -> tuple[str, str]:
+    """SAD AD-8: explicit UI path wins, then safety override, else TUTOR."""
+    path = (state.explicit_path or "").strip().lower()
+    if path == "scam":
+        route = "SCAM"
+    elif path == "tutor":
+        route = "TUTOR"
+    elif _safety_override(state):
+        route = "SCAM"
+    else:
+        route = "TUTOR"
+
+    mode = state.mode if state.mode in {"normal", "patient", "priority"} else "normal"
+    if route == "SCAM" and _safety_override(state):
+        mode = "priority"
+    elif route == "TUTOR" and state.client_action == "get_extra_help":
+        mode = "patient"
+    return route, mode
 
 
 def _safety_override(state: ChatTurnState) -> bool:
@@ -221,4 +227,5 @@ def _crew_inputs(state: ChatTurnState) -> dict[str, Any]:
         "last_step": state.last_step,
         "suspicious_content": state.suspicious_content,
         "current_year": state.current_year,
+        "library_result": json.dumps(lookup_payload(state.user_message)),
     }

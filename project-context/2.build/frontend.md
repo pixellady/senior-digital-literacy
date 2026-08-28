@@ -50,7 +50,7 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 ## UI notes (SAD / PRD)
 
 - Calm “Crew: running. Working on this…” loading copy; non-streaming wait (AD-5).
-- Sticky Crew status banner: `Crew: idle|running|done`, gray/blue/green pills, Last updated (seconds).
+- Sticky Crew status banner: `Crew: idle|running|done`, gray/blue/green pills, Last updated (seconds). Locale time is formatted **after mount** so SSR HTML matches the client (no hydration mismatch from `toLocaleString` / `new Date()`).
 - Same `Crew: …` phrase in banner, Run, and Results.
 - On-page `h1` and document title: **Learn the Signs, Protect Yourself**. Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
 - Pause idle copy: “Pause is always here, waiting for you.” Paused hint is unchanged (`PAUSE_HINT`).
@@ -263,3 +263,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `sync-docs` — Spec Sync S8 SHA `7c8b535` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend-funcional-spec.md S8 + Last synced commit |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-27T23:30:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — format Last updated after mount (hydration) |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `CrewStatusBanner` client-only locale time; spec Last updated note |

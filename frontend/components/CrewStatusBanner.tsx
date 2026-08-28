@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   CREW_DOT_CLASS,
   CREW_PILL_CLASS,
@@ -13,6 +16,11 @@ type CrewStatusBannerProps = {
 
 export function CrewStatusBanner({ phase, lastUpdated }: CrewStatusBannerProps) {
   const label = crewStatusLabel(phase);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   return (
     <div
@@ -32,7 +40,9 @@ export function CrewStatusBanner({ phase, lastUpdated }: CrewStatusBannerProps) 
           {label}
         </span>
         <p className="text-base font-medium text-slate-800">
-          Last updated: {formatLastUpdated(lastUpdated)}
+          {hasMounted
+            ? `Last updated: ${formatLastUpdated(lastUpdated)}`
+            : "Last updated:"}
         </p>
       </div>
     </div>

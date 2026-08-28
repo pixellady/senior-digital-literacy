@@ -39,8 +39,9 @@ tutor_turn_task:
 
     Tutorial RAG is not wired. Set content.verified_guide to false.
     Fill the named TutorTurnForm: risk_level null, resource_links [].
+    Calm tone. No shame language. No scam verdict. No invented banking or password steps.
   expected_output: >
-    Fill the named form TutorTurnForm (Pydantic). JSON fields:
+    Fill the named form TutorTurnForm (Pydantic). Raw JSON only — no markdown fences. JSON fields:
 
     {
       "agent_id": "step_by_step_tutor",
@@ -68,11 +69,6 @@ tutor_turn_task:
       }
     }
   agent: step_by_step_tutor
-  guardrail: >
-    Must fill named form TutorTurnForm. Valid JSON. One tutoring step.
-    mode must be normal or patient. risk_level must be null.
-    No shame language. No scam verdict. No invented banking or password steps.
-  guardrail_max_retries: 2
 
 scam_check_task:
   description: >
@@ -100,14 +96,18 @@ scam_check_task:
     Do not tutor email or phone skills; if they want a how-to lesson,
     say the tutor can help with that after they are safe.
 
-    You have exactly one tool: search_scam_library. Call it with the
-    learner message before you answer. Use only that library. Do not
-    search the open web. If the tool matches, use its risk_level,
-    guidance, and resource_links; set verified_guide true. If it does
-    not match, set verified_guide false, pick suspicious or likely_safe,
-    and use only catalog links the tool returned (often none).
+    A local library search already ran. Result:
+    {library_result}
+
+    Use that result. Do not call search_scam_library unless the result is
+    missing. Do not search the open web. If matched is true, use its
+    risk_level, guidance, and resource_links; set verified_guide true.
+    If matched is false, set verified_guide false, pick suspicious or
+    likely_safe, and use only catalog links from the result (often none).
+    Calm tone. Do not blame the user. Do not claim to be a bank, police,
+    or a person who will call back.
   expected_output: >
-    Fill the named form ScamTurnForm (Pydantic). JSON fields:
+    Fill the named form ScamTurnForm (Pydantic). Raw JSON only — no markdown fences. Keep content.text to 4 short sentences. JSON fields:
 
     {
       "agent_id": "scam_detector",
@@ -133,9 +133,3 @@ scam_check_task:
       }
     }
   agent: scam_detector
-  guardrail: >
-    Must fill named form ScamTurnForm. Valid JSON. One scam-check turn.
-    mode must be normal or priority. risk_level must be likely_scam,
-    suspicious, likely_safe, or critical. Calm tone. Do not blame the user.
-    Do not claim to be a bank, police, or a person who will call back.
-  guardrail_max_retries: 2
