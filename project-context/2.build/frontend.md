@@ -288,3 +288,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `develop-fe` — print sheet Checked date/time + Website URL |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | `PrintSummary` after-mount meta; spec Save or print subsection |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-30T08:50:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `6273d22` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | frontend-funcional-spec.md S8 + Last synced commit |

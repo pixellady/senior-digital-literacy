@@ -461,14 +461,14 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps hidden. Save or print after `done`; sheet has Checked + Website; no session_id or paste. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
 | S7 | Run, Reset, Retry; client Pause always visible | synced | Idle copy: “Pause is always here, waiting for you.” |
-| S8 | `frontend.md` Audit records this FE change | pending | Print Checked + Website; frontend.md Audit this change. Last synced after commit. |
+| S8 | `frontend.md` Audit records this FE change | synced | Recorded print Checked + Website, commit `6273d22`. |
 | S9 | SAD extra routes and Tutor step not implemented | synced | Tutor still deferred; live Flow on `/` already wired. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | h1 is **Learn the Signs, Protect Yourself**. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** pending  
-**Last synced at:** pending
+**Last synced commit:** `6273d22`  
+**Last synced at:** 2026-08-30T08:50:00Z
 
 ---
 
@@ -672,3 +672,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `document-frontend` — print sheet Checked date/time + Website URL |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | Results Save or print subsection; S5; US-016/US-017 sources |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-30T08:50:00Z |
+| Persona id | `frontend-eng` |
+| Action | `sync-docs` — Spec Sync S8 SHA `6273d22` |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | S8 synced; Last synced commit `6273d22` |
