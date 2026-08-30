@@ -1,8 +1,10 @@
+import { PrintSummary } from "@/components/PrintSummary";
+import { SavePrintControl } from "@/components/SavePrintControl";
+import { VerifiedGuideBadge } from "@/components/VerifiedGuideBadge";
 import { AI_DISCLOSURE_COPY, modeLabel } from "@/lib/copy/chatCopy";
 import { shouldShowWeeklyCaps } from "@/lib/copy/caps";
 import { crewStatusLabel } from "@/lib/copy/crewStatus";
 import { riskHeading } from "@/lib/copy/riskCopy";
-import { VerifiedGuideBadge } from "@/components/VerifiedGuideBadge";
 import type { ChatResponse } from "@/lib/types/chat";
 import type { RunPhase } from "@/lib/types/run";
 
@@ -18,18 +20,24 @@ export function ResultsSection({ phase, result }: ResultsSectionProps) {
   return (
     <section
       aria-labelledby="results-heading"
+      id="results-print-card"
       className="rounded-xl border-2 border-slate-800 bg-white p-6 shadow-sm"
     >
-      <h2 id="results-heading" className="text-2xl font-semibold text-slate-900">
-        Results
-      </h2>
+      <div className="no-print flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <h2 id="results-heading" className="text-2xl font-semibold text-slate-900">
+          Results
+        </h2>
+        {showResult ? <SavePrintControl /> : null}
+      </div>
+
+      {showResult && result ? <PrintSummary result={result} /> : null}
 
       {!showResult || !result ? (
         <p className="mt-4 text-xl text-slate-800">
           Results will appear here when {crewStatusLabel("done")}.
         </p>
       ) : (
-        <div className="mt-4 space-y-4">
+        <div className="no-print mt-4 space-y-4">
           <p className="text-xl font-semibold text-slate-800">
             {crewStatusLabel("done")}
           </p>

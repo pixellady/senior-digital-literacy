@@ -6,6 +6,7 @@ import { InputsSection } from "@/components/InputsSection";
 import { ResultsSection } from "@/components/ResultsSection";
 import { RunSection } from "@/components/RunSection";
 import { SafetyBar } from "@/components/SafetyBar";
+import { PRIVACY_REASSURANCE_COPY } from "@/lib/copy/privacyReassurance";
 import { useCriticalResearchRun } from "@/lib/hooks/useCriticalResearchRun";
 
 export function CriticalResearchWorkflow() {
@@ -15,23 +16,29 @@ export function CriticalResearchWorkflow() {
     <div>
       <a
         href="#workflow-main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-lg focus:font-semibold focus:text-slate-900 focus:outline focus:outline-4 focus:outline-blue-800"
+        className="no-print sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-lg focus:font-semibold focus:text-slate-900 focus:outline focus:outline-4 focus:outline-blue-800"
       >
         Skip to workflow
       </a>
 
-      <CrewStatusBanner phase={workflow.phase} lastUpdated={workflow.lastUpdated} />
-      <SafetyBar
-        paused={workflow.paused}
-        onPause={workflow.pause}
-        onResume={workflow.resume}
-      />
+      <div className="no-print sticky top-0 z-20">
+        <CrewStatusBanner
+          phase={workflow.phase}
+          lastUpdated={workflow.lastUpdated}
+          paused={workflow.paused}
+        />
+        <SafetyBar
+          paused={workflow.paused}
+          onPause={workflow.pause}
+          onResume={workflow.resume}
+        />
+      </div>
 
       <div
         id="workflow-main"
         className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-8 sm:px-8"
       >
-        <header>
+        <header className="no-print">
           <p className="text-base font-medium uppercase tracking-wide text-slate-700">
             Scam Defense
           </p>
@@ -42,9 +49,11 @@ export function CriticalResearchWorkflow() {
             Check a suspicious message or call. You&apos;re safe here, and
             you&apos;re never wrong to ask.
           </p>
+          <p className="mt-2 text-base text-slate-700">{PRIVACY_REASSURANCE_COPY}</p>
         </header>
 
         <form
+          className="no-print"
           onSubmit={(event) => {
             event.preventDefault();
             void workflow.run();
@@ -70,9 +79,11 @@ export function CriticalResearchWorkflow() {
         </form>
 
         <ResultsSection phase={workflow.phase} result={workflow.result} />
-        <HistorySection entries={workflow.history} />
+        <div className="no-print">
+          <HistorySection entries={workflow.history} />
+        </div>
 
-        <footer className="border-t-2 border-slate-300 pt-4 text-base text-slate-700">
+        <footer className="no-print border-t-2 border-slate-300 pt-4 text-base text-slate-700">
           <p>
             Future work (not working yet): Extra Guidance, Learn a skill,
             account signup, and progress for caregivers. Extra routes wait until

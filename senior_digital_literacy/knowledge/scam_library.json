@@ -5,6 +5,26 @@
       "url": "https://consumer.ftc.gov/articles/how-avoid-gift-card-scam"
     },
     {
+      "label": "FTC: Tech support scams",
+      "url": "https://consumer.ftc.gov/articles/how-spot-avoid-and-report-tech-support-scams"
+    },
+    {
+      "label": "IRS: Tax scams and consumer alerts",
+      "url": "https://www.irs.gov/newsroom/tax-scams-consumer-alerts"
+    },
+    {
+      "label": "HUD OIG: Report housing fraud",
+      "url": "https://www.hud.gov/program_offices/inspector_general/hotline"
+    },
+    {
+      "label": "FTC: Romance scams",
+      "url": "https://consumer.ftc.gov/articles/what-you-need-know-about-romance-scams"
+    },
+    {
+      "label": "FTC: Recovery scams",
+      "url": "https://consumer.ftc.gov/articles/how-avoid-government-imposter-scams"
+    },
+    {
       "label": "AARP Fraud Watch",
       "url": "https://www.aarp.org/money/scams-fraud/"
     },
@@ -17,6 +37,7 @@
     {
       "id": "gift_card_jail",
       "title": "Grandparent gift-card bail",
+      "personas": ["Margaret"],
       "risk_level": "likely_scam",
       "sample_text": "A text says my grandson is in jail and I must buy Apple gift cards and send the codes to keep him from staying overnight.",
       "markers": [
@@ -39,6 +60,7 @@
     {
       "id": "account_closed_maybe",
       "title": "Account closed unless you tap a link",
+      "personas": ["Margaret"],
       "risk_level": "suspicious",
       "sample_text": "Your bank account will be closed today unless you tap this link and confirm your password.",
       "markers": [
@@ -52,6 +74,129 @@
       "guidance": "This looks like a maybe-scam from our library: a text that rushes you to tap a link to keep an account open. Banks and real companies do not usually ask you to confirm a password from a text link. Do not tap the link. Do not type a password. Use a number or app you already trust, or wait and ask someone you know.",
       "resource_link_ids": [
         "https://www.ic3.gov/",
+        "https://www.aarp.org/money/scams-fraud/"
+      ]
+    },
+    {
+      "id": "tech_support_lock",
+      "title": "Tech-support pop-up on a home phone",
+      "personas": ["Margaret"],
+      "risk_level": "likely_scam",
+      "sample_text": "A pop-up on my iPhone says Microsoft locked my computer for a refund error. It told me to call a number and let them remote in with AnyDesk.",
+      "markers": [
+        "microsoft locked",
+        "tech support",
+        "anydesk",
+        "teamviewer",
+        "remote in",
+        "refund error",
+        "windows support",
+        "apple support pop-up"
+      ],
+      "guidance": "This matches a tech-support pattern in our library. Microsoft, Apple, and your phone company do not lock your device with a pop-up and then ask you to call a number or install remote-access software. Do not call the number on the screen. Do not install AnyDesk or TeamViewer. Close the pop-up or ask a person you already know to help you power the device off and back on.",
+      "resource_link_ids": [
+        "https://consumer.ftc.gov/articles/how-spot-avoid-and-report-tech-support-scams",
+        "https://www.aarp.org/money/scams-fraud/"
+      ]
+    },
+    {
+      "id": "irs_tax_warrant",
+      "title": "IRS tax warrant or fake refund",
+      "personas": ["Margaret"],
+      "risk_level": "likely_scam",
+      "sample_text": "A man on the phone said he was with the IRS. He said I owe back taxes and they will issue a tax warrant today unless I pay with a wire.",
+      "markers": [
+        "irs",
+        "back taxes",
+        "tax warrant",
+        "tax refund",
+        "internal revenue",
+        "owe taxes"
+      ],
+      "guidance": "This matches an IRS-impersonation pattern in our library. The real IRS does not call to demand gift cards, a wire, or same-day payment, and it does not threaten an instant warrant on a cold call. Hang up. Do not pay. If you want to check a real tax notice, use a number printed on a letter you already have, or irs.gov — not a number from the caller.",
+      "resource_link_ids": [
+        "https://www.irs.gov/newsroom/tax-scams-consumer-alerts",
+        "https://www.aarp.org/money/scams-fraud/"
+      ]
+    },
+    {
+      "id": "housing_benefits_fee",
+      "title": "Housing or benefits recertification fee",
+      "personas": ["Carmen"],
+      "risk_level": "likely_scam",
+      "sample_text": "A flyer in the lobby says the housing authority will stop my Section 8 unless I pay a recertification fee today on a website and send a photo of my SNAP card.",
+      "markers": [
+        "section 8",
+        "housing authority",
+        "recertification fee",
+        "public housing",
+        "snap card",
+        "benefits will stop",
+        "hud eviction"
+      ],
+      "guidance": "This matches a housing-and-benefits pattern we keep for shared computers and public housing. Real housing authorities and benefits offices do not ask you to pay a sudden website fee or send a photo of your SNAP or ID card from a flyer. Do not pay. Do not send photos of cards. Ask the office you already use — a number on a letter you already have, or the front desk you already know — not the flyer website.",
+      "resource_link_ids": [
+        "https://www.hud.gov/program_offices/inspector_general/hotline",
+        "https://www.ic3.gov/"
+      ]
+    },
+    {
+      "id": "romance_ticket_money",
+      "title": "Romance or overseas ticket request",
+      "personas": ["Margaret"],
+      "risk_level": "likely_scam",
+      "sample_text": "Someone I met online says they are in the military overseas and need me to Western Union money for a plane ticket so they can visit me.",
+      "markers": [
+        "western union",
+        "military overseas",
+        "plane ticket",
+        "moneygram",
+        "stranded overseas",
+        "send money for a ticket"
+      ],
+      "guidance": "This matches a romance-scam pattern in our library. People who care about you do not usually ask a new online friend to send cash or a ticket by Western Union. Do not send money. Do not share bank details. You can stop the chat and tell someone you already trust. Wanting company does not make this your fault.",
+      "resource_link_ids": [
+        "https://consumer.ftc.gov/articles/what-you-need-know-about-romance-scams",
+        "https://www.aarp.org/money/scams-fraud/"
+      ]
+    },
+    {
+      "id": "recovery_get_money_back",
+      "title": "Recovery: pay us to get your money back",
+      "personas": ["Margaret", "Carmen"],
+      "risk_level": "likely_scam",
+      "sample_text": "A caller said they know I already lost money to a scam and their agency can recover the funds if I pay a processing fee today.",
+      "markers": [
+        "recover the funds",
+        "get your money back",
+        "you already lost money",
+        "processing fee today",
+        "recovery agency",
+        "we can get your refund"
+      ],
+      "guidance": "This matches a recovery-scam pattern in our library. After a loss, new callers often pretend they can get the money back — if you pay another fee. Real government or police offices do not call to collect a processing fee to recover funds. Do not pay. Do not share a code. You can report at IC3 and talk to AARP Fraud Watch. Losing money once does not mean you did something wrong.",
+      "resource_link_ids": [
+        "https://consumer.ftc.gov/articles/how-avoid-government-imposter-scams",
+        "https://www.ic3.gov/"
+      ]
+    },
+    {
+      "id": "caregiver_remote_setup",
+      "title": "Stranger offers to set up a parent's phone",
+      "personas": ["David"],
+      "risk_level": "suspicious",
+      "sample_text": "Someone texted me that they can set up my mom's banking app tonight if I install AnyDesk on her phone and leave it unlocked.",
+      "markers": [
+        "set up my mom",
+        "mom's banking",
+        "install anydesk",
+        "leave it unlocked",
+        "set up her phone",
+        "caregiver access"
+      ],
+      "guidance": "This looks like a maybe-scam aimed at a family helper. People who truly help a parent do not usually text a child and ask for AnyDesk plus an unlocked phone. Do not install remote-access apps from a stranger. Do not leave the phone unlocked for someone you have not met. Sit with your mom, use the official app store, and keep the login in her name.",
+      "resource_link_ids": [
+        "https://consumer.ftc.gov/articles/how-spot-avoid-and-report-tech-support-scams",
         "https://www.aarp.org/money/scams-fraud/"
       ]
     }

@@ -20,3 +20,75 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 0.75in;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    background: white;
+    color: #0f172a;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  #results-print-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  #print-summary {
+    max-width: 40rem;
+  }
+
+  #print-summary h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+  }
+
+  #print-summary h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.75rem 0;
+  }
+
+  #print-summary h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+  }
+
+  #print-summary .print-verified {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+  }
+
+  #print-summary .print-body,
+  #print-summary li {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  #print-summary .print-url {
+    word-break: break-all;
+  }
+}

@@ -58,6 +58,7 @@ All inputs are collected on route `/` while the FSM is `idle` (form enabled). Th
 - Form editable in `idle` only; read-only in `running` and `done` until **Reset**.
 - Page `h1` / document title: **Learn the Signs, Protect Yourself**.
 - Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
+- Privacy reassurance (below subtitle): “A computer guide helps read your message. This is a private check. No live person is reading along with you.” (`frontend/lib/copy/privacyReassurance.ts`). MVP-accurate: no human reads along; Extra Guidance remains AI (US-013).
 
 ---
 

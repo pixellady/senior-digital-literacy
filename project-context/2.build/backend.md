@@ -52,12 +52,18 @@ Intent Router is a **Flow `@router`**, not an agent. Progress remains a stub obj
 
 ## Owned scam library
 
-Two operator-owned samples (not live search):
+Eight operator-owned samples (not live search). US-003 drill types plus all three product personas (Margaret, Carmen, David):
 
-| Pattern id | Sample | `risk_level` | Links |
-|------------|--------|--------------|-------|
-| `gift_card_jail` | Grandson in jail / buy gift cards | `likely_scam` | FTC gift-card, AARP |
-| `account_closed_maybe` | Account closed unless you tap a link | `suspicious` | IC3, AARP |
+| Pattern id | Personas | Sample | `risk_level` |
+|------------|----------|--------|--------------|
+| `gift_card_jail` | Margaret | Grandson in jail / buy gift cards | `likely_scam` |
+| `account_closed_maybe` | Margaret | Account closed unless you tap a link | `suspicious` |
+| `tech_support_lock` | Margaret | Microsoft pop-up / AnyDesk | `likely_scam` |
+| `irs_tax_warrant` | Margaret | IRS tax warrant / same-day wire | `likely_scam` |
+| `housing_benefits_fee` | Carmen | Section 8 / SNAP recertification fee | `likely_scam` |
+| `romance_ticket_money` | Margaret | Overseas ticket via Western Union | `likely_scam` |
+| `recovery_get_money_back` | Margaret, Carmen | Pay a fee to recover lost money | `likely_scam` |
+| `caregiver_remote_setup` | David | Stranger will set up mom's banking | `suspicious` |
 
 Flow `_ground_scam_content` **overwrites** `verified_guide`, matched `risk_level`, and `resource_links` from this file. Unmatched pastes: `verified_guide` false; any agent links filtered to the catalog allowlist.
 
@@ -124,7 +130,7 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 
 ## Open Questions
 
-1. Expand the library beyond two demo patterns before beta?
+1. Grow past these eight patterns before beta (US-003 asks for ≥10 drills)?
 2. Haiku for the router vs Sonnet for conversational agents — still deferred.
 
 *Resolved:* `activeScamNow` is not added this week. Open-web search is off for the demo.
@@ -151,3 +157,12 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 | Model | Cursor Grok 4.6 |
 | Prompt Trace | Omitted — implementation; library and forms are the contract |
 | Tools used | Read/Grep/Write/Delete; uv run matcher check |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-30T00:00:00Z |
+| Persona id | `backend-eng` |
+| Action | `define-agents` — expand owned library to 8 patterns across Margaret, Carmen, David |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `knowledge/scam_library.json`; this file |
+| Prompt Trace | Omitted — owned sample texts from PRD personas / US-003 types |

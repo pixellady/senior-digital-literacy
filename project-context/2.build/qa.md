@@ -1,12 +1,12 @@
 # QA Build Log — Senior Digital Literacy
 
 **Persona:** `@qa.eng`  
-**Action:** `*test-unit` / `*test-integration` / `*qa` / `*verify-flow`  
-**Slice:** Unit + integration + smoke / E2E on shipped `/` (UI → live FastAPI Flow)
+**Action:** `*test-unit` / `*test-integration` / `*qa` / `*verify-flow` / print after  
+**Slice:** Unit + integration + smoke / E2E on shipped `/`, plus Save as PDF ≥16px (desktop + phone viewport)
 
 ## Status
 
-Unit stage **pass** (37 tests). Integration stage **pass** (11 automated checks: 6 HTTP mocked, 3 `sendChat`, 2 live Flow). Smoke / verify-flow **pass** (browser click-through on `/` against live API). MVP QA gate for implemented scam-check is complete.
+Unit stage **pass** (37 tests). Integration stage **pass** (11 automated checks: 6 HTTP mocked, 3 `sendChat`, 2 live Flow). Smoke / verify-flow **pass**. Print / Save as PDF **pass** (body ≥16px on desktop and phone-sized print CSS). MVP QA gate for implemented scam-check is complete.
 
 No `AC-*` IDs exist in `system-description.md` (file absent) or user stories. Mapping uses **US-xxx-n** = story ID + numbered acceptance criterion.
 
@@ -130,6 +130,26 @@ End-to-end UI → backend on shipped `/` only.
 
 Network body (`session_id`, `route_intent`) was not captured in this browser session (no Playwright request listener). Functional live-vs-stub call is from Results content above, consistent with integration live gift-card turn.
 
+## Print / Save as PDF
+
+Executed 2026-08-30 after a live gift-card Results turn (`P16QA`). Control: **Save or print** → `window.print()`; hint tells the user to choose **Save as PDF**. Native OS print dialogs were not completed (automation cannot drive Save as PDF). Measured `@media print` on desktop and iPhone (390×844, DPR 3), then Chrome headless `--print-to-pdf` of the same print stylesheet.
+
+| Check | Story | Result |
+|-------|-------|--------|
+| Print CSS `html` 16px; body / list / URLs 18px; headings 20–28px. No print-summary node below 16px | US-017-3, US-018-2 | **Pass** (desktop and phone viewport; same rem scale) |
+| Phone screen: Save or print 20.25px, hint 18px, `min-h` 49.5px | US-018-2 (control, not print sheet) | Pass |
+| Print article has no session UUID; chrome (`no-print`) hidden | US-017-2 | Pass |
+| Print body includes do-not-buy / do-not-send-codes | US-017-4 (scam-check adaptation) | Pass |
+| Browser print-to-PDF fallback exists | US-017-5 | Pass (hint + Chrome PDF sample) |
+
+Computed print sizes (both viewports): article 16px; `.print-body` / `li` / `.print-url` 18px; h3 20px; h2 24px; h1 28px. Color `#0f172a` on white.
+
+US-017-1 numbered illustrated No-Device steps: **N/A** — shipped print is the scam-check summary, not a tutor step sheet.
+
+Sample PDF (same CSS as `@media print`): `project-context/2.build/logs/qa-save-as-pdf-sample.pdf`.
+
+Physical phone / iOS Share sheet was not used. Phone check is Chrome device metrics + the same print CSS phones would apply.
+
 ## Limitations
 
 - No `aamad.config.yml`; testing prefs taken from `aamad.config.example.yml` (`require_unit_tests`, `require_integration_tests`, `map_to_acceptance_criteria`).
@@ -152,11 +172,13 @@ QA for implemented MVP scam-check is complete. Next: `@security.eng` (`*assess-s
 - `project-context/2.build/integration.md`
 - `project-context/1.define/prd.md` v2.3
 - `project-context/1.define/sad.md` §9, AD-8
-- User stories US-001, US-002, US-009, US-013, US-014, US-021
+- User stories US-001, US-002, US-009, US-013, US-014, US-017, US-018, US-021
 - `senior_digital_literacy/tests/test_api_http.py`
 - `senior_digital_literacy/tests/test_live_chat.py`
 - `frontend/lib/services/sendChat.test.ts`
 - `project-context/2.build/logs/crewai-amp-tracing.md`
+- `frontend/app/globals.css` `@media print`
+- `project-context/2.build/logs/qa-save-as-pdf-sample.pdf`
 
 ## Assumptions
 
@@ -219,3 +241,15 @@ QA for implemented MVP scam-check is complete. Next: `@security.eng` (`*assess-s
 | Prompt Trace | Omitted — no runtime agent prompt write |
 | Tools used | Write; StrReplace |
 | Prohibited actions honored | No secrets, device codes, ephemeral access codes, or pasted scam text in the log |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-29T22:20:00Z |
+| Persona id | `qa-eng` |
+| Action | `qa` after — desktop + phone print; confirm Save as PDF readable ≥16px |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | this file (Print / Save as PDF); `project-context/2.build/logs/qa-save-as-pdf-sample.pdf` |
+| Model | Cursor Grok 4.6 |
+| Prompt Trace | Omitted — no runtime agent prompt write |
+| Tools used | Cursor browser (print media, iPhone metrics, computed styles); Chrome `--print-to-pdf` |
+| Prohibited actions honored | Did not treat US-017-1 tutor illustrations as implemented; no physical-device claim |
