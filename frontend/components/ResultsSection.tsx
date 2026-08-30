@@ -11,9 +11,10 @@ import type { RunPhase } from "@/lib/types/run";
 type ResultsSectionProps = {
   phase: RunPhase;
   result: ChatResponse | null;
+  checkedAt: Date;
 };
 
-export function ResultsSection({ phase, result }: ResultsSectionProps) {
+export function ResultsSection({ phase, result, checkedAt }: ResultsSectionProps) {
   const showResult = phase === "done" && result !== null;
   const links = result?.content.resource_links ?? [];
 
@@ -30,7 +31,9 @@ export function ResultsSection({ phase, result }: ResultsSectionProps) {
         {showResult ? <SavePrintControl /> : null}
       </div>
 
-      {showResult && result ? <PrintSummary result={result} /> : null}
+      {showResult && result ? (
+        <PrintSummary result={result} checkedAt={checkedAt} />
+      ) : null}
 
       {!showResult || !result ? (
         <p className="mt-4 text-xl text-slate-800">

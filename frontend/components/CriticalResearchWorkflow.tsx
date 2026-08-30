@@ -78,7 +78,11 @@ export function CriticalResearchWorkflow() {
           </div>
         </form>
 
-        <ResultsSection phase={workflow.phase} result={workflow.result} />
+        <ResultsSection
+          phase={workflow.phase}
+          result={workflow.result}
+          checkedAt={workflow.lastUpdated}
+        />
         <div className="no-print">
           <HistorySection entries={workflow.history} />
         </div>

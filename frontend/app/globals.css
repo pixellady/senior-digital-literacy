@@ -76,7 +76,8 @@ body {
     margin: 1rem 0 0.5rem;
   }
 
-  #print-summary .print-verified {
+  #print-summary .print-verified,
+  #print-summary .print-meta {
     font-size: 1.125rem;
     font-weight: 600;
     margin: 0.5rem 0;

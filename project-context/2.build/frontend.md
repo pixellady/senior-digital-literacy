@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path: paste → `explicit_path: "scam"` → `POST /api/v1/chat` → large-type verdict. Client **Pause** is always visible. Weekly cap numbers stay on the SAD envelope but are **hidden** (`WEEKLY_CAPS_ARE_REAL = false`). No `/onboarding`, `/learn`, or `/caregiver`. Tutor step is still not on this page.
+Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path: paste → `explicit_path: "scam"` → `POST /api/v1/chat` → large-type verdict. Client **Pause** is always visible. After **Crew: done**, **Save or print** opens `window.print()` for a curated `#print-summary` sheet (Checked date/time + Website URL; no `session_id` or paste). Weekly cap numbers stay on the SAD envelope but are **hidden** (`WEEKLY_CAPS_ARE_REAL = false`). No `/onboarding`, `/learn`, or `/caregiver`. Tutor step is still not on this page.
 
 `sendChat` is **not stub-only**. Integration (`7c42dc1`) wired live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set. When it is unset, `sendChat` still returns named Path A/B fixtures. Live Flow owns Priority Mode from the message; `activeScamNow` only selects a fixture.
 
@@ -29,6 +29,7 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 15. Hid weekly-limit / cap numbers until they are real. Did **not** ask `@backend.eng` to count sessions.
 16. Operator copy: h1 **Learn the Signs, Protect Yourself**; subtitle “You're safe here, and you're never wrong to ask.”; Pause idle “Pause is always here, waiting for you.”
 17. Documented live `sendChat` (`NEXT_PUBLIC_API_BASE_URL` → `fetch`) plus fixture fallback. Did not change application code. US-001 / US-002 owned by `@product-mgr`.
+18. Print sheet (`#print-summary`) adds **Checked:** locale date/time (`lastUpdated` when the check finished) and **Website:** origin + pathname after mount. Still no `session_id` or pasted text (US-016 AC5, US-017 AC2).
 
 ## Application map
 
@@ -39,6 +40,9 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 | `frontend/components/CrewStatusBanner.tsx` | Sticky `Crew:` banner, pill, last updated |
 | `frontend/components/SafetyBar.tsx` | Always-visible Pause / Resume (client, US-009) |
 | `frontend/components/VerifiedGuideBadge.tsx` | RAG trust indicator when `verified_guide` |
+| `frontend/components/SavePrintControl.tsx` | **Save or print** after `done`; `window.print()` |
+| `frontend/components/PrintSummary.tsx` | Curated print sheet; Checked + Website after mount |
+| `frontend/lib/copy/printSummary.ts` | Save/print and sheet labels |
 | `frontend/lib/copy/crewStatus.ts` | Canonical status labels and inline copy |
 | `frontend/lib/copy/caps.ts` | `WEEKLY_CAPS_ARE_REAL` gate; hide stub 0/5 until backend counts |
 | `frontend/lib/fsm/runFsm.ts` | `idle` \| `running` \| `done` |
@@ -64,6 +68,7 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 - Shame-free copy; no blame on send failure.
 - Wire is SAD §4: one `sendChat` with full `ChatRequest`. Live path uses `fetch`. When the API base is unset, `stubPath` selects Path A (`likely_scam`, gift-card) or Path B (`critical`, `mode: priority`, `ai_disclosure: true`) from `activeScamNow`. The client never scores `message` keywords.
 - `ChatResponse.caps` stays on the wire. Results do not show used/limit. Flip `WEEKLY_CAPS_ARE_REAL` only after `@backend.eng` counts real weekly sessions. No CapMessage.
+- **Save or print** (Crew: done only): `window.print()` + print CSS; no PDF library. Sheet includes title, Checked date/time, Website URL, Verified guide if on, risk heading, `content.text`, official links. Chrome, `session_id`, paste, and caps stay off the paper. Session ID and paste wait for `@security.eng`.
 
 ## Future Work placeholders (visible, non-functional)
 
@@ -91,7 +96,7 @@ After **every commit** that changes this UI or the spec, update the checklist in
 
 - `project-context/1.define/prd.md` v2.3
 - `project-context/1.define/sad.md` v1.0 §3, §4, AD-3, AD-5, AD-11
-- User stories US-001, US-002, US-014, US-009, US-013, US-018
+- User stories US-001, US-002, US-014, US-009, US-013, US-016, US-017, US-018
 - `.cursor/agents/frontend-eng.md`
 - `project-context/2.build/frontend-funcional-spec.md`
 - `project-context/2.build/backend.md` — hide weekly limits until they are real
@@ -99,6 +104,7 @@ After **every commit** that changes this UI or the spec, update the checklist in
 - Operator request: replace on-page title and Pause/subtitle copy (Learn the Signs, Protect Yourself)
 - Operator request: stop describing frontend.md / spec / README as stub-only (`sendChat` live when API base is set)
 - `project-context/2.build/integration.md` — live `fetch` in `7c42dc1`
+- Operator request: print sheet may show check date/time and website URL; session ID and pasted text stay off paper until `@security.eng`
 
 ## Assumptions
 
@@ -108,6 +114,7 @@ After **every commit** that changes this UI or the spec, update the checklist in
 - No `aamad.config.yml`; example config for type checking, no modals, 400-line file cap.
 - Next.js 15.4.x patched to **15.4.10** and React to **19.1.2** for CVE-2025-66478 / CVE-2025-55182 and the 2025-12-11 RSC follow-ups (create-next-app 15.4.6 was vulnerable).
 - Single-route override of SAD multi-route map is this increment only.
+- Save or print is a curated `#print-summary` sheet, not a dump of the whole page. Date, time, and site URL are allowed without changing US-016 / US-017.
 
 ## Open Questions
 
@@ -117,6 +124,8 @@ After **every commit** that changes this UI or the spec, update the checklist in
 *Resolved:* Do not grow the SAD route map. Client Pause is on `/`. Tutor step is still not on this page. Live Flow on the scam check is already wired when `NEXT_PUBLIC_API_BASE_URL` is set.
 
 *Resolved:* Hide weekly cap numbers rather than asking `@backend.eng` to count sessions. Envelope `caps` may still be stub zeros on fixtures and unused on Results; UI gate is `WEEKLY_CAPS_ARE_REAL`.
+
+*Deferred:* Session ID and pasted message on the print sheet wait for `@security.eng`. US-016 AC5 and US-017 AC2 still apply.
 
 ## Audit
 
@@ -271,3 +280,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `style-ui` — format Last updated after mount (hydration) |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | `CrewStatusBanner` client-only locale time; spec Last updated note |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-30T08:45:00Z |
+| Persona id | `frontend-eng` |
+| Action | `develop-fe` — print sheet Checked date/time + Website URL |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `PrintSummary` after-mount meta; spec Save or print subsection |

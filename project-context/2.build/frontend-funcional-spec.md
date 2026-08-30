@@ -22,7 +22,7 @@ This spec describes the first frontend slice: a **single-route** form + results 
 
 - **Feature ID**: `CRW-001` (Critical Research Workflow) — maps to PRD **F1** Scam Defense Hub + US-002 check flow; critical/active-scam path from US-014
 - **Purpose**: Let a senior (Margaret) paste or describe a suspicious message or call, start a check, wait calmly, read a plain-language result, and review earlier checks from this browser session
-- **In Scope**: Single route `/` only. Proof path: paste → `explicit_path: "scam"` → `sendChat` (`POST /api/v1/chat`) → large-type verdict. Live Flow when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset. FSM `idle → running → done`; Crew banner; client **Pause** (US-009, no in-flight cancel); History; basic keyboard + headings
+- **In Scope**: Single route `/` only. Proof path: paste → `explicit_path: "scam"` → `sendChat` (`POST /api/v1/chat`) → large-type verdict. Live Flow when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset. FSM `idle → running → done`; Crew banner; client **Pause** (US-009, no in-flight cancel); History; **Save or print** after `done` (`window.print()`, date/time/URL on the sheet); basic keyboard + headings
 - **Out of Scope**: Extra SAD routes (`/onboarding`, `/learn`, `/scam`, `/caregiver`, …); streaming; Tutor step on this page; Extra Guidance; auth; OCR; retry-diff
 
 ---
@@ -32,7 +32,7 @@ This spec describes the first frontend slice: a **single-route** form + results 
 | Anchor | Reference |
 |--------|-----------|
 | PRD | §4 F1 Scam Defense; §3 `scam_detector`; §6 UX (no auto-dismiss modals; calm loading) |
-| Stories | US-001 entry, US-002 paste/describe + assessment, US-014 active-scam / critical, US-009 Pause, US-013 Extra Guidance later, US-018 large type / 44px targets, US-021 verified guide |
+| Stories | US-001 entry, US-002 paste/describe + assessment, US-014 active-scam / critical, US-009 Pause, US-013 Extra Guidance later, US-016/US-017 print redaction, US-018 large type / 44px targets, US-021 verified guide |
 | SAD | §3 Frontend (Next.js + Tailwind, single chat bubble later); §4 `ChatRequest`/`ChatResponse` (live JSON or fixture fallback); AD-3, AD-5 non-streaming; AD-11 Extra Guidance label |
 | Conflict | SAD §3 lists many PWA routes. Operator: **do not grow the route map** until paste → `explicit_path=scam` → Scam Detector + RAG → large-type verdict is proven. Tutor step after that if time. |
 
@@ -153,7 +153,7 @@ Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice 
 | `content.resource_links` | `{ label, url }[]` | Official IC3/AARP/FTC links |
 | `mode` | `normal` \| `patient` \| `priority` | Label `Mode: {mode}` |
 | `ai_disclosure` | boolean | “This check uses AI.” when `true` |
-| `session_id` | UUID string | Not shown on Results; History key prefix |
+| `session_id` | UUID string | Not shown on Results or the print sheet; History key prefix |
 | `caps.tutor_sessions_*` / `tutor_capped` | number / boolean | **Hidden.** Fixture zeros until `@backend.eng` counts real weekly sessions (`WEEKLY_CAPS_ARE_REAL`). No CapMessage. |
 
 **Fixture rules (when API base is unset)**
@@ -165,6 +165,26 @@ Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice 
 - No streaming chunks, tool-call traces, or cost fields.
 
 Errors from `sendChat` (live or fixture): return to **Crew: idle**, keep inputs, inline message + **Retry**.
+
+### Save or print (Crew: done only)
+
+**Save or print** sits next to the Results heading. It is hidden while `idle` or `running`. The control calls `window.print()`. There is no custom PDF library. Hint: “Opens your browser print window. Choose Save as PDF if you want a file.”
+
+Print uses `@media print` in `frontend/app/globals.css`. Chrome is `.no-print` (banner, Pause, Inputs, Run, History, footer, the button). The sheet is `#print-summary` (`.print-only` on screen).
+
+| On the sheet | Source | Notes |
+|--------------|--------|-------|
+| Title | **Learn the Signs, Protect Yourself** | Same as page `h1` |
+| **Checked:** date + time | `lastUpdated` when the check finished | Locale `dateStyle: medium`, `timeStyle: medium`; set after mount |
+| **Website:** URL | `window.location.origin` + `pathname` | No query or hash |
+| Verified guide | `content.verified_guide` | Line only when `true` |
+| Risk heading | `riskHeading(content.risk_level)` | Same copy as Results |
+| Plain-language text | `content.text` | |
+| Official resources | `content.resource_links` | Label and URL |
+
+**Not on the sheet (US-016 AC5, US-017 AC2):** `session_id`, the pasted message / History preview, weekly `caps`. Session ID and paste stay off paper until `@security.eng` and a story change.
+
+Print type is ≥16px (US-017-3).
 
 ---
 
@@ -438,17 +458,17 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S2 | Inputs `messageText`, `activeScamNow`; max 4000; form locked when `running`/`done` | synced | `activeScamNow` selects Path B on fixtures only; still not a `ChatRequest` field. |
 | S3 | FSM `idle` → `running` → `done`; events START / COMPLETE / RESET | synced | Unchanged. Pause is a UX freeze, not a fourth FSM state. |
 | S4 | One non-streaming `POST /api/v1/chat`; `explicit_path: "scam"` | synced | Live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset (`7c42dc1`). |
-| S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps still hidden (`WEEKLY_CAPS_ARE_REAL` false); no CapMessage. |
+| S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps hidden. Save or print after `done`; sheet has Checked + Website; no session_id or paste. |
 | S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
 | S7 | Run, Reset, Retry; client Pause always visible | synced | Idle copy: “Pause is always here, waiting for you.” |
-| S8 | `frontend.md` Audit records this FE change | synced | Recorded live `sendChat` + fixture fallback, commit `7c8b535`. |
+| S8 | `frontend.md` Audit records this FE change | pending | Print Checked + Website; frontend.md Audit this change. Last synced after commit. |
 | S9 | SAD extra routes and Tutor step not implemented | synced | Tutor still deferred; live Flow on `/` already wired. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
 | S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | h1 is **Learn the Signs, Protect Yourself**. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** `7c8b535`  
-**Last synced at:** 2026-08-26T16:30:00Z
+**Last synced commit:** pending  
+**Last synced at:** pending
 
 ---
 
@@ -461,6 +481,8 @@ Update this checklist **in the same change as each commit** that touches Critica
 - `project-context/1.define/user-stories/US-014-active-scam-priority-escalation.md`
 - `project-context/1.define/user-stories/US-009-pause-emotional-safety.md`
 - `project-context/1.define/user-stories/US-013-get-extra-help-extended-help-mode.md`
+- `project-context/1.define/user-stories/US-016-public-computer-mode.md` — AC5: print excludes session IDs
+- `project-context/1.define/user-stories/US-017-printable-step-summary.md` — AC2: print excludes transcript and session IDs; AC3 print type ≥16px
 - `project-context/1.define/user-stories/US-018-accessible-pwa-speech-input.md`
 - `.cursor/templates/sfs-template.md` (section taxonomy adapted; operator required Inputs / Run / Results / History)
 - `.cursor/agents/frontend-eng.md` — UI only; live `fetch` owned by `@integration.eng` (`7c42dc1`)
@@ -476,6 +498,7 @@ Update this checklist **in the same change as each commit** that touches Critica
 - Operator request (follow-up): stop describing spec / frontend.md / README as stub-only
 - `project-context/2.build/integration.md` — live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set
 - `project-context/2.build/backend.md` — frontend should hide weekly limits until they are real
+- Operator request (follow-up): print sheet may show check date/time and website URL without changing US-016 / US-017 / PRD / SAD; session ID and pasted text stay off paper until `@security.eng`
 
 ## Assumptions
 
@@ -488,6 +511,7 @@ Update this checklist **in the same change as each commit** that touches Critica
 - Fixture verdicts are **named fixtures** (`STUB_PATH_A_GIFT_CARD_BAIL`, `STUB_PATH_B_ACTIVE_SCAM`) when the API base is unset. `activeScamNow` selects the id. `message` is never scored on the client.
 - Single-route scope is an operator override of SAD’s multi-route PWA map for this epic increment only.
 - Weekly `caps` on the envelope are not shown until `@backend.eng` counts real weekly sessions.
+- Save or print is a curated `#print-summary` sheet (`window.print()` + print CSS), not a dump of the whole page. Date, time, and site URL are allowed without a story change. `session_id` and pasted text stay off the sheet until `@security.eng`.
 
 ## Open Questions
 
@@ -496,6 +520,8 @@ Update this checklist **in the same change as each commit** that touches Critica
 *Resolved:* Do **not** grow the route map (`/onboarding`, `/learn`, `/caregiver`, …). One Tutor step is still not on this page. Client Pause is on `/` now (US-009). `Crew: idle|running|done` remains the on-page status copy. Wire contract is SAD §4. Live Flow is already used when `NEXT_PUBLIC_API_BASE_URL` is set.
 
 *Resolved:* Hide weekly cap numbers (`WEEKLY_CAPS_ARE_REAL = false`) instead of asking `@backend.eng` to count sessions.
+
+*Deferred:* Session ID and pasted message on the print sheet wait for `@security.eng`. US-016 AC5 and US-017 AC2 still apply.
 
 ## Audit
 
@@ -638,3 +664,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `sync-docs` — Spec Sync S8 SHA `7c8b535` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | S8 synced; Last synced commit `7c8b535` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-08-30T08:45:00Z |
+| Persona id | `frontend-eng` |
+| Action | `document-frontend` — print sheet Checked date/time + Website URL |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | Results Save or print subsection; S5; US-016/US-017 sources |
