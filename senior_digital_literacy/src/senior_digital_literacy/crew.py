@@ -8,6 +8,7 @@ from senior_digital_literacy.schemas import (
     TutorTurnForm,
     parse_json_object,
 )
+from senior_digital_literacy.runtime_flags import tracing_enabled
 from senior_digital_literacy.tools.scam_library_tool import SearchScamLibraryTool
 
 # Name contract:
@@ -99,7 +100,7 @@ class SeniorDigitalLiteracy():
             tasks=[self.tutor_turn_task()],
             process=Process.sequential,
             memory=False,
-            tracing=True,
+            tracing=tracing_enabled(),
             verbose=True,
         )
 
@@ -110,7 +111,7 @@ class SeniorDigitalLiteracy():
             tasks=[self.scam_check_task()],
             process=Process.sequential,
             memory=False,
-            tracing=True,
+            tracing=tracing_enabled(),
             verbose=True,
         )
 

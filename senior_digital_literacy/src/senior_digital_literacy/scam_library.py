@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -25,9 +26,28 @@ def _project_library_path() -> Path:
     return _LIBRARY_PATH
 
 
+UNMATCHED_GUIDANCE = (
+    "We could not match this to a pattern in our own library, so we cannot "
+    "say it is safe. Do not tap unknown links, do not share codes or "
+    "passwords, and do not pay. Use the official resources below, or ask "
+    "someone you already know."
+)
+
+_UNMATCHED_LINK_URLS = frozenset(
+    {
+        "https://www.ic3.gov/",
+        "https://www.aarp.org/money/scams-fraud/",
+    }
+)
+
+
 @lru_cache(maxsize=1)
 def load_library() -> dict[str, Any]:
     return json.loads(_project_library_path().read_text(encoding="utf-8"))
+
+
+def unmatched_resource_links() -> list[dict[str, str]]:
+    return [link for link in catalog_links() if link.get("url") in _UNMATCHED_LINK_URLS]
 
 
 def catalog_links() -> list[dict[str, str]]:
@@ -68,6 +88,15 @@ def lookup_payload(message: str) -> dict[str, Any]:
     }
 
 
+def _marker_in_blob(blob: str, marker: str) -> bool:
+    """Substring match for phrases; word boundary for short tokens (avoid 'irs' in 'first')."""
+    if not marker:
+        return False
+    if " " in marker or len(marker) > 4:
+        return marker in blob
+    return re.search(rf"\b{re.escape(marker)}\b", blob) is not None
+
+
 def match_scam_library(message: str) -> LibraryHit | None:
     """Best local pattern whose markers appear in the pasted text. No web."""
     blob = (message or "").strip().lower()
@@ -77,7 +106,7 @@ def match_scam_library(message: str) -> LibraryHit | None:
     best: tuple[int, dict[str, Any]] | None = None
     for pattern in load_library().get("patterns") or []:
         markers = [str(m).lower() for m in (pattern.get("markers") or [])]
-        score = sum(1 for marker in markers if marker and marker in blob)
+        score = sum(1 for marker in markers if _marker_in_blob(blob, marker))
         if score <= 0:
             continue
         if best is None or score > best[0]:

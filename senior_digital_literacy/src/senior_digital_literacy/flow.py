@@ -10,10 +10,13 @@ from pydantic import BaseModel, Field
 from crewai.flow import Flow, listen, or_, router, start
 
 from senior_digital_literacy.crew import SeniorDigitalLiteracy
+from senior_digital_literacy.runtime_flags import tracing_enabled
 from senior_digital_literacy.scam_library import (
+    UNMATCHED_GUIDANCE,
     filter_links_to_catalog,
     lookup_payload,
     match_scam_library,
+    unmatched_resource_links,
 )
 from senior_digital_literacy.schemas import parse_json_object
 
@@ -56,7 +59,7 @@ class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
     """Product turn: start → route → one crew → final JSON output."""
 
     def __init__(self, **kwargs):
-        kwargs.setdefault("tracing", True)
+        kwargs.setdefault("tracing", tracing_enabled())
         super().__init__(**kwargs)
 
     @start()
@@ -165,20 +168,18 @@ def _result_payload(result: Any) -> str:
 def _ground_scam_content(content: dict[str, Any], message: str) -> dict[str, Any]:
     """Badge and links come from the owned library, never the open web."""
     hit = match_scam_library(message)
-    text = str(content.get("text") or "").strip()
     if hit:
         content["verified_guide"] = True
         content["risk_level"] = hit.risk_level
         content["resource_links"] = hit.resource_links
-        if not text:
-            content["text"] = hit.guidance
+        content["text"] = hit.guidance
         return content
 
     content["verified_guide"] = False
-    risk = content.get("risk_level")
-    if risk not in {"likely_scam", "suspicious", "likely_safe", "critical"}:
-        content["risk_level"] = "suspicious"
-    content["resource_links"] = filter_links_to_catalog(content.get("resource_links"))
+    content["risk_level"] = "suspicious"
+    content["text"] = UNMATCHED_GUIDANCE
+    links = filter_links_to_catalog(content.get("resource_links"))
+    content["resource_links"] = links or unmatched_resource_links()
     return content
 
 

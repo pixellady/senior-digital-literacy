@@ -7,6 +7,7 @@ from senior_digital_literacy.flow import (
     _safety_override,
     decide_route_and_mode,
 )
+from senior_digital_literacy.scam_library import UNMATCHED_GUIDANCE
 
 
 def test_explicit_scam_path_wins_without_markers():
@@ -72,7 +73,8 @@ def test_ground_matched_library_sets_verified_guide():
     )
     assert out["verified_guide"] is True
     assert out["risk_level"] == "likely_scam"
-    assert out["text"] == "agent prose"
+    assert "agent prose" not in out["text"]
+    assert "gift-card bail" in out["text"].lower() or "gift cards" in out["text"].lower()
     urls = {link["url"] for link in out["resource_links"]}
     assert "https://evil.example" not in urls
     assert "https://consumer.ftc.gov/articles/how-avoid-gift-card-scam" in urls
@@ -88,11 +90,28 @@ def test_ground_unmatched_clears_verified_and_filters_links():
             {"label": "AARP", "url": "https://www.aarp.org/money/scams-fraud/"},
         ],
     }
-    out = _ground_scam_content(content, "First Coastal Bank suspicious sign-in")
+    out = _ground_scam_content(content, "A shop emailed me about canned peas on sale")
     assert out["verified_guide"] is False
-    assert out["risk_level"] == "critical"
+    assert out["risk_level"] == "suspicious"
+    assert out["text"] == UNMATCHED_GUIDANCE
     urls = [link["url"] for link in out["resource_links"]]
     assert urls == ["https://www.aarp.org/money/scams-fraud/"]
+
+
+def test_ground_unmatched_never_keeps_likely_safe():
+    content = {
+        "text": "This looks fine.",
+        "verified_guide": False,
+        "risk_level": "likely_safe",
+        "resource_links": [],
+    }
+    out = _ground_scam_content(content, "a neighbor waved hello")
+    assert out["risk_level"] == "suspicious"
+    assert out["verified_guide"] is False
+    assert out["text"] == UNMATCHED_GUIDANCE
+    urls = {link["url"] for link in out["resource_links"]}
+    assert "https://www.ic3.gov/" in urls
+    assert "https://www.aarp.org/money/scams-fraud/" in urls
 
 
 def test_parse_agent_payload_strips_fences():

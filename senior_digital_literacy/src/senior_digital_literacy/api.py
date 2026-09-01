@@ -36,7 +36,7 @@ TrackOverride = Literal["beginner", "partial_user", "no_device"]
 
 class ChatRequest(BaseModel):
     session_id: str | None = None
-    message: str = Field(..., min_length=1)
+    message: str = Field(..., min_length=1, max_length=4000)
     explicit_path: ExplicitPath | None = None
     client_action: ClientAction = "none"
     track_override: TrackOverride | None = None
@@ -95,6 +95,6 @@ def serve() -> None:
 
     uvicorn.run(
         "senior_digital_literacy.api:app",
-        host="0.0.0.0",
+        host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", "8000")),
     )

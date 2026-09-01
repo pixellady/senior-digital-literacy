@@ -68,6 +68,18 @@ def test_chat_empty_message_is_validation_error():
     assert response.status_code == 422
 
 
+def test_chat_message_over_4000_is_validation_error():
+    response = client.post(
+        "/api/v1/chat",
+        json={
+            "message": "x" * 4001,
+            "explicit_path": "scam",
+            "client_action": "none",
+        },
+    )
+    assert response.status_code == 422
+
+
 def test_chat_returns_sad_envelope_when_flow_succeeds():
     with patch("senior_digital_literacy.api.SeniorDigitalLiteracyFlow") as flow_cls:
         instance = MagicMock()

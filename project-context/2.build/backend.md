@@ -65,7 +65,7 @@ Eight operator-owned samples (not live search). US-003 drill types plus all thre
 | `recovery_get_money_back` | Margaret, Carmen | Pay a fee to recover lost money | `likely_scam` |
 | `caregiver_remote_setup` | David | Stranger will set up mom's banking | `suspicious` |
 
-Flow `_ground_scam_content` **overwrites** `verified_guide`, matched `risk_level`, and `resource_links` from this file. Unmatched pastes: `verified_guide` false; any agent links filtered to the catalog allowlist.
+Flow `_ground_scam_content` **overwrites** `verified_guide`, matched `risk_level`, `resource_links`, and **`content.text`** from this file. Unmatched pastes: `verified_guide` false, `risk_level` `suspicious`, canned “not in our library” copy, catalog links only.
 
 Gift-card **safety markers** in `_SCAM_SAFETY_MARKERS` (including `"gift card"`) still force SCAM route and Priority Mode. That is separate from the badge.
 
@@ -87,7 +87,11 @@ NL `classify_intent` and US-020 are **not** implemented. `activeScamNow` is **no
 
 **`GET /health`** → `{"status":"ok"}`
 
-**`POST /api/v1/chat`** — SAD ChatRequest in, ChatResponse-shaped dict out. Local/dev: no auth.
+**`POST /api/v1/chat`** — SAD ChatRequest in, ChatResponse-shaped dict out. Local/dev: no auth. `message` max length **4000**. `serve()` binds **`127.0.0.1`** by default (`HOST` override for later deploy).
+
+CrewAI AMP tracing defaults **off**. Set `CREWAI_TRACING_ENABLED=true` only on an operator machine.
+
+On a library **match**, `content.text` is the owned `guidance` (not the model paragraph). On **no match**, risk is `suspicious`, text is canned, never model `likely_safe`.
 
 Response still includes stubbed `caps` and `progress_hint` (zeros). Frontend should hide weekly limits until they are real (`@frontend.eng`).
 
@@ -107,6 +111,7 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 
 - Tutorial RAG still absent; tutor `verified_guide` is always false.
 - Caps and progress are still zeros/false stubs (do not show in the demo UI).
+- Auth, rate limit, and 8K token cap still later. Loopback does not stop this laptop from spending the Anthropic key.
 - CrewAI `AGENTS.md` and CLI train/replay/test remain scaffold leftovers (ignored for the demo).
 - Haiku router vs Sonnet conversational agents — still deferred.
 
@@ -166,3 +171,11 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | `knowledge/scam_library.json`; this file |
 | Prompt Trace | Omitted — owned sample texts from PRD personas / US-003 types |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-01T10:45:00Z |
+| Persona id | `backend-eng` |
+| Action | `develop-be` — SEC-001/002/003 minimum: loopback, 4000 cap, tracing off, library text, unmatched canned |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `api.py`; `flow.py`; `crew.py`; `runtime_flags.py`; `scam_library.py`; tests; this file |
