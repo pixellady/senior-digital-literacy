@@ -18,7 +18,9 @@ Copy secrets into a gitignored `.env` in this folder. Required names:
 - `ANTHROPIC_API_KEY`
 - `MODEL` (Anthropic model id used by the agents)
 
-Optional: `CORS_ORIGIN` (default `http://localhost:3000`), `PORT` (default `8000`).
+Optional: `CORS_ORIGIN` (default `http://localhost:3000`), `PORT` (default `8000`), `HOST` (default `127.0.0.1`), `CHAT_RATE_LIMIT_PER_MINUTE` (default `10`), `CHAT_RATE_LIMIT_PER_HOUR` (default `40`).
+
+`POST /api/v1/chat` is capped at 10 requests per minute and 40 per hour per client IP. Extra calls return 429 and do not bill Claude. Set a monthly spend limit in the Anthropic Console on a **named** workspace (Default cannot take a cap).
 
 Do not commit `.env`. Open-web search is off; `SERPER_API_KEY` is not used.
 

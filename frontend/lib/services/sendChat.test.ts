@@ -76,4 +76,28 @@ describe("sendChat integration", () => {
       ),
     ).rejects.toThrow("The helper could not finish this check. Please try again.");
   });
+
+  it("throws wait copy on HTTP 429 RATE_LIMIT", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "http://127.0.0.1:8000");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({
+        detail: {
+          error: {
+            code: "RATE_LIMIT",
+            message: "Please wait a moment, then try again.",
+            retryable: true,
+          },
+        },
+      }),
+    }));
+
+    await expect(
+      sendChat(
+        toChatRequest({ messageText: "check this", activeScamNow: false }, null),
+        "path_a_gift_card_bail",
+      ),
+    ).rejects.toThrow(/wait a moment/i);
+  });
 });

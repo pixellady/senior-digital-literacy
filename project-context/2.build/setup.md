@@ -105,6 +105,9 @@ Create a **gitignored** `.env` file in `senior_digital_literacy/` (see `.gitigno
 | `SERPER_API_KEY` | No | SerperDevTool on Scam Detector (when tool is used) |
 | `CORS_ORIGIN` | No | Allowed browser origin(s); default `http://localhost:3000` |
 | `PORT` | No | Uvicorn listen port; default `8000` |
+| `HOST` | No | Bind address for `serve()`; default `127.0.0.1` |
+| `CHAT_RATE_LIMIT_PER_MINUTE` | No | Max `POST /api/v1/chat` per IP per minute; default `10` |
+| `CHAT_RATE_LIMIT_PER_HOUR` | No | Max `POST /api/v1/chat` per IP per hour; default `40` |
 
 No committed `.env.example` in the repo at catch-up time — operators follow `senior_digital_literacy/README.md`.
 

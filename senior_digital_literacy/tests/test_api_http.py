@@ -142,6 +142,29 @@ def test_chat_invalid_flow_payload_returns_internal_error():
     assert response.json()["detail"]["error"]["code"] == "INTERNAL"
 
 
+def test_chat_eleventh_request_returns_rate_limit_without_kickoff():
+    with patch("senior_digital_literacy.api.SeniorDigitalLiteracyFlow") as flow_cls:
+        instance = MagicMock()
+        instance.kickoff.return_value = _ENVELOPE
+        flow_cls.return_value = instance
+        payload = {
+            "message": "check this",
+            "explicit_path": "scam",
+            "client_action": "none",
+        }
+        for _ in range(10):
+            assert client.post("/api/v1/chat", json=payload).status_code == 200
+        blocked = client.post("/api/v1/chat", json=payload)
+    assert blocked.status_code == 429
+    error = blocked.json()["detail"]["error"]
+    assert error["code"] == "RATE_LIMIT"
+    assert error["retryable"] is True
+    assert "wait" in error["message"].lower()
+    assert blocked.headers.get("retry-after") == "60"
+    assert instance.kickoff.call_count == 10
+    assert client.get("/health").status_code == 200
+
+
 def test_cors_preflight_allows_localhost_3000():
     response = client.options(
         "/api/v1/chat",

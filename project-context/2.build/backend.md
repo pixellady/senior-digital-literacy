@@ -89,6 +89,10 @@ NL `classify_intent` and US-020 are **not** implemented. `activeScamNow` is **no
 
 **`POST /api/v1/chat`** — SAD ChatRequest in, ChatResponse-shaped dict out. Local/dev: no auth. `message` max length **4000**. `serve()` binds **`127.0.0.1`** by default (`HOST` override for later deploy).
 
+Chat is rate-limited **before** Flow kickoff: **10 requests / minute** and **40 / hour** per client IP. The 11th call in a minute returns HTTP **429** `RATE_LIMIT` and does not call Sonnet. Override with `CHAT_RATE_LIMIT_PER_MINUTE` / `CHAT_RATE_LIMIT_PER_HOUR` (restart uvicorn). Crews also set `max_rpm=10`, agent `max_tokens=2048`, `max_execution_time=25s`.
+
+This does **not** replace an Anthropic Console monthly spend cap (operator sets that on a named workspace, not Default).
+
 CrewAI AMP tracing defaults **off**. Set `CREWAI_TRACING_ENABLED=true` only on an operator machine.
 
 On a library **match**, `content.text` is the owned `guidance` (not the model paragraph). On **no match**, risk is `suspicious`, text is canned, never model `likely_safe`.
@@ -97,7 +101,7 @@ Response still includes stubbed `caps` and `progress_hint` (zeros). Frontend sho
 
 ## How to run
 
-Secrets live in `senior_digital_literacy/.env` (gitignored). Required names: `ANTHROPIC_API_KEY`, `MODEL`. Optional: `CORS_ORIGIN`, `PORT`. `SERPER_API_KEY` is unused.
+Secrets live in `senior_digital_literacy/.env` (gitignored). Required names: `ANTHROPIC_API_KEY`, `MODEL`. Optional: `CORS_ORIGIN`, `PORT`, `CHAT_RATE_LIMIT_PER_MINUTE`, `CHAT_RATE_LIMIT_PER_HOUR`. `SERPER_API_KEY` is unused.
 
 ```bash
 cd senior_digital_literacy
@@ -111,7 +115,7 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 
 - Tutorial RAG still absent; tutor `verified_guide` is always false.
 - Caps and progress are still zeros/false stubs (do not show in the demo UI).
-- Auth, rate limit, and 8K token cap still later. Loopback does not stop this laptop from spending the Anthropic key.
+- Auth and 8K session token cap still later. HTTP rate limit bounds a POST loop; a Console spend cap is still the hard dollar stop.
 - CrewAI `AGENTS.md` and CLI train/replay/test remain scaffold leftovers (ignored for the demo).
 - Haiku router vs Sonnet conversational agents — still deferred.
 
@@ -179,3 +183,12 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 | Action | `develop-be` — SEC-001/002/003 minimum: loopback, 4000 cap, tracing off, library text, unmatched canned |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | `api.py`; `flow.py`; `crew.py`; `runtime_flags.py`; `scam_library.py`; tests; this file |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-02T14:10:00Z |
+| Persona id | `backend-eng` |
+| Action | `implement-endpoint` — chat rate limit 10/min 40/hour; crew max_rpm 10; max_tokens 2048; 25s agent cap |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `api.py`; `rate_limit.py`; `runtime_flags.py`; `crew.py`; `agents.yaml`; tests; this file |
+| Prompt Trace | Omitted — spend guardrails, not a production prompt write |

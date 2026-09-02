@@ -17,6 +17,9 @@ export const CREW_INLINE_MESSAGES: Record<CrewStatus, string> = {
 export const CREW_ERROR_DETAIL =
   "Something went wrong while checking. Nothing you did caused this. Your message is still here. Tap Retry to run again with the same inputs.";
 
+export const RATE_LIMIT_DETAIL =
+  "Please wait a moment, then try again. Nothing you did caused this. Your message is still here.";
+
 export const CREW_PILL_CLASS: Record<CrewStatus, string> = {
   idle: "bg-slate-500 text-white",
   running: "bg-blue-700 text-white",

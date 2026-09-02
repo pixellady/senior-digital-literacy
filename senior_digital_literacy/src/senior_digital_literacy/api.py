@@ -3,11 +3,12 @@ from __future__ import annotations
 import os
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from senior_digital_literacy.flow import SeniorDigitalLiteracyFlow
+from senior_digital_literacy.runtime_flags import chat_limiter
 
 app = FastAPI(title="Senior Digital Literacy API", version="0.1.0")
 
@@ -42,24 +43,42 @@ class ChatRequest(BaseModel):
     track_override: TrackOverride | None = None
 
 
+def _client_key(request: Request) -> str:
+    if request.client and request.client.host:
+        return request.client.host
+    return "unknown"
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @app.post("/api/v1/chat")
-def chat(request: ChatRequest) -> dict[str, Any]:
+def chat(request: Request, body: ChatRequest) -> dict[str, Any]:
+    if not chat_limiter.allow(_client_key(request)):
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "error": {
+                    "code": "RATE_LIMIT",
+                    "message": "Please wait a moment, then try again.",
+                    "retryable": True,
+                }
+            },
+            headers={"Retry-After": "60"},
+        )
     try:
         flow = SeniorDigitalLiteracyFlow()
         result = flow.kickoff(
             inputs={
-                "session_id": request.session_id,
-                "user_message": request.message.strip(),
-                "explicit_path": request.explicit_path,
-                "client_action": request.client_action,
-                "learning_track": request.track_override or "beginner",
-                "suspicious_content": request.message.strip()
-                if request.explicit_path == "scam"
+                "session_id": body.session_id,
+                "user_message": body.message.strip(),
+                "explicit_path": body.explicit_path,
+                "client_action": body.client_action,
+                "learning_track": body.track_override or "beginner",
+                "suspicious_content": body.message.strip()
+                if body.explicit_path == "scam"
                 else "",
                 "mode": "normal",
             }

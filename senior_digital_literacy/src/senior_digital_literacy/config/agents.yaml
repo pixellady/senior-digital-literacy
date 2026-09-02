@@ -5,6 +5,9 @@
 step_by_step_tutor:
   llm: anthropic/claude-sonnet-4-5-20250929
   max_iter: 3
+  max_tokens: 2048
+  max_execution_time: 25
+  max_rpm: 10
   allow_delegation: false
   verbose: true
   role: >
@@ -33,6 +36,9 @@ step_by_step_tutor:
 scam_detector:
   llm: anthropic/claude-sonnet-4-5-20250929
   max_iter: 3
+  max_tokens: 2048
+  max_execution_time: 25
+  max_rpm: 10
   allow_delegation: false
   verbose: true
   role: >

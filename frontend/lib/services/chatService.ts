@@ -3,6 +3,7 @@ import {
   STUB_SESSION_ID,
   type StubFixturePath,
 } from "@/lib/fixtures/chatFixtures";
+import { RATE_LIMIT_DETAIL } from "@/lib/copy/crewStatus";
 import { CHAT_ENDPOINT, type ChatRequest, type ChatResponse } from "@/lib/types/chat";
 import type { RunInput } from "@/lib/types/run";
 import { MESSAGE_MAX_LENGTH } from "@/lib/validation/runInput";
@@ -64,6 +65,9 @@ export async function sendChat(
     });
     const payload: unknown = await response.json();
     if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error(RATE_LIMIT_DETAIL);
+      }
       throw new Error("The helper could not finish this check. Please try again.");
     }
     return payload as ChatResponse;

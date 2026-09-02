@@ -8,7 +8,12 @@ from senior_digital_literacy.schemas import (
     TutorTurnForm,
     parse_json_object,
 )
-from senior_digital_literacy.runtime_flags import tracing_enabled
+from senior_digital_literacy.runtime_flags import (
+    crew_max_execution_seconds,
+    crew_max_rpm,
+    llm_max_output_tokens,
+    tracing_enabled,
+)
 from senior_digital_literacy.tools.scam_library_tool import SearchScamLibraryTool
 
 # Name contract:
@@ -65,6 +70,9 @@ class SeniorDigitalLiteracy():
         return Agent(
             config=self.agents_config["step_by_step_tutor"],
             verbose=True,
+            max_rpm=crew_max_rpm(),
+            max_tokens=llm_max_output_tokens(),
+            max_execution_time=crew_max_execution_seconds(),
         )
 
     @agent
@@ -73,6 +81,9 @@ class SeniorDigitalLiteracy():
             config=self.agents_config["scam_detector"],
             verbose=True,
             tools=[SearchScamLibraryTool()],
+            max_rpm=crew_max_rpm(),
+            max_tokens=llm_max_output_tokens(),
+            max_execution_time=crew_max_execution_seconds(),
         )
 
     @task
@@ -102,6 +113,7 @@ class SeniorDigitalLiteracy():
             memory=False,
             tracing=tracing_enabled(),
             verbose=True,
+            max_rpm=crew_max_rpm(),
         )
 
     def scam_crew(self) -> Crew:
@@ -113,6 +125,7 @@ class SeniorDigitalLiteracy():
             memory=False,
             tracing=tracing_enabled(),
             verbose=True,
+            max_rpm=crew_max_rpm(),
         )
 
     @crew

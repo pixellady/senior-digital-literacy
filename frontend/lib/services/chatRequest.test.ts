@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { WEEKLY_CAPS_ARE_REAL, shouldShowWeeklyCaps } from "@/lib/copy/caps";
-import { CREW_ERROR_DETAIL, CREW_STATUS_LABELS } from "@/lib/copy/crewStatus";
+import {
+  CREW_ERROR_DETAIL,
+  CREW_STATUS_LABELS,
+  RATE_LIMIT_DETAIL,
+} from "@/lib/copy/crewStatus";
 import { riskHeading } from "@/lib/copy/riskCopy";
 import { PAUSE_IDLE } from "@/lib/copy/safetyBar";
 import {
@@ -54,6 +58,8 @@ describe("copy and caps", () => {
 
   it("send-failure copy does not blame the user (US-001-6, US-009-4)", () => {
     expect(CREW_ERROR_DETAIL.toLowerCase()).toContain("nothing you did caused this");
+    expect(RATE_LIMIT_DETAIL.toLowerCase()).toContain("wait a moment");
+    expect(RATE_LIMIT_DETAIL.toLowerCase()).toContain("nothing you did caused this");
     expect(CREW_STATUS_LABELS.running).toBe("Crew: running");
   });
 

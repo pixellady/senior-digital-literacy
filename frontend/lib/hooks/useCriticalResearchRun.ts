@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { CREW_ERROR_DETAIL } from "@/lib/copy/crewStatus";
+import { CREW_ERROR_DETAIL, RATE_LIMIT_DETAIL } from "@/lib/copy/crewStatus";
 import { selectStubFixturePath } from "@/lib/fixtures/chatFixtures";
 import { canReset, transition } from "@/lib/fsm/runFsm";
 import { sendChat, toChatRequest } from "@/lib/services/chatService";
@@ -75,8 +75,12 @@ export function useCriticalResearchRun() {
       ]);
       setPhase((current) => transition(current, "COMPLETE"));
       setLastUpdated(new Date());
-    } catch {
-      setErrorMessage(CREW_ERROR_DETAIL);
+    } catch (err) {
+      const waitCopy =
+        err instanceof Error && err.message === RATE_LIMIT_DETAIL
+          ? RATE_LIMIT_DETAIL
+          : CREW_ERROR_DETAIL;
+      setErrorMessage(waitCopy);
       setRetryable(true);
       setPhase((current) => transition(current, "RESET"));
       setLastUpdated(new Date());

@@ -6,7 +6,7 @@
 
 ## Status
 
-QA gate is present (`project-context/2.build/qa.md`: unit, integration, smoke, verify-flow, print). Security assessment for that shipped slice is **complete**; **SEC-001 bind, SEC-004 length, SEC-002 tracing default, and SEC-003 text grounding** have a **minimum backend patch** (loopback `serve()`, `message` max 4000, tracing off unless `CREWAI_TRACING_ENABLED=true`, library `guidance` on match, unmatched canned `suspicious`). Residual SEC-001: no auth/rate limit; this laptop can still spend the Anthropic key.
+QA gate is present (`project-context/2.build/qa.md`: unit, integration, smoke, verify-flow, print). Security assessment for that shipped slice is **complete**; **SEC-001 bind, SEC-004 length, SEC-002 tracing default, and SEC-003 text grounding** have a **minimum backend patch** (loopback `serve()`, `message` max 4000, tracing off unless `CREWAI_TRACING_ENABLED=true`, library `guidance` on match, unmatched canned `suspicious`). **SEC-001 rate limit (2026-09-02):** `POST /api/v1/chat` is 10/min and 40/hour per IP (429 `RATE_LIMIT` before Flow). Residual SEC-001: no auth; no 8K session token cap; Console monthly spend cap is still an operator action. This laptop can still spend the Anthropic key up to those HTTP and Console stops.
 
 **Deliver handoff:** do **not** invoke `@devops.eng` for a network-facing or partner demo until remaining SEC-001 spend controls (auth/rate limit) are mitigated **or** the operator records them as accepted risks. Local loopback demo (`127.0.0.1` only) may proceed.
 
