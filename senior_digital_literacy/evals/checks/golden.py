@@ -28,6 +28,7 @@ def grade_case(case: dict[str, Any]) -> dict[str, Any]:
     state = ChatTurnState(
         user_message=paste,
         explicit_path=case.get("explicit_path"),
+        client_action=case.get("client_action") or "none",
     )
     route, mode = decide_route_and_mode(state)
     if route != case["expect_route"]:

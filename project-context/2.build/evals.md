@@ -37,6 +37,7 @@ Adopt-evals checklist complete for this existing project. Offline code-based sui
 | library_match | `evals/dataset/library_match.jsonl` | 16 | Owned samples + paraphrases (8 patterns × 2) |
 | unmatched | `evals/dataset/unmatched.jsonl` | 3 | First Coastal; neighbor hello; **doctor portal** (never in prior live set) |
 | routing | `evals/dataset/routing.jsonl` | 3 | Tutor email; gift-card no path; **wire-the-money** no path |
+| tutor | `evals/dataset/tutor.jsonl` | 3 | UI goals email / video+extra-help / photo (2026-09-05 re-QA) |
 | adversarial | `evals/dataset/adversarial.jsonl` | 3 | Jailbreak+gift-card; whitespace; Medicare “likely safe” social proof |
 
 Synthetic, PRD-persona shaped. No production logs exist. Adversarial rows are inputs the implementation was not previously live-tested against (skill adopt-evals / contract-review anti-pattern).
@@ -72,15 +73,16 @@ cd ../frontend && npm test
 
 ### 6. Results
 
-Offline runner 2026-09-05T13:20:21Z (`eval-run-latest.json`):
+Offline runner 2026-09-05T14:30:33Z (`eval-run-latest.json`):
 
 | Category | n | Failed |
 |----------|---|--------|
 | library_match | 16 | 0 |
 | unmatched | 3 | 0 |
 | routing | 3 | 0 |
+| tutor | 3 | 0 |
 | adversarial | 3 | 0 |
-| **Total** | **25** | **0** |
+| **Total** | **28** | **0** |
 
 Pytest golden + freshness: **28 passed**.
 

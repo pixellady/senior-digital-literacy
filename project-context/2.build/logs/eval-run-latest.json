@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-05T13:20:21.234635+00:00",
+  "timestamp": "2026-09-05T14:30:33.454651+00:00",
   "runtime": "crewai",
   "grading": "code-based",
-  "total": 25,
-  "passed": 25,
+  "total": 28,
+  "passed": 28,
   "failed": 0,
   "by_category": {
     "adversarial": {
@@ -15,6 +15,10 @@
       "failed": 0
     },
     "routing": {
+      "n": 3,
+      "failed": 0
+    },
+    "tutor": {
       "n": 3,
       "failed": 0
     },

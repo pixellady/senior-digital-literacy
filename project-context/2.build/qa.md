@@ -1,12 +1,12 @@
 # QA Build Log — Senior Digital Literacy
 
 **Persona:** `@qa.eng`  
-**Action:** `*test-unit` / `*test-integration` / `*qa` / `*verify-flow` / print after / `*run-evals`  
-**Slice:** Unit + integration + smoke / E2E on shipped `/`, plus Save as PDF ≥16px, plus golden eval pack
+**Action:** `*qa` re-run after tutor proof + session print on `/` (`2634cff`)  
+**Slice:** Scam-check + Learn-a-skill on `/`; session-wide print; offline evals
 
 ## Status
 
-Unit stage **pass** (37 tests). Integration stage **pass** (11 automated checks: 6 HTTP mocked, 3 `sendChat`, 2 live Flow). Smoke / verify-flow **pass**. Print / Save as PDF **pass**. Golden eval **pass** (23 offline checks; 2 live rows skipped without `LIVE_API=1`). MVP QA gate for implemented scam-check is complete.
+Re-QA **pass** for committed tutor proof + session print. Offline eval **28/28**. Pytest **77 passed**, 4 skipped (live). Vitest **24 passed**. **Do not block** on EC-005 (p95 ≤5s) or EV-017 / QA-EVAL-001 (live IC3 slash). Those stay logged gaps.
 
 No `AC-*` IDs exist in `system-description.md` (file absent) or user stories. Mapping uses **US-xxx-n** = story ID + numbered acceptance criterion.
 
@@ -14,14 +14,14 @@ No `AC-*` IDs exist in `system-description.md` (file absent) or user stories. Ma
 
 | Suite | Command | Result |
 |-------|---------|--------|
-| Backend (pytest 9.1.1) | `cd senior_digital_literacy && uv run pytest -q` | **24 passed** in 1.41s |
-| Frontend (Vitest 4.1.11) | `cd frontend && npm test` | **13 passed** in 178ms |
+| Backend (pytest 9.1.1) | `cd senior_digital_literacy && uv run pytest -q` | **77 passed**, 4 skipped (2026-09-05 re-QA) |
+| Frontend (Vitest 4.1.11) | `cd frontend && npm test` | **24 passed** (2026-09-05 re-QA) |
 
 ### Mapping (implemented code only)
 
 | Test / module | Story criterion | Result |
 |---------------|-----------------|--------|
-| `toChatRequest` always `explicit_path: "scam"` | US-002-2, US-001-4 | Pass |
+| `toChatRequest` `scam` on check; `tutor` + `partial_user` + goal title on learn | US-002-2, US-007 | Pass |
 | `validateRunInput` rejects empty paste | US-002-2 | Pass |
 | Gift-card jail library match + verified payload | US-002-6, US-021-1 | Pass |
 | Account-closed library match (`suspicious`) | US-002-3 | Pass |
@@ -29,7 +29,7 @@ No `AC-*` IDs exist in `system-description.md` (file absent) or user stories. Ma
 | `_ground_scam_content` overwrites badge/risk/links on match | US-021-1 | Pass |
 | `decide_route_and_mode` explicit `scam` / `tutor` | SAD AD-8 | Pass |
 | Gift-card marker → SCAM + **priority** | US-014-1 | Pass |
-| `get_extra_help` on tutor → patient | US-013 (mode only; Extra Guidance UI not on `/`) | Pass |
+| `get_extra_help` on tutor → patient | US-013 (mode; Extra Guidance control still not a separate route) | Pass |
 | Path A/B fixtures: `likely_scam` vs `critical`+Priority+disclosure | US-002-3, US-014-2 | Pass |
 | `selectStubFixturePath` uses checkbox, not keywords | frontend.md contract | Pass |
 | IC3/AARP on Path B fixture (catalog URLs) | US-014-3 | Pass (fixture) |
@@ -52,7 +52,7 @@ No `AC-*` IDs exist in `system-description.md` (file absent) or user stories. Ma
 - US-002-5 Progress milestone / caregiver redaction — Progress is a stub envelope.
 - US-001-5 p95 ≤5s — performance; Integration already recorded ~13s; this action does not time live LLM turns.
 - US-021-3 ≥10 scam drills — library has **2** patterns (gift-card jail, account-closed). Gap, not a unit failure of matching code.
-- US-007 tutor step on `/` — Tutor crew exists; UI always sends `explicit_path: "scam"`.
+- US-007 tutor illustrations / full lesson graph — proof slice is three goal titles only.
 - Pause cancel of in-flight POST — known Integration keep-out.
 - Crew `kickoff` / Flow HTTP — covered under Integration.
 
@@ -123,18 +123,26 @@ End-to-end UI → backend on shipped `/` only.
 | Check | Result |
 |-------|--------|
 | Live API, not Path A/B stub | **Pass.** Results showed **Scam checker**, **Verified guide**, FTC “How to avoid a gift card scam” + AARP. No Path A/B labels, no stub snippet “gift-card bail request”, no stub `session_id` `11111111-1111-4111-8111-111111111111` in the page. Matches live library-grounded gift-card envelope (same class as `LIVE_API=1` integration). |
-| `explicit_path` from UI | Not re-probed in the browser (always `"scam"` on `/`; covered by unit `toChatRequest`). |
+| `explicit_path` from UI | Check → `"scam"`; Learn → `"tutor"` (`toChatRequest`). Not re-clicked in browser this re-QA. |
 | Pause during POST | Not tested — Pause does not abort in-flight `fetch` (no `AbortController`). Keep-out. |
-| Unmatched paste (First Coastal) | Not run in this browser pass. |
-| Tutor / Extra Guidance / caregiver | Not on `/`. Not tested. |
+| Unmatched paste (First Coastal) | Not run in this browser pass. Live EV-017 gap stands (**do not block**). |
+| Tutor on `/` | Implemented (`2634cff`). Offline golden EV-026–028. No live tutor LLM turn this re-QA. |
+| Caregiver / Extra Guidance as its own page | Not on `/`. Not tested. |
 
 Network body (`session_id`, `route_intent`) was not captured in this browser session (no Playwright request listener). Functional live-vs-stub call is from Results content above, consistent with integration live gift-card turn.
 
 ## Eval (`*run-evals`)
 
-Canonical pack is now `senior_digital_literacy/evals/dataset/*.jsonl` (25 cases) plus `evals/run.py` (AAMAD 0.8.0). See `project-context/2.build/evals.md`.
+Canonical pack: `senior_digital_literacy/evals/dataset/*.jsonl` plus `evals/run.py`. See `evals.md`.
 
-Executed 2026-09-05 offline runner: **25/25**. Pytest golden + freshness: **28 passed**. Live EV-017 still **QA-EVAL-001**.
+**Re-QA 2026-09-05 (tutor proof + session print):** added `tutor.jsonl` EV-026–028. Offline runner **28/28**. Full pytest **77 passed**, 4 skipped. Vitest **24 passed**.
+
+| Suite | Result |
+|-------|--------|
+| `uv run python evals/run.py` | **28 passed** (library 16, unmatched 3, routing 3, adversarial 3, **tutor 3**) |
+| Golden + freshness pytest | Included in the 77 |
+| Live (`LIVE_API=1`) | **Not re-run.** EV-017 / QA-EVAL-001 remains a logged gap; **not a blocker**. |
+| EC-005 p95 ≤5s | **Logged only.** **Not a blocker.** |
 
 | Suite | Result |
 |-------|--------|
@@ -152,8 +160,11 @@ Offline cases assert: expected `pattern_id` or unmatched; `decide_route_and_mode
 | EV-003–004 account-closed + `verify your account` → priority | US-002-3 | Pass |
 | EV-005–016 tech / IRS / housing / romance / recovery / caregiver (canonical + paraphrase) | US-021-1 | Pass |
 | EV-017–018 unmatched (First Coastal, neighbor hello); never `likely_safe` | US-021-1, US-002-3 | Pass |
-| EV-019 explicit tutor email | SAD AD-8 | Pass (router only; Tutor UI not on `/`) |
+| EV-019 explicit tutor email | SAD AD-8 | Pass |
 | EV-020 no `explicit_path`, gift-card safety override | US-014-1 | Pass |
+| EV-026 UI title “Send an email to my daughter” → TUTOR | US-007 | Pass |
+| EV-027 “Join a video call…” + `get_extra_help` → patient | US-013 | Pass |
+| EV-028 “Find a photo on my phone” → TUTOR | US-007 | Pass |
 
 **Full re-run 2026-09-05 (Adopting evals checklist):** API `GET /health` 200.
 
@@ -189,7 +200,9 @@ Executed 2026-08-30 after a live gift-card Results turn (`P16QA`). Control: **Sa
 
 Computed print sizes (both viewports): article 16px; `.print-body` / `li` / `.print-url` 18px; h3 20px; h2 24px; h1 28px. Color `#0f172a` on white.
 
-US-017-1 numbered illustrated No-Device steps: **N/A** — shipped print is the scam-check summary, not a tutor step sheet.
+**Session print (2026-09-05, `2634cff`):** History **Print this visit** walks `printSnapshots` (scam + learn cards). `buildPrintSnapshot` unit: scam label, learn “Learn a skill” / “Your next step”, no `sessionId` or paste on the snapshot. Deduped catalog links. This re-QA did **not** re-run Chrome `--print-to-pdf`; prior ≥16px print CSS still applies.
+
+US-017-1 numbered illustrated No-Device steps: **N/A** — print is check/learn summaries, not illustrated tutor cards.
 
 Sample PDF (same CSS as `@media print`): `project-context/2.build/logs/qa-save-as-pdf-sample.pdf`.
 
@@ -206,7 +219,7 @@ Physical phone / iOS Share sheet was not used. Phone check is Chrome device metr
 
 ## Handoff
 
-QA for implemented MVP scam-check is complete. Next: `@security.eng` (`*assess-security` → `project-context/2.build/security.md`). Example config sets `security.require_security_assessment: true` before Deliver (`@devops.eng`).
+Re-QA for tutor proof + session print is complete. `security.md` already exists. Next Deliver when authorized: `@devops.eng`. Do not treat EC-005 or EV-017 as release blockers for this slice.
 
 ## Sources
 
@@ -335,3 +348,14 @@ AAMAD_TARGET_RUNTIME: crewai
 | Outputs | `.cursor/skills/run-evals/`; `evals/dataset`; `evals.md`; sad.md §9 |
 | Prompt Trace | Omitted |
 | Tools used | WebFetch 7914d9c; `evals/run.py`; pytest; `uvx aamad validate --phase build` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-05T14:30:00Z |
+| Persona id | `qa-eng` |
+| Action | `qa` — re-QA tutor proof + session print; tutor golden EV-026–028; offline evals |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `evals/dataset/tutor.jsonl`; this file |
+| Prompt Trace | Omitted |
+| Tools used | `evals/run.py` 28/28; `pytest` 77 passed 4 skipped; `npm test` 24 passed |
+| Prohibited actions honored | Did not block on EC-005 or EV-017; no live LLM this pass |
