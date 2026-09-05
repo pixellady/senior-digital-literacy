@@ -701,6 +701,8 @@ QA maps tests to user-story acceptance criteria (`testing.map_to_acceptance_crit
 
 ## Audit
 
+AAMAD_TARGET_RUNTIME: crewai
+
 | Field | Value |
 |-------|-------|
 | Timestamp | 2026-08-26T15:45:00Z |

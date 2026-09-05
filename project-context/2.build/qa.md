@@ -194,6 +194,8 @@ QA for implemented MVP scam-check is complete. Next: `@security.eng` (`*assess-s
 
 ## Audit
 
+AAMAD_TARGET_RUNTIME: crewai
+
 | Field | Value |
 |-------|-------|
 | Timestamp | 2026-08-28T14:40:00Z |

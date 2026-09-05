@@ -123,6 +123,8 @@ QA should test the shipped scam path (live with env set; fixtures with env unset
 
 ## Audit
 
+AAMAD_TARGET_RUNTIME: crewai
+
 | Field | Value |
 |-------|-------|
 | Timestamp | 2026-08-26T00:14:00Z |

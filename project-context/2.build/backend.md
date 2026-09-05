@@ -146,6 +146,8 @@ Restart uvicorn after this change. PWA: `NEXT_PUBLIC_API_BASE_URL=http://127.0.0
 
 ## Audit
 
+AAMAD_TARGET_RUNTIME: crewai
+
 | Field | Value |
 |-------|-------|
 | Timestamp | 2026-08-24T18:05:00Z |
