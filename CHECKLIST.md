@@ -141,6 +141,15 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ---
 
+### Step 5.4: Evaluation Strategy (`@qa.eng`) — recommended before Security/Deliver
+
+- [x] Run `*run-evals` following `.cursor/skills/run-evals/SKILL.md`.
+- [x] Implement the SAD section 9 evaluation criteria table when present; otherwise answer the skill's operator gap check (thresholds, SLA, risk tolerance, dataset provenance, judge calibration).
+- [x] Build the golden dataset and graders; cover accuracy, latency, safety, security, and cost.
+- [x] Complete project-context/2.build/evals.md, including Production Monitoring Recommendations for `@devops.eng`.
+
+---
+
 ### Step 5.5: Security Assessment (`@security.eng`) — recommended before Deliver
 
 - [ ] Invoke `@security.eng` (required when `aamad.config.yml` sets `security.require_security_assessment: true`).
@@ -152,9 +161,10 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ### Step 6: Deliver (`@devops.eng`)
 
-- [ ] Invoke `@devops.eng` after QA artifacts are complete (and security.md when required).
+- [ ] Invoke `@devops.eng` after QA artifacts are complete (and evals.md / security.md when available).
 - [ ] Run `*prepare-release`
   - [ ] Confirm qa.md documents MVP verification (pass or scoped gaps)
+  - [ ] Note evals.md status and fold its monitoring recommendations into deploy config
   - [ ] Note security.md status (present or accepted gap)
   - [ ] Summarize release scope and version in deploy.md
 - [ ] Run `*define-deploy` and `*configure-cicd`
@@ -192,6 +202,19 @@ After debugging or enhancing generated frontend, backend, or integration code, a
 - [ ] Reconcile `project-context/2.build/*.md` (and deploy.md if needed) with the current codebase.
 - [ ] Append Audit entries noting action `sync-docs` on each updated artifact.
 - [ ] Re-run `aamad validate` for the relevant phase.
+
+---
+
+## Maintenance: Adopting evals in an existing project
+
+For projects already at or past the QA stage without a SAD section 9 evaluation criteria table (built before this capability existed). This is the normal entry point for those projects, not a fallback — no back-to-Phase-1 rework required.
+
+- [x] Invoke `@qa.eng` and run `*run-evals` directly.
+- [x] Answer the skill's operator gap-check questions (thresholds, SLA, risk tolerance, dataset provenance, judge calibration) in place of the missing SAD table.
+- [x] Source golden-dataset items from the PRD and user stories, including inputs the current implementation was never exercised against — do not build the dataset only from cases already known to pass.
+- [x] Complete project-context/2.build/evals.md with agreed thresholds.
+- [x] Once evals.md exists, backfill sad.md section 9 from it via `.cursor/prompts/prompt-sync-docs` so future model/prompt changes have a real gate.
+- [x] Re-run `aamad validate --phase build`.
 
 ---
 

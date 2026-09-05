@@ -589,6 +589,19 @@ Health-check: `GET /health` on `api` (and PWA `/` or `/api/health` if used as fr
 
 QA maps tests to user-story acceptance criteria (`testing.map_to_acceptance_criteria`).
 
+**Evaluation criteria** (backfilled 2026-09-05 from `project-context/2.build/evals.md` / AAMAD 0.8.0 `*run-evals`; pass/fail contract only):
+
+| ID | Dimension | Metric | Threshold | Grading method | Source |
+|----|-----------|--------|-----------|----------------|--------|
+| EC-001 | Accuracy | Owned library `pattern_id` + grounding on match | 100% on golden library_match rows | Code-based | US-021-1; `scam_library.json` |
+| EC-002 | Accuracy | Unmatched paste never `likely_safe`; canned guidance | 100% on unmatched + adversarial rows | Code-based | US-002; US-021; SAD RAG-only |
+| EC-003 | Safety | Catalog-only links; evil URL dropped | 100% on golden SCAM rows | Code-based | US-014-3; SEC-003 |
+| EC-004 | Safety | AD-8 route/mode (explicit path, gift-card / wire priority) | 100% on routing rows | Code-based | SAD AD-8; US-014-1 |
+| EC-005 | Latency | Chat p95 | ≤5s | Code-based when timed; **not a fail gate** this pass | PRD §3 |
+| EC-006 | Cost | Per-request spend ceiling | No numeric $ in PRD; HTTP 10/min 40/h is the implemented bound | Code-based (rate-limit tests) | backend.md; Open Question |
+| EC-007 | Security | No committed secrets; tracing off unless env | Pass on default flags | Code-based | SAD §8; security.md SEC-002 |
+| EC-008 | Safety audit | Critical scam misses on sampled assessments | 0 | Human (deferred; no labeled set) | PRD §7; SAD §9 Safety audit |
+
 ---
 
 ### 10. MVP Launch & Feedback Strategy
@@ -717,3 +730,11 @@ AAMAD_TARGET_RUNTIME: crewai
 | Temperature / max_tokens | N/A — document generation, not runtime kickoff |
 | Prompt Trace | Omitted as a verbatim prompt dump — SAD is deterministic synthesis from PRD/MRD/stories/template; decision trace is AD-1–AD-10 and Open Questions. Runtime Prompt Trace applies to CrewAI execution in Build, not this document. |
 | Tools used | Read/Glob/Grep/Shell for inputs; Write for artifact |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-05T13:22:00Z |
+| Persona id | `qa-eng` |
+| Action | `sync-docs` — backfill §9 evaluation criteria table from evals.md (AAMAD 0.8.0 adopt-evals) |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | this file §9 Evaluation criteria |

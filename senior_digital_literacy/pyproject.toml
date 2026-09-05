@@ -30,7 +30,7 @@ project_id = "43bf7993-eb59-419f-8301-8f2d5e96c09e"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 
 [dependency-groups]
 dev = [

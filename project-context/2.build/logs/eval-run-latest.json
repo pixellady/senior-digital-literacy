@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-09-05T13:20:21.234635+00:00",
+  "runtime": "crewai",
+  "grading": "code-based",
+  "total": 25,
+  "passed": 25,
+  "failed": 0,
+  "by_category": {
+    "adversarial": {
+      "n": 3,
+      "failed": 0
+    },
+    "library_match": {
+      "n": 16,
+      "failed": 0
+    },
+    "routing": {
+      "n": 3,
+      "failed": 0
+    },
+    "unmatched": {
+      "n": 3,
+      "failed": 0
+    }
+  },
+  "failures": []
+}
