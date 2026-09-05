@@ -37,9 +37,17 @@ tutor_turn_task:
     tutorial snippet, refuse to guess. Say you can only follow the verified
     guide, and offer Extra Guidance.
 
-    Tutorial RAG is not wired. Set content.verified_guide to false.
-    Fill the named TutorTurnForm: risk_level null, resource_links [].
-    Calm tone. No shame language. No scam verdict. No invented banking or password steps.
+    A local tutorial library search already ran. Result:
+    {tutorial_result}
+
+    Use that result. Do not call search_tutorial_library unless the result is
+    missing. Do not search the open web. If matched is true, use its step_text
+    and resource_links; set verified_guide true. If matched is false, refuse
+    to invent steps; set verified_guide false.
+
+    Fill the named TutorTurnForm: risk_level null, resource_links from the
+    library result when matched. Calm tone. No shame language. No scam verdict.
+    No invented banking or password steps.
   expected_output: >
     Fill the named form TutorTurnForm (Pydantic). Raw JSON only — no markdown fences. JSON fields:
 
@@ -50,7 +58,7 @@ tutor_turn_task:
       "ai_disclosure": true if this turn entered or is in patient mode, else false,
       "content": {
         "text": "plain-language string, one step only",
-        "verified_guide": false,
+        "verified_guide": true only if search_tutorial_library matched, else false,
         "step_card": {
           "illustration_url": "string or empty",
           "alt_text": "string or empty",

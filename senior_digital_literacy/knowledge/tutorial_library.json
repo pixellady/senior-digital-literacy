@@ -1,0 +1,42 @@
+{
+  "catalog_links": [
+    {
+      "label": "DigitalLearn: Email basics",
+      "url": "https://www.digitallearn.org/courses/email-basics"
+    },
+    {
+      "label": "Senior Planet: Video calling",
+      "url": "https://seniorplanet.org/articles/how-to-use-zoom/"
+    }
+  ],
+  "goals": [
+    {
+      "id": "send_email_daughter",
+      "title": "Send an email to my daughter",
+      "picker_hint": "One step at a time. You can pause anytime.",
+      "learning_tracks": ["partial_user"],
+      "step_text": "On your phone or tablet, open your Mail app — it often looks like an envelope. Tap Compose or the pencil icon to start a new message.",
+      "resource_link_ids": [
+        "https://www.digitallearn.org/courses/email-basics"
+      ]
+    },
+    {
+      "id": "video_call_family",
+      "title": "Join a video call with family",
+      "picker_hint": "One step at a time. You can pause anytime.",
+      "learning_tracks": ["partial_user"],
+      "step_text": "Open the app you use for video calls, such as FaceTime or Zoom. Find the button to start a new call — it may say New call or show a camera with a plus sign.",
+      "resource_link_ids": [
+        "https://seniorplanet.org/articles/how-to-use-zoom/"
+      ]
+    },
+    {
+      "id": "find_photo_phone",
+      "title": "Find a photo on my phone",
+      "picker_hint": "One step at a time. You can pause anytime.",
+      "learning_tracks": ["partial_user"],
+      "step_text": "Open your Photos app — it usually looks like a colorful flower or pinwheel. Scroll to look through your pictures, or tap Albums to see groups of photos.",
+      "resource_link_ids": []
+    }
+  ]
+}

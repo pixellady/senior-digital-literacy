@@ -1,20 +1,19 @@
-import { PrintSummary } from "@/components/PrintSummary";
 import { SavePrintControl } from "@/components/SavePrintControl";
 import { VerifiedGuideBadge } from "@/components/VerifiedGuideBadge";
 import { AI_DISCLOSURE_COPY, modeLabel } from "@/lib/copy/chatCopy";
 import { shouldShowWeeklyCaps } from "@/lib/copy/caps";
 import { crewStatusLabel } from "@/lib/copy/crewStatus";
-import { riskHeading } from "@/lib/copy/riskCopy";
+import { resultsHeading } from "@/lib/copy/riskCopy";
 import type { ChatResponse } from "@/lib/types/chat";
 import type { RunPhase } from "@/lib/types/run";
 
 type ResultsSectionProps = {
   phase: RunPhase;
   result: ChatResponse | null;
-  checkedAt: Date;
+  onPrintCurrent?: () => void;
 };
 
-export function ResultsSection({ phase, result, checkedAt }: ResultsSectionProps) {
+export function ResultsSection({ phase, result, onPrintCurrent }: ResultsSectionProps) {
   const showResult = phase === "done" && result !== null;
   const links = result?.content.resource_links ?? [];
 
@@ -28,12 +27,8 @@ export function ResultsSection({ phase, result, checkedAt }: ResultsSectionProps
         <h2 id="results-heading" className="text-2xl font-semibold text-slate-900">
           Results
         </h2>
-        {showResult ? <SavePrintControl /> : null}
+        {showResult && onPrintCurrent ? <SavePrintControl onPrint={onPrintCurrent} /> : null}
       </div>
-
-      {showResult && result ? (
-        <PrintSummary result={result} checkedAt={checkedAt} />
-      ) : null}
 
       {!showResult || !result ? (
         <p className="mt-4 text-xl text-slate-800">
@@ -49,9 +44,11 @@ export function ResultsSection({ phase, result, checkedAt }: ResultsSectionProps
           </p>
           <VerifiedGuideBadge visible={result.content.verified_guide} />
           <p className="text-4xl font-bold leading-tight text-slate-950">
-            {riskHeading(result.content.risk_level)}
+            {resultsHeading(result)}
           </p>
-          <p className="text-xl text-slate-900">{modeLabel(result.mode)}</p>
+          {result.route_intent === "SCAM" ? (
+            <p className="text-xl text-slate-900">{modeLabel(result.mode)}</p>
+          ) : null}
           {result.ai_disclosure ? (
             <p role="status" className="text-xl text-slate-900">
               {AI_DISCLOSURE_COPY}

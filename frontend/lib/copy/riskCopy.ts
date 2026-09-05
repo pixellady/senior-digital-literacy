@@ -1,3 +1,4 @@
+import type { ChatResponse } from "@/lib/types/chat";
 import type { RiskLevel } from "@/lib/types/chat";
 
 const RISK_HEADINGS: Record<Exclude<RiskLevel, null>, string> = {
@@ -12,6 +13,14 @@ export function riskHeading(level: RiskLevel): string {
     return "No risk level in this check";
   }
   return RISK_HEADINGS[level];
+}
+
+/** Large-type Results heading: tutor steps vs scam risk labels. */
+export function resultsHeading(result: ChatResponse): string {
+  if (result.route_intent === "TUTOR") {
+    return "Your next step";
+  }
+  return riskHeading(result.content.risk_level);
 }
 
 export function formatCompletedAt(iso: string): string {

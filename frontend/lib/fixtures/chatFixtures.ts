@@ -6,7 +6,10 @@ export const STUB_SESSION_ID = "11111111-1111-4111-8111-111111111111";
  * Named stub paths. Verdicts are these frozen ChatResponse blobs.
  * Do not derive risk_level, mode, or ai_disclosure from message text.
  */
-export type StubFixturePath = "path_a_gift_card_bail" | "path_b_active_scam";
+export type StubFixturePath =
+  | "path_a_gift_card_bail"
+  | "path_b_active_scam"
+  | "path_c_tutor_step";
 
 const SCAM_ENVELOPE: Omit<ChatResponse, "mode" | "ai_disclosure" | "content"> = {
   session_id: STUB_SESSION_ID,
@@ -85,15 +88,66 @@ export const STUB_PATH_B_ACTIVE_SCAM: ChatResponse = {
   },
 };
 
+/** Path C — Tutor proof slice. One verified Partial User step. */
+export const STUB_PATH_C_TUTOR_STEP: ChatResponse = {
+  session_id: STUB_SESSION_ID,
+  route_intent: "TUTOR",
+  agent_id: "step_by_step_tutor",
+  agent_display_name: "Your tutor",
+  mode: "normal",
+  ai_disclosure: false,
+  content: {
+    text: "On your phone or tablet, open your Mail app — it often looks like an envelope. Tap Compose or the pencil icon to start a new message.",
+    verified_guide: true,
+    step_card: null,
+    risk_level: null,
+    resource_links: [
+      {
+        label: "DigitalLearn: Email basics",
+        url: "https://www.digitallearn.org/courses/email-basics",
+      },
+    ],
+  },
+  interrupt: {
+    active: false,
+    label: "Scam checker tip",
+  },
+  ui: {
+    actions: [
+      "pause",
+      "explain_simpler",
+      "repeat_step",
+      "start_over",
+      "get_extra_help",
+    ],
+    clarifying_question: false,
+  },
+  caps: {
+    tutor_sessions_used_this_week: 0,
+    tutor_sessions_limit: 5,
+    tutor_capped: false,
+  },
+  progress_hint: {
+    continue_lesson: false,
+    continue_drill: false,
+  },
+};
+
 export const STUB_FIXTURES: Record<StubFixturePath, ChatResponse> = {
   path_a_gift_card_bail: STUB_PATH_A_GIFT_CARD_BAIL,
   path_b_active_scam: STUB_PATH_B_ACTIVE_SCAM,
+  path_c_tutor_step: STUB_PATH_C_TUTOR_STEP,
 };
 
 /**
- * Stub-only selector. Uses the Happening now checkbox, never message keywords.
- * false → Path A (gift-card likely_scam). true → Path B (critical + Priority disclosure).
+ * Stub-only selector. Learn mode → Path C tutor. Scam uses Happening now checkbox.
  */
-export function selectStubFixturePath(activeScamNow: boolean): StubFixturePath {
-  return activeScamNow ? "path_b_active_scam" : "path_a_gift_card_bail";
+export function selectStubFixturePath(input: {
+  mode: "scam" | "learn";
+  activeScamNow: boolean;
+}): StubFixturePath {
+  if (input.mode === "learn") {
+    return "path_c_tutor_step";
+  }
+  return input.activeScamNow ? "path_b_active_scam" : "path_a_gift_card_bail";
 }

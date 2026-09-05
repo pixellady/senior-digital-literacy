@@ -76,7 +76,8 @@ def chat(request: Request, body: ChatRequest) -> dict[str, Any]:
                 "user_message": body.message.strip(),
                 "explicit_path": body.explicit_path,
                 "client_action": body.client_action,
-                "learning_track": body.track_override or "beginner",
+                "learning_track": body.track_override
+                or ("partial_user" if body.explicit_path == "tutor" else "beginner"),
                 "suspicious_content": body.message.strip()
                 if body.explicit_path == "scam"
                 else "",

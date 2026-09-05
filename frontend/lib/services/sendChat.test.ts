@@ -14,7 +14,12 @@ describe("sendChat integration", () => {
     vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "");
     vi.useFakeTimers();
     const request = toChatRequest(
-      { messageText: "anything can go here", activeScamNow: false },
+      {
+        mode: "scam",
+        messageText: "anything can go here",
+        activeScamNow: false,
+        tutorGoalId: null,
+      },
       null,
     );
     const pending = sendChat(request, "path_a_gift_card_bail");
@@ -40,7 +45,12 @@ describe("sendChat integration", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const request = toChatRequest(
-      { messageText: "Buy gift cards for jail", activeScamNow: false },
+      {
+        mode: "scam",
+        messageText: "Buy gift cards for jail",
+        activeScamNow: false,
+      tutorGoalId: null,
+      },
       "sess-1",
     );
     const response = await sendChat(request, "path_b_active_scam");
@@ -71,7 +81,15 @@ describe("sendChat integration", () => {
 
     await expect(
       sendChat(
-        toChatRequest({ messageText: "check this", activeScamNow: false }, null),
+        toChatRequest(
+          {
+            mode: "scam",
+            messageText: "check this",
+            activeScamNow: false,
+            tutorGoalId: null,
+          },
+          null,
+        ),
         "path_a_gift_card_bail",
       ),
     ).rejects.toThrow("The helper could not finish this check. Please try again.");
@@ -95,7 +113,15 @@ describe("sendChat integration", () => {
 
     await expect(
       sendChat(
-        toChatRequest({ messageText: "check this", activeScamNow: false }, null),
+        toChatRequest(
+          {
+            mode: "scam",
+            messageText: "check this",
+            activeScamNow: false,
+            tutorGoalId: null,
+          },
+          null,
+        ),
         "path_a_gift_card_bail",
       ),
     ).rejects.toThrow(/wait a moment/i);

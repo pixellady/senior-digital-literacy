@@ -92,4 +92,23 @@ body {
   #print-summary .print-url {
     word-break: break-all;
   }
+
+  #print-summary .print-check-label {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0.25rem 0 0.5rem;
+  }
+
+  #print-summary .print-check-section + .print-check-section {
+    margin-top: 0;
+  }
+
+  #print-summary .print-page-break {
+    page-break-after: always;
+  }
+
+  #print-summary .print-footer {
+    font-size: 1rem;
+    margin-top: 1.5rem;
+  }
 }

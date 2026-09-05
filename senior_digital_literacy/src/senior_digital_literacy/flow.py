@@ -18,6 +18,11 @@ from senior_digital_literacy.scam_library import (
     match_scam_library,
     unmatched_resource_links,
 )
+from senior_digital_literacy.tutorial_library import (
+    UNMATCHED_TUTOR_GUIDANCE,
+    lookup_tutorial_payload,
+    match_tutorial_library,
+)
 from senior_digital_literacy.schemas import parse_json_object
 
 # SAD AD-8: explicit UI path wins, then safety override, else TUTOR.
@@ -111,9 +116,7 @@ class SeniorDigitalLiteracyFlow(Flow[ChatTurnState]):
         if self.state.route_intent == "SCAM":
             content = _ground_scam_content(content, self.state.user_message)
         else:
-            content["verified_guide"] = False
-            content["risk_level"] = None
-            content["resource_links"] = []
+            content = _ground_tutor_content(content, self.state.user_message)
 
         interrupt = parsed.get("interrupt") if isinstance(parsed.get("interrupt"), dict) else {
             "active": False,
@@ -163,6 +166,23 @@ def _result_payload(result: Any) -> str:
     if isinstance(json_out, dict):
         return json.dumps(json_out)
     return getattr(result, "raw", "") or ""
+
+
+def _ground_tutor_content(content: dict[str, Any], message: str) -> dict[str, Any]:
+    """Step text and badge come from the owned tutorial library, never the open web."""
+    hit = match_tutorial_library(message)
+    if hit:
+        content["verified_guide"] = True
+        content["text"] = hit.step_text
+        content["resource_links"] = hit.resource_links
+        content["risk_level"] = None
+        return content
+
+    content["verified_guide"] = False
+    content["text"] = UNMATCHED_TUTOR_GUIDANCE
+    content["resource_links"] = []
+    content["risk_level"] = None
+    return content
 
 
 def _ground_scam_content(content: dict[str, Any], message: str) -> dict[str, Any]:
@@ -229,4 +249,5 @@ def _crew_inputs(state: ChatTurnState) -> dict[str, Any]:
         "suspicious_content": state.suspicious_content,
         "current_year": state.current_year,
         "library_result": json.dumps(lookup_payload(state.user_message)),
+        "tutorial_result": json.dumps(lookup_tutorial_payload(state.user_message)),
     }

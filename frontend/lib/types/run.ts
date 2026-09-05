@@ -1,13 +1,24 @@
-import type { RiskLevel } from "@/lib/types/chat";
+import type { ResourceLink, RiskLevel } from "@/lib/types/chat";
 
-export type RunPhase = "idle" | "running" | "done";
+export type WorkflowMode = "scam" | "learn";
 
-export type RunFsmEvent = "START" | "COMPLETE" | "RESET";
+/** Printable snapshot for one completed run (no session id or pasted message). */
+export interface PrintSnapshot {
+  completedAt: string;
+  mode: WorkflowMode;
+  checkLabel: string;
+  verifiedGuide: boolean;
+  heading: string;
+  text: string;
+  resourceLinks: ResourceLink[];
+}
 
 /** Form state for this slice. Mapped to ChatRequest at the stub boundary. */
 export interface RunInput {
+  mode: WorkflowMode;
   messageText: string;
   activeScamNow: boolean;
+  tutorGoalId: string | null;
 }
 
 export interface HistoryEntry {
@@ -16,4 +27,5 @@ export interface HistoryEntry {
   inputPreview: string;
   riskLevel: RiskLevel;
   activeScamNow: boolean;
+  mode: WorkflowMode;
 }

@@ -1,6 +1,21 @@
 import { describe, expect, it } from "vitest";
 
 import { canReset, canRun, isFormLocked, transition } from "@/lib/fsm/runFsm";
+import type { RunInput } from "@/lib/types/run";
+
+const scamInput = (messageText: string): RunInput => ({
+  mode: "scam",
+  messageText,
+  activeScamNow: false,
+  tutorGoalId: null,
+});
+
+const learnInput = (tutorGoalId: string | null): RunInput => ({
+  mode: "learn",
+  messageText: "",
+  activeScamNow: false,
+  tutorGoalId,
+});
 
 describe("runFsm", () => {
   it("idle START goes to running", () => {
@@ -15,10 +30,15 @@ describe("runFsm", () => {
     expect(transition("running", "RESET")).toBe("idle");
   });
 
-  it("canRun only when idle with non-empty paste", () => {
-    expect(canRun("idle", "  paste this  ")).toBe(true);
-    expect(canRun("idle", "   ")).toBe(false);
-    expect(canRun("running", "paste")).toBe(false);
+  it("canRun only when idle with non-empty paste in scam mode", () => {
+    expect(canRun("idle", scamInput("  paste this  "))).toBe(true);
+    expect(canRun("idle", scamInput("   "))).toBe(false);
+    expect(canRun("running", scamInput("paste"))).toBe(false);
+  });
+
+  it("canRun in learn mode when a task is picked", () => {
+    expect(canRun("idle", learnInput("send_email_daughter"))).toBe(true);
+    expect(canRun("idle", learnInput(null))).toBe(false);
   });
 
   it("locks form while running or done", () => {

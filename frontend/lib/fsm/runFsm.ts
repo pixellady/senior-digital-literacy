@@ -1,4 +1,4 @@
-import type { RunFsmEvent, RunPhase } from "@/lib/types/run";
+import type { RunFsmEvent, RunInput, RunPhase } from "@/lib/types/run";
 
 /**
  * Tiny FSM: idle → running → done.
@@ -21,8 +21,12 @@ export function transition(phase: RunPhase, event: RunFsmEvent): RunPhase {
   }
 }
 
-export function canRun(phase: RunPhase, messageText: string): boolean {
-  return phase === "idle" && messageText.trim().length > 0;
+export function canRun(phase: RunPhase, input: RunInput): boolean {
+  if (phase !== "idle") return false;
+  if (input.mode === "learn") {
+    return input.tutorGoalId !== null && input.tutorGoalId.length > 0;
+  }
+  return input.messageText.trim().length > 0;
 }
 
 export function canReset(phase: RunPhase): boolean {

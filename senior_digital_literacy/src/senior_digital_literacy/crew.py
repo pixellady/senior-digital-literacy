@@ -15,6 +15,7 @@ from senior_digital_literacy.runtime_flags import (
     tracing_enabled,
 )
 from senior_digital_literacy.tools.scam_library_tool import SearchScamLibraryTool
+from senior_digital_literacy.tools.tutorial_library_tool import SearchTutorialLibraryTool
 
 # Name contract:
 #   @agent method name  ==  agents.yaml key  ==  tasks.yaml `agent:` value
@@ -70,6 +71,7 @@ class SeniorDigitalLiteracy():
         return Agent(
             config=self.agents_config["step_by_step_tutor"],
             verbose=True,
+            tools=[SearchTutorialLibraryTool()],
             max_rpm=crew_max_rpm(),
             max_tokens=llm_max_output_tokens(),
             max_execution_time=crew_max_execution_seconds(),

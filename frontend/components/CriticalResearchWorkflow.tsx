@@ -3,14 +3,18 @@
 import { CrewStatusBanner } from "@/components/CrewStatusBanner";
 import { HistorySection } from "@/components/HistorySection";
 import { InputsSection } from "@/components/InputsSection";
+import { PrintSummary } from "@/components/PrintSummary";
 import { ResultsSection } from "@/components/ResultsSection";
-import { RunSection } from "@/components/RunSection";
 import { SafetyBar } from "@/components/SafetyBar";
+import { TutorTaskSection } from "@/components/TutorTaskSection";
+import { WorkflowModeToggle } from "@/components/WorkflowModeToggle";
 import { PRIVACY_REASSURANCE_COPY } from "@/lib/copy/privacyReassurance";
+import { isFormLocked } from "@/lib/fsm/runFsm";
 import { useCriticalResearchRun } from "@/lib/hooks/useCriticalResearchRun";
 
 export function CriticalResearchWorkflow() {
   const workflow = useCriticalResearchRun();
+  const formLocked = isFormLocked(workflow.phase);
 
   return (
     <div>
@@ -50,6 +54,11 @@ export function CriticalResearchWorkflow() {
             you&apos;re never wrong to ask.
           </p>
           <p className="mt-2 text-base text-slate-700">{PRIVACY_REASSURANCE_COPY}</p>
+          <WorkflowModeToggle
+            mode={workflow.input.mode}
+            disabled={formLocked}
+            onChange={workflow.updateWorkflowMode}
+          />
         </header>
 
         <form
@@ -60,38 +69,52 @@ export function CriticalResearchWorkflow() {
           }}
         >
           <div className="flex flex-col gap-8">
-            <InputsSection
-              phase={workflow.phase}
-              input={workflow.input}
-              onMessageTextChange={workflow.updateMessageText}
-              onActiveScamNowChange={workflow.updateActiveScamNow}
-            />
-            <RunSection
-              phase={workflow.phase}
-              input={workflow.input}
-              errorMessage={workflow.errorMessage}
-              retryable={workflow.retryable}
-              paused={workflow.paused}
-              onReset={workflow.reset}
-              onRetry={workflow.retry}
-            />
+            {workflow.input.mode === "scam" ? (
+              <InputsSection
+                phase={workflow.phase}
+                input={workflow.input}
+                errorMessage={workflow.errorMessage}
+                retryable={workflow.retryable}
+                paused={workflow.paused}
+                onMessageTextChange={workflow.updateMessageText}
+                onActiveScamNowChange={workflow.updateActiveScamNow}
+                onReset={workflow.reset}
+                onRetry={workflow.retry}
+              />
+            ) : (
+              <TutorTaskSection
+                phase={workflow.phase}
+                input={workflow.input}
+                errorMessage={workflow.errorMessage}
+                retryable={workflow.retryable}
+                paused={workflow.paused}
+                selectedGoalId={workflow.input.tutorGoalId}
+                onGoalChange={workflow.updateTutorGoalId}
+                onReset={workflow.reset}
+                onRetry={workflow.retry}
+              />
+            )}
           </div>
         </form>
 
         <ResultsSection
           phase={workflow.phase}
           result={workflow.result}
-          checkedAt={workflow.lastUpdated}
+          onPrintCurrent={workflow.printCurrent}
         />
+        <PrintSummary snapshots={workflow.activePrintSnapshots} />
         <div className="no-print">
-          <HistorySection entries={workflow.history} />
+          <HistorySection
+            entries={workflow.history}
+            onPrintVisit={workflow.printVisit}
+          />
         </div>
 
         <footer className="no-print border-t-2 border-slate-300 pt-4 text-base text-slate-700">
           <p>
-            Future work (not working yet): Extra Guidance, Learn a skill,
-            account signup, and progress for caregivers. Extra routes wait until
-            this scam check talks to Flow.
+            Future work (not working yet): Extra Guidance, account signup, and
+            progress for caregivers. Beginner and No-Device tracks, onboarding,
+            and multi-step lessons are not on this page yet.
           </p>
         </footer>
       </div>

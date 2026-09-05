@@ -1,3 +1,4 @@
+import { RunControls } from "@/components/RunControls";
 import { isFormLocked } from "@/lib/fsm/runFsm";
 import type { RunInput, RunPhase } from "@/lib/types/run";
 import { MESSAGE_MAX_LENGTH } from "@/lib/validation/runInput";
@@ -5,15 +6,25 @@ import { MESSAGE_MAX_LENGTH } from "@/lib/validation/runInput";
 type InputsSectionProps = {
   phase: RunPhase;
   input: RunInput;
+  errorMessage: string | null;
+  retryable: boolean;
+  paused: boolean;
   onMessageTextChange: (value: string) => void;
   onActiveScamNowChange: (value: boolean) => void;
+  onReset: () => void;
+  onRetry: () => void;
 };
 
 export function InputsSection({
   phase,
   input,
+  errorMessage,
+  retryable,
+  paused,
   onMessageTextChange,
   onActiveScamNowChange,
+  onReset,
+  onRetry,
 }: InputsSectionProps) {
   const disabled = isFormLocked(phase);
 
@@ -68,6 +79,16 @@ export function InputsSection({
             I think this is happening right now
           </label>
         </div>
+
+        <RunControls
+          phase={phase}
+          input={input}
+          errorMessage={errorMessage}
+          retryable={retryable}
+          paused={paused}
+          onReset={onReset}
+          onRetry={onRetry}
+        />
       </div>
     </section>
   );

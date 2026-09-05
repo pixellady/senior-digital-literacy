@@ -5,6 +5,7 @@ import {
 } from "@/lib/fixtures/chatFixtures";
 import { RATE_LIMIT_DETAIL } from "@/lib/copy/crewStatus";
 import { CHAT_ENDPOINT, type ChatRequest, type ChatResponse } from "@/lib/types/chat";
+import { tutorGoalTitle } from "@/lib/copy/tutorGoals";
 import type { RunInput } from "@/lib/types/run";
 import { MESSAGE_MAX_LENGTH } from "@/lib/validation/runInput";
 
@@ -21,18 +22,24 @@ export function toChatRequest(
   input: RunInput,
   sessionId: string | null,
 ): ChatRequest {
+  const isLearn = input.mode === "learn";
   return {
     session_id: sessionId,
-    message: input.messageText.trim(),
-    explicit_path: "scam",
+    message: isLearn
+      ? tutorGoalTitle(input.tutorGoalId)
+      : input.messageText.trim(),
+    explicit_path: isLearn ? "tutor" : "scam",
     client_action: "none",
-    track_override: null,
+    track_override: isLearn ? "partial_user" : null,
   };
 }
 
 function validateChatRequest(request: ChatRequest): string | null {
   const text = request.message.trim();
   if (text.length < 1) {
+    if (request.explicit_path === "tutor") {
+      return "Please pick a task to learn.";
+    }
     return "Please paste or type the message or call you want to check.";
   }
   if (text.length > MESSAGE_MAX_LENGTH) {
