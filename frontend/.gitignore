@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Next overlay workaround (wallet extensions); not part of MVP
+instrumentation-client.ts
+public/ignore-extension-errors.js
