@@ -1,0 +1,14 @@
+.venv
+.env
+.env.*
+!.env.example
+__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+tests
+evals
+*.md
+.DS_Store
+crewai_flow.html
+**/*.pyc

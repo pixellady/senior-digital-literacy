@@ -1,0 +1,49 @@
+# Local loopback demo only (release 0.1.0).
+# Host ports bind to 127.0.0.1 — do not change to "8000:8000" or "3000:3000".
+# No Postgres: the shipped slice does not use a database.
+# Copy senior_digital_literacy/.env.example → senior_digital_literacy/.env (gitignored) before up.
+
+name: senior-digital-literacy
+
+services:
+  api:
+    build:
+      context: ./senior_digital_literacy
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - path: ./senior_digital_literacy/.env
+        required: false
+    environment:
+      # Inside the container 0.0.0.0 is required so the published host port works.
+      # The host mapping above keeps the API off the LAN (SEC-001).
+      HOST: "0.0.0.0"
+      PORT: "8000"
+      CORS_ORIGIN: "http://localhost:3000,http://127.0.0.1:3000"
+      CREWAI_TRACING_ENABLED: "false"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+    depends_on:
+      api:
+        condition: service_healthy

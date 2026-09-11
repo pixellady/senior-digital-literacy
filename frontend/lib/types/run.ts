@@ -2,6 +2,10 @@ import type { ResourceLink, RiskLevel } from "@/lib/types/chat";
 
 export type WorkflowMode = "scam" | "learn";
 
+/** Client run FSM (frontend.md). Errors are not a fourth state. */
+export type RunPhase = "idle" | "running" | "done";
+export type RunFsmEvent = "START" | "COMPLETE" | "RESET";
+
 /** Printable snapshot for one completed run (no session id or pasted message). */
 export interface PrintSnapshot {
   completedAt: string;

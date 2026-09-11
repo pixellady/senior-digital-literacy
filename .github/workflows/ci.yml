@@ -1,0 +1,65 @@
+# Lint, test, and build only. Does not deploy, does not call Anthropic.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend lint / test / evals
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: senior_digital_literacy
+    env:
+      CREWAI_TRACING_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.5"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync --frozen --dev
+      - name: Syntax check
+        run: uv run python -m compileall -q src evals
+      - name: Pytest (offline; live tests skip unless LIVE_API=1)
+        run: uv run pytest -q
+      - name: Offline evals
+        run: uv run python evals/run.py
+
+  frontend:
+    name: Frontend lint / test / build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000

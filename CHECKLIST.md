@@ -161,20 +161,20 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ### Step 6: Deliver (`@devops.eng`)
 
-- [ ] Invoke `@devops.eng` after QA artifacts are complete (and evals.md / security.md when available).
-- [ ] Run `*prepare-release`
-  - [ ] Confirm qa.md documents MVP verification (pass or scoped gaps)
-  - [ ] Note evals.md status and fold its monitoring recommendations into deploy config
-  - [ ] Note security.md status (present or accepted gap)
-  - [ ] Summarize release scope and version in deploy.md
-- [ ] Run `*define-deploy` and `*configure-cicd`
-  - [ ] Add minimal deploy and CI config aligned with SAD and AAMAD_TARGET_RUNTIME
-  - [ ] Do not embed secrets; reference `.env.example` keys only
-- [ ] Run `*document-deploy`
-  - [ ] Complete project-context/3.deliver/deploy.md (hosting, access control, rollback, Audit)
-- [ ] Run `*document-user-guide`
-  - [ ] Complete project-context/3.deliver/user-guide.md
-- [ ] Optionally run `aamad validate --phase deliver`.
+- [x] Invoke `@devops.eng` after QA artifacts are complete (and evals.md / security.md when available).
+- [x] Run `*prepare-release`
+  - [x] Confirm qa.md documents MVP verification (pass or scoped gaps)
+  - [x] Note evals.md status and fold its monitoring recommendations into deploy config
+  - [x] Note security.md status (present or accepted gap)
+  - [x] Summarize release scope and version in deploy.md
+- [x] Run `*define-deploy` and `*configure-cicd`
+  - [x] Add minimal deploy and CI config aligned with SAD and AAMAD_TARGET_RUNTIME
+  - [x] Do not embed secrets; reference `.env.example` keys only
+- [x] Run `*document-deploy`
+  - [x] Complete project-context/3.deliver/deploy.md (hosting, access control, rollback, Audit)
+- [x] Run `*document-user-guide`
+  - [x] Complete project-context/3.deliver/user-guide.md
+- [x] Optionally run `aamad validate --phase deliver`.
 
 ---
 
