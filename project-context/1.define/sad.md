@@ -600,7 +600,7 @@ QA maps tests to user-story acceptance criteria (`testing.map_to_acceptance_crit
 | EC-005 | Latency | Chat p95 | ≤5s | Code-based when timed; **not a fail gate** this pass | PRD §3 |
 | EC-006 | Cost | Per-request spend ceiling | No numeric $ in PRD; HTTP 10/min 40/h is the implemented bound | Code-based (rate-limit tests) | backend.md; Open Question |
 | EC-007 | Security | No committed secrets; tracing off unless env | Pass on default flags | Code-based | SAD §8; security.md SEC-002 |
-| EC-008 | Safety audit | Critical scam misses on sampled assessments | 0 | Human (deferred; no labeled set) | PRD §7; SAD §9 Safety audit |
+| EC-008 | Safety audit | Critical scam misses on sampled assessments | 0 | Human — **pass** 2026-09-11 (8/8 library `sample_text`; 0 critical misses; 3 missing-link = QA-EVAL-001, not pay instruction) | PRD §7; SAD §9 Safety audit |
 
 ---
 

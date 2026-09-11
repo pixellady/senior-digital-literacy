@@ -6,7 +6,7 @@
 
 ## Status
 
-Re-QA **pass** for committed tutor proof + session print. Offline eval **28/28**. Pytest **77 passed**, 4 skipped (live). Vitest **24 passed**. **Do not block** on EC-005 (p95 ≤5s) or EV-017 / QA-EVAL-001 (live IC3 slash). Those stay logged gaps.
+Re-QA **pass** for committed tutor proof + session print. Offline eval **28/28**. Pytest **77 passed**, 4 skipped (live). Vitest **24 passed**. **EC-008 human sample pass** (2026-09-11): operator ran all 8 library `sample_text` pastes; 0 critical misses; tutor did not ask to pay. **3/8** missing a catalog link stays **QA-EVAL-001** (not an EC-008 fail). **Do not block** on EC-005 (p95 ≤5s) or EV-017 / QA-EVAL-001. Those stay logged gaps.
 
 No `AC-*` IDs exist in `system-description.md` (file absent) or user stories. Mapping uses **US-xxx-n** = story ID + numbered acceptance criterion.
 
@@ -359,3 +359,13 @@ AAMAD_TARGET_RUNTIME: crewai
 | Prompt Trace | Omitted |
 | Tools used | `evals/run.py` 28/28; `pytest` 77 passed 4 skipped; `npm test` 24 passed |
 | Prohibited actions honored | Did not block on EC-005 or EV-017; no live LLM this pass |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-11T13:00:00Z |
+| Persona id | `qa-eng` |
+| Action | `run-evals` — record operator EC-008 HITL pass |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | this Status line; `evals.md`; SAD §9 EC-008 |
+| Prompt Trace | Omitted — operator review, no new live suite |
+| Prohibited actions honored | Missing-link rows logged as QA-EVAL-001, not critical misses |

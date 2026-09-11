@@ -152,10 +152,10 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ### Step 5.5: Security Assessment (`@security.eng`) — recommended before Deliver
 
-- [ ] Invoke `@security.eng` (required when `aamad.config.yml` sets `security.require_security_assessment: true`).
-- [ ] Run `*assess-security` (and `*scan-secrets` / `*review-deps` as needed).
-- [ ] Complete project-context/2.build/security.md with severity-ranked findings.
-- [ ] Route mitigations to owning personas; do not change app logic inside this persona.
+- [x] Invoke `@security.eng` (required when `aamad.config.yml` sets `security.require_security_assessment: true`).
+- [x] Run `*assess-security` (and `*scan-secrets` / `*review-deps` as needed).
+- [x] Complete project-context/2.build/security.md with severity-ranked findings.
+- [x] Route mitigations to owning personas; do not change app logic inside this persona.
 
 ---
 
