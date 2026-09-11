@@ -7,7 +7,7 @@ export function VerifiedGuideBadge({ visible }: VerifiedGuideBadgeProps) {
 
   return (
     <p
-      className="inline-flex min-h-11 items-center rounded-lg border-2 border-slate-800 bg-stone-50 px-3 py-2 text-lg font-semibold text-slate-900"
+      className="inline-flex min-h-11 items-center rounded-xl border border-forest bg-white px-3 py-2 text-lg font-semibold text-forest"
       role="status"
     >
       Verified guide

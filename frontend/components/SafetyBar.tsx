@@ -4,9 +4,7 @@ import {
   PAUSE_LABEL,
   RESUME_LABEL,
 } from "@/lib/copy/safetyBar";
-
-const controlClass =
-  "min-h-11 min-w-11 rounded-lg px-6 py-3 text-lg font-semibold focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2";
+import { btnSecondary } from "@/lib/ui/surfaces";
 
 type SafetyBarProps = {
   paused: boolean;
@@ -16,19 +14,19 @@ type SafetyBarProps = {
 
 export function SafetyBar({ paused, onPause, onResume }: SafetyBarProps) {
   return (
-    <div className="border-b-2 border-slate-800 bg-stone-50 px-4 py-3 sm:px-8">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="rounded-xl border border-forest/15 bg-white p-4 shadow-[0_6px_16px_rgba(70,124,83,0.16)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={paused ? onResume : onPause}
-          className={`${controlClass} border-2 border-slate-800 bg-white text-slate-900 hover:bg-slate-100 focus-visible:outline-slate-900`}
+          className={btnSecondary}
         >
           {paused ? RESUME_LABEL : PAUSE_LABEL}
         </button>
         {paused ? (
-          <p className="text-lg text-slate-900">{PAUSE_HINT}</p>
+          <p className="text-xl text-slate-900">{PAUSE_HINT}</p>
         ) : (
-          <p className="text-lg text-slate-800">
+          <p className="text-xl text-slate-800">
             {PAUSE_IDLE}
           </p>
         )}

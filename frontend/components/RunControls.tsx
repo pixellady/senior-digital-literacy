@@ -1,9 +1,7 @@
 import { CREW_INLINE_MESSAGES } from "@/lib/copy/crewStatus";
 import { canReset, canRun } from "@/lib/fsm/runFsm";
 import type { RunInput, RunPhase } from "@/lib/types/run";
-
-const controlClass =
-  "min-h-11 min-w-11 rounded-lg px-6 py-3 text-lg font-semibold focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 disabled:cursor-not-allowed";
+import { btnPrimary, btnSecondary } from "@/lib/ui/surfaces";
 
 type RunControlsProps = {
   phase: RunPhase;
@@ -30,7 +28,7 @@ export function RunControls({
   const resetEnabled = canReset(phase);
 
   return (
-    <div className="mt-6 border-t-2 border-slate-200 pt-6">
+    <div className="mt-6 border-t border-forest/15 pt-6">
       <p className="min-h-11 text-lg font-medium text-slate-900">
         {CREW_INLINE_MESSAGES[phase]}
       </p>
@@ -39,7 +37,7 @@ export function RunControls({
         <button
           type="submit"
           disabled={!runEnabled}
-          className={`${controlClass} bg-blue-800 text-white hover:bg-blue-900 focus-visible:outline-blue-800 disabled:bg-slate-400`}
+          className={btnPrimary}
         >
           Run
         </button>
@@ -47,7 +45,7 @@ export function RunControls({
           type="button"
           disabled={!resetEnabled}
           onClick={onReset}
-          className={`${controlClass} border-2 border-slate-800 bg-white text-slate-900 hover:bg-slate-100 focus-visible:outline-slate-900 disabled:border-slate-400 disabled:text-slate-400`}
+          className={btnSecondary}
         >
           Reset
         </button>
@@ -63,7 +61,7 @@ export function RunControls({
             <button
               type="button"
               onClick={onRetry}
-              className={`${controlClass} mt-3 bg-red-800 text-white hover:bg-red-900 focus-visible:outline-red-800`}
+              className={`${btnPrimary} mt-3 bg-red-800 hover:bg-red-900 focus-visible:outline-red-800`}
             >
               Retry
             </button>

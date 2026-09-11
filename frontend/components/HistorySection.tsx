@@ -1,41 +1,42 @@
 import { PRINT_VISIT_HINT, PRINT_VISIT_LABEL } from "@/lib/copy/printSummary";
-import { formatCompletedAt, riskHeading } from "@/lib/copy/riskCopy";
+import { formatCompletedAt } from "@/lib/copy/riskCopy";
 import type { HistoryEntry } from "@/lib/types/run";
-
-const controlClass =
-  "min-h-11 min-w-11 rounded-lg border-2 border-slate-800 bg-white px-6 py-3 text-lg font-semibold text-slate-900 hover:bg-slate-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900";
+import { btnSecondary, surfaceCard, surfaceInset } from "@/lib/ui/surfaces";
 
 type HistorySectionProps = {
   entries: HistoryEntry[];
   onPrintVisit?: () => void;
 };
 
-export function HistorySection({ entries, onPrintVisit }: HistorySectionProps) {
+export function HistorySection({
+  entries,
+  onPrintVisit,
+}: HistorySectionProps) {
   return (
     <section
       aria-labelledby="history-heading"
-      className="rounded-xl border-2 border-slate-800 bg-white p-6 shadow-sm"
+      className={surfaceCard}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
         <h2 id="history-heading" className="text-2xl font-semibold text-slate-900">
           History
         </h2>
         {entries.length > 0 && onPrintVisit ? (
-          <div className="flex flex-col gap-2 sm:items-end">
-            <button type="button" onClick={onPrintVisit} className={controlClass}>
+          <div className="mt-4 flex flex-col items-start gap-2">
+            <button type="button" onClick={onPrintVisit} className={btnSecondary}>
               {PRINT_VISIT_LABEL}
             </button>
-            <p className="text-base text-slate-800">{PRINT_VISIT_HINT}</p>
+            <p className="text-left text-xl text-slate-800">{PRINT_VISIT_HINT}</p>
           </div>
         ) : null}
       </div>
-      <p className="mt-2 text-lg text-slate-800">
+      <p className="mt-2 text-xl text-slate-800">
         Checks from this visit only. They are not saved on this device after you
         close the page.
       </p>
 
       {entries.length === 0 ? (
-        <p className="mt-4 text-lg text-slate-800">
+        <p className="mt-4 text-lg font-medium text-slate-800">
           No checks yet in this visit.
         </p>
       ) : (
@@ -43,22 +44,32 @@ export function HistorySection({ entries, onPrintVisit }: HistorySectionProps) {
           {entries.map((entry, index) => (
             <li
               key={`${entry.sessionId}-${entry.completedAt}-${index}`}
-              className="rounded-lg border border-slate-700 p-4"
+              className={surfaceInset}
             >
-              <p className="text-base text-slate-700">
-                {formatCompletedAt(entry.completedAt)}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {entry.mode === "learn"
-                  ? "Learn a skill"
-                  : riskHeading(entry.riskLevel)}
-              </p>
-              <p className="mt-1 text-lg text-slate-900">{entry.inputPreview}</p>
-              {entry.activeScamNow ? (
-                <p className="mt-2 text-base font-medium text-slate-800">
-                  Happening now
+              <article aria-labelledby={`history-item-${index}`}>
+                <p className="text-xl text-slate-700">
+                  {formatCompletedAt(entry.completedAt)}
                 </p>
-              ) : null}
+                <h3
+                  id={`history-item-${index}`}
+                  className="mt-1 text-xl font-semibold text-slate-900"
+                >
+                  {entry.mode === "learn" ? "Learn a skill" : "Scam check"}
+                </h3>
+                <p className="mt-2 text-xl text-slate-900">
+                  <span className="font-semibold">You asked: </span>
+                  {entry.inputPreview}
+                </p>
+                <p className="mt-2 text-xl text-slate-900">
+                  <span className="font-semibold">What we found: </span>
+                  {entry.resultHeading}. {entry.resultPreview}
+                </p>
+                {entry.activeScamNow ? (
+                  <p className="mt-2 text-lg font-medium text-slate-800">
+                    Happening now
+                  </p>
+                ) : null}
+              </article>
             </li>
           ))}
         </ol>

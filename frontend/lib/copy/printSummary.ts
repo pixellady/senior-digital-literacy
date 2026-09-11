@@ -6,6 +6,8 @@ export const PRINT_VISIT_HINT =
   "Includes every check from this visit in one file. Choose Save as PDF in the print window if you want a file.";
 export const PRINT_VISIT_FOOTER =
   "From this visit only — not saved after you close the page.";
+export const PRINT_ROW_LABEL = "Save or print this check";
+export const PRINT_STEP_LABEL = "Step 1";
 export const PRINT_HEADING = "Learn the Signs, Protect Yourself";
 export const PRINT_RESOURCES_HEADING = "Official resources";
 export const PRINT_CHECKED_LABEL = "Checked:";

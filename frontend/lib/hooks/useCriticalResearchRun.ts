@@ -5,11 +5,12 @@ import { flushSync } from "react-dom";
 import { CREW_ERROR_DETAIL, RATE_LIMIT_DETAIL } from "@/lib/copy/crewStatus";
 import { selectStubFixturePath } from "@/lib/fixtures/chatFixtures";
 import { canReset, transition } from "@/lib/fsm/runFsm";
+import { resultsHeading } from "@/lib/copy/riskCopy";
 import { buildPrintSnapshot } from "@/lib/print/buildPrintSnapshot";
 import { sendChat, toChatRequest } from "@/lib/services/chatService";
 import type { ChatResponse } from "@/lib/types/chat";
 import type { HistoryEntry, PrintSnapshot, RunInput, RunPhase } from "@/lib/types/run";
-import { previewRunInput, validateRunInput } from "@/lib/validation/runInput";
+import { previewResultText, previewRunInput, validateRunInput } from "@/lib/validation/runInput";
 
 const EMPTY_INPUT: RunInput = {
   mode: "scam",
@@ -40,6 +41,9 @@ export function useCriticalResearchRun() {
   }, []);
 
   const updateWorkflowMode = useCallback((mode: RunInput["mode"]) => {
+    if (input.mode === mode) {
+      return;
+    }
     setInput((current) => ({
       ...current,
       mode,
@@ -47,7 +51,13 @@ export function useCriticalResearchRun() {
       activeScamNow: mode === "learn" ? false : current.activeScamNow,
       tutorGoalId: mode === "scam" ? null : current.tutorGoalId,
     }));
-  }, []);
+    setPhase((current) => (current === "done" ? transition(current, "RESET") : current));
+    setResult(null);
+    setErrorMessage(null);
+    setRetryable(false);
+    setPaused(false);
+    setLastUpdated(new Date());
+  }, [input.mode]);
 
   const updateTutorGoalId = useCallback((tutorGoalId: string) => {
     setInput((current) => ({ ...current, tutorGoalId }));
@@ -88,6 +98,8 @@ export function useCriticalResearchRun() {
           sessionId: response.session_id,
           completedAt,
           inputPreview: previewRunInput(payload),
+          resultPreview: previewResultText(response.content.text),
+          resultHeading: resultsHeading(response),
           riskLevel: response.content.risk_level,
           activeScamNow: payload.activeScamNow,
           mode: payload.mode,
@@ -163,6 +175,18 @@ export function useCriticalResearchRun() {
     window.print();
   }, [printSnapshots]);
 
+  const printEntry = useCallback(
+    (completedAt: string) => {
+      const snapshot = printSnapshots.find((item) => item.completedAt === completedAt);
+      if (!snapshot) return;
+      flushSync(() => {
+        setActivePrintSnapshots([snapshot]);
+      });
+      window.print();
+    },
+    [printSnapshots],
+  );
+
   return {
     phase,
     lastUpdated,
@@ -184,5 +208,6 @@ export function useCriticalResearchRun() {
     resume,
     printCurrent,
     printVisit,
+    printEntry,
   };
 }

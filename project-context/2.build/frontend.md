@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path: paste → `explicit_path: "scam"` → `POST /api/v1/chat` → large-type verdict. Client **Pause** is always visible. After **Crew: done**, **Save or print** opens `window.print()` for a curated `#print-summary` sheet (Checked date/time + Website URL; no `session_id` or paste). Weekly cap numbers stay on the SAD envelope but are **hidden** (`WEEKLY_CAPS_ARE_REAL = false`). No `/onboarding`, `/learn`, or `/caregiver`. Tutor step is still not on this page.
+Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Proof path: paste → `explicit_path: "scam"` → `POST /api/v1/chat` → large-type verdict. Learn a skill: pick a task → one **Step 1** card. Client **Pause** is always visible. After **Crew: done**, **Check a scam / Learn a skill** returns to idle without Reset. History shows You asked / What we found (no pasted scam text) and per-row print. **Save or print** / **Print this visit** use `#print-summary` (no `session_id` or paste). Weekly cap numbers stay hidden. No `/onboarding`, `/learn`, or `/caregiver`.
 
 `sendChat` is **not stub-only**. Integration (`7c42dc1`) wired live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set. When it is unset, `sendChat` still returns named Path A/B fixtures. Live Flow owns Priority Mode from the message; `activeScamNow` only selects a fixture.
 
@@ -30,6 +30,7 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 16. Operator copy: h1 **Learn the Signs, Protect Yourself**; subtitle “You're safe here, and you're never wrong to ask.”; Pause idle “Pause is always here, waiting for you.”
 17. Documented live `sendChat` (`NEXT_PUBLIC_API_BASE_URL` → `fetch`) plus fixture fallback. Did not change application code. US-001 / US-002 owned by `@product-mgr`.
 18. Print sheet (`#print-summary`) adds **Checked:** locale date/time (`lastUpdated` when the check finished) and **Website:** origin + pathname after mount. Still no `session_id` or pasted text (US-016 AC5, US-017 AC2).
+19. Senior-reading pass: mode switch after results without Reset; History result preview + per-row print; tutor Step 1 card; mode-aware header/footer; focus moves to the next heading.
 
 ## Application map
 
@@ -40,6 +41,9 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 | `frontend/components/CrewStatusBanner.tsx` | Sticky `Crew:` banner, pill, last updated |
 | `frontend/components/SafetyBar.tsx` | Always-visible Pause / Resume (client, US-009) |
 | `frontend/components/VerifiedGuideBadge.tsx` | RAG trust indicator when `verified_guide` |
+| `frontend/components/TutorStepCard.tsx` | Learn-mode Step 1 card (text + optional illustration) |
+| `frontend/components/WorkflowModeToggle.tsx` | Check a scam / Learn a skill; enabled after results |
+| `frontend/lib/copy/pageChrome.ts` | Title, mode subtitles, footer |
 | `frontend/components/SavePrintControl.tsx` | **Save or print** after `done`; `window.print()` |
 | `frontend/components/PrintSummary.tsx` | Curated print sheet; Checked + Website after mount |
 | `frontend/lib/copy/printSummary.ts` | Save/print and sheet labels |
@@ -56,7 +60,7 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 - Calm “Crew: running. Working on this…” loading copy; non-streaming wait (AD-5).
 - Sticky Crew status banner: `Crew: idle|running|done`, gray/blue/green pills, Last updated (seconds). Locale time is formatted **after mount** so SSR HTML matches the client (no hydration mismatch from `toLocaleString` / `new Date()`).
 - Same `Crew: …` phrase in banner, Run, and Results.
-- On-page `h1` and document title: **Learn the Signs, Protect Yourself**. Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
+- On-page `h1` and document title: **Learn the Signs, Protect Yourself**. Subtitle and privacy line follow Check a scam vs Learn a skill (`pageChrome.ts`). Eyebrow is sentence case.
 - Pause idle copy: “Pause is always here, waiting for you.” Paused hint is unchanged (`PAUSE_HINT`).
 - Controls: **Run**, **Reset**, **Pause**. Pause is client-side and does not cancel an in-flight request.
 - Results proof: **Scam checker** + **Verified guide** + `text-4xl` verdict (live envelope or fixture).
@@ -64,17 +68,20 @@ Implemented a Next.js App Router app at `frontend/` with **one route** (`/`). Pr
 - Basic a11y: skip link, h1/h2, native keyboard/focus. Advanced a11y deferred.
 - No modals (`prefer_modals: false`).
 - Body ≥16px (18px root); primary controls `min-h-11` (44px).
-- Light high-contrast palette (no dark-mode inversion in this slice).
+- Light card dashboard: mint canvas `#eef5f2`, white cards with soft shadow, teal-800 actions (WCAG). No dark theme.
+- Typeface is **Lexend** (Google Fonts): body 300, unselected buttons 500, headlines and selected buttons 600. No eyebrow above the page title.
 - Shame-free copy; no blame on send failure.
 - Wire is SAD §4: one `sendChat` with full `ChatRequest`. Live path uses `fetch`. When the API base is unset, `stubPath` selects Path A (`likely_scam`, gift-card) or Path B (`critical`, `mode: priority`, `ai_disclosure: true`) from `activeScamNow`. The client never scores `message` keywords.
 - `ChatResponse.caps` stays on the wire. Results do not show used/limit. Flip `WEEKLY_CAPS_ARE_REAL` only after `@backend.eng` counts real weekly sessions. No CapMessage.
-- **Save or print** (Crew: done only): `window.print()` + print CSS; no PDF library. Sheet includes title, Checked date/time, Website URL, Verified guide if on, risk heading, `content.text`, official links. Chrome, `session_id`, paste, and caps stay off the paper. Session ID and paste wait for `@security.eng`.
+- **Save or print** (Crew: done only): `window.print()` + print CSS; no PDF library. Sheet includes title, Checked date/time, Website URL, Verified guide if on, risk heading or Step 1 card, `content.text`, official links. Chrome, `session_id`, paste, and caps stay off the paper.
+- Mode toggle is locked only while `running`. Switching after `done` goes to idle, keeps History, and focuses the next section heading.
+- History rows: You asked (task title or “A message you pasted”), What we found (heading + snippet), **Save or print this check**. No pasted scam body.
 
 ## Future Work placeholders (visible, non-functional)
 
-- Extra Guidance, Learn a skill, signup, caregiver progress (footer only).
+- Extra Guidance, account signup, caregiver progress, multi-step lessons (footer only).
 - SAD routes `/onboarding`, `/learn`, `/scam`, `/progress`, `/caregiver`, `/settings` — **not created**.
-- One Tutor step — still deferred; the scam check on `/` already posts to Flow when `NEXT_PUBLIC_API_BASE_URL` is set (`7c42dc1`).
+- One Tutor step is on `/`. Illustrated `step_card` shows only when the API sends a URL.
 
 ## How to run
 
@@ -296,3 +303,11 @@ After **every commit** that changes this UI or the spec, update the checklist in
 | Action | `sync-docs` — Spec Sync S8 SHA `6273d22` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Outputs | frontend-funcional-spec.md S8 + Last synced commit |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-05T14:50:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — senior reading: mode switch, history preview, tutor step card, chrome |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Outputs | `TutorStepCard`; `pageChrome.ts`; History result preview; mode toggle after done |

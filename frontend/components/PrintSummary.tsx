@@ -6,6 +6,7 @@ import {
   PRINT_CHECKED_LABEL,
   PRINT_HEADING,
   PRINT_RESOURCES_HEADING,
+  PRINT_STEP_LABEL,
   PRINT_VISIT_FOOTER,
   PRINT_WEBSITE_LABEL,
 } from "@/lib/copy/printSummary";
@@ -50,8 +51,18 @@ export function PrintSummary({ snapshots }: PrintSummaryProps) {
             {snapshot.verifiedGuide ? (
               <p className="print-verified">Verified guide</p>
             ) : null}
-            <h2>{snapshot.heading}</h2>
-            <p className="print-body">{snapshot.text}</p>
+            {snapshot.mode === "learn" ? (
+              <div className="print-step-card">
+                <p className="print-step-label">{PRINT_STEP_LABEL}</p>
+                <h2>{snapshot.heading}</h2>
+                <p className="print-body">{snapshot.text}</p>
+              </div>
+            ) : (
+              <>
+                <h2>{snapshot.heading}</h2>
+                <p className="print-body">{snapshot.text}</p>
+              </>
+            )}
             {links.length > 0 ? (
               <div>
                 <h3>{PRINT_RESOURCES_HEADING}</h3>

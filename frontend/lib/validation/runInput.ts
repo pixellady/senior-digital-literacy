@@ -30,9 +30,15 @@ export function previewMessage(messageText: string, maxLength = 80): string {
   return `${trimmed.slice(0, maxLength).trimEnd()}…`;
 }
 
+export const SCAM_HISTORY_ASKED_LABEL = "A message you pasted";
+
 export function previewRunInput(input: RunInput, maxLength = 80): string {
   if (input.mode === "learn") {
     return previewMessage(tutorGoalTitle(input.tutorGoalId), maxLength);
   }
-  return previewMessage(input.messageText, maxLength);
+  return SCAM_HISTORY_ASKED_LABEL;
+}
+
+export function previewResultText(text: string, maxLength = 140): string {
+  return previewMessage(text, maxLength);
 }

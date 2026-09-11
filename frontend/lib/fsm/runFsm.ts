@@ -36,3 +36,8 @@ export function canReset(phase: RunPhase): boolean {
 export function isFormLocked(phase: RunPhase): boolean {
   return phase === "running" || phase === "done";
 }
+
+/** Mode toggle stays available after results. Only lock it while a run is in flight. */
+export function isModeToggleLocked(phase: RunPhase): boolean {
+  return phase === "running";
+}

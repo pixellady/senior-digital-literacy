@@ -4,6 +4,7 @@ import { RunControls } from "@/components/RunControls";
 import { TUTOR_GOALS } from "@/lib/copy/tutorGoals";
 import { isFormLocked } from "@/lib/fsm/runFsm";
 import type { RunInput, RunPhase } from "@/lib/types/run";
+import { surfaceCard } from "@/lib/ui/surfaces";
 
 type TutorTaskSectionProps = {
   phase: RunPhase;
@@ -33,12 +34,16 @@ export function TutorTaskSection({
   return (
     <section
       aria-labelledby="tutor-tasks-heading"
-      className="rounded-xl border-2 border-slate-800 bg-white p-6 shadow-sm"
+      className={surfaceCard}
     >
-      <h2 id="tutor-tasks-heading" className="text-2xl font-semibold text-slate-900">
+      <h2
+        id="tutor-tasks-heading"
+        tabIndex={-1}
+        className="scroll-mt-36 text-2xl font-semibold text-ink outline-none focus-visible:ring-4 focus-visible:ring-forest"
+      >
         Pick a task
       </h2>
-      <p className="mt-2 text-lg text-slate-800">
+      <p className="mt-2 text-xl text-slate-800">
         Choose one task. You will get one clear step. Then tap Run.
       </p>
 
@@ -49,10 +54,10 @@ export function TutorTaskSection({
           return (
             <label
               key={goal.id}
-              className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border-2 p-4 ${
+              className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border-2 p-4 ${
                 checked
-                  ? "border-blue-800 bg-blue-50"
-                  : "border-slate-800 bg-white hover:bg-stone-50"
+                  ? "border-forest bg-white"
+                  : "border-forest/15 bg-white hover:bg-white"
               } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
             >
               <input
@@ -61,14 +66,20 @@ export function TutorTaskSection({
                 value={goal.id}
                 checked={checked}
                 disabled={disabled}
+                aria-describedby={`tutor-goal-hint-${goal.id}`}
                 onChange={() => onGoalChange(goal.id)}
-                className="mt-1 h-11 w-11 shrink-0 border-2 border-slate-800 accent-blue-800"
+                className="mt-1 h-11 w-11 shrink-0 border-2 border-forest accent-forest"
               />
               <span>
                 <span className="block text-lg font-semibold text-slate-900">
                   {goal.title}
                 </span>
-                <span className="mt-1 block text-base text-slate-700">{goal.hint}</span>
+                <span
+                  id={`tutor-goal-hint-${goal.id}`}
+                  className="mt-1 block text-xl text-slate-700"
+                >
+                  {goal.hint}
+                </span>
               </span>
             </label>
           );

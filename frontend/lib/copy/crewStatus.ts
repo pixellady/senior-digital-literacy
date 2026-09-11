@@ -21,15 +21,15 @@ export const RATE_LIMIT_DETAIL =
   "Please wait a moment, then try again. Nothing you did caused this. Your message is still here.";
 
 export const CREW_PILL_CLASS: Record<CrewStatus, string> = {
-  idle: "bg-slate-500 text-white",
-  running: "bg-blue-700 text-white",
-  done: "bg-green-700 text-white",
+  idle: "bg-[#1e0e4b] text-white",
+  running: "bg-forest text-white",
+  done: "bg-ink text-white",
 };
 
 export const CREW_DOT_CLASS: Record<CrewStatus, string> = {
-  idle: "bg-slate-200",
-  running: "bg-blue-200",
-  done: "bg-green-200",
+  idle: "bg-[#d7d2e8]",
+  running: "bg-[#c6edd0]",
+  done: "bg-[#e6d7c8]",
 };
 
 export function crewStatusLabel(status: CrewStatus): string {

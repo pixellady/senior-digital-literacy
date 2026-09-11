@@ -25,6 +25,8 @@ export interface HistoryEntry {
   sessionId: string;
   completedAt: string;
   inputPreview: string;
+  resultPreview: string;
+  resultHeading: string;
   riskLevel: RiskLevel;
   activeScamNow: boolean;
   mode: WorkflowMode;

@@ -1,4 +1,5 @@
 import { SavePrintControl } from "@/components/SavePrintControl";
+import { TutorStepCard } from "@/components/TutorStepCard";
 import { VerifiedGuideBadge } from "@/components/VerifiedGuideBadge";
 import { AI_DISCLOSURE_COPY, modeLabel } from "@/lib/copy/chatCopy";
 import { shouldShowWeeklyCaps } from "@/lib/copy/caps";
@@ -6,6 +7,7 @@ import { crewStatusLabel } from "@/lib/copy/crewStatus";
 import { resultsHeading } from "@/lib/copy/riskCopy";
 import type { ChatResponse } from "@/lib/types/chat";
 import type { RunPhase } from "@/lib/types/run";
+import { surfaceCard } from "@/lib/ui/surfaces";
 
 type ResultsSectionProps = {
   phase: RunPhase;
@@ -21,13 +23,17 @@ export function ResultsSection({ phase, result, onPrintCurrent }: ResultsSection
     <section
       aria-labelledby="results-heading"
       id="results-print-card"
-      className="rounded-xl border-2 border-slate-800 bg-white p-6 shadow-sm"
+      className={surfaceCard}
     >
-      <div className="no-print flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="no-print">
         <h2 id="results-heading" className="text-2xl font-semibold text-slate-900">
           Results
         </h2>
-        {showResult && onPrintCurrent ? <SavePrintControl onPrint={onPrintCurrent} /> : null}
+        {showResult && onPrintCurrent ? (
+          <div className="mt-4">
+            <SavePrintControl onPrint={onPrintCurrent} />
+          </div>
+        ) : null}
       </div>
 
       {!showResult || !result ? (
@@ -35,7 +41,7 @@ export function ResultsSection({ phase, result, onPrintCurrent }: ResultsSection
           Results will appear here when {crewStatusLabel("done")}.
         </p>
       ) : (
-        <div className="no-print mt-4 space-y-4">
+        <div className="no-print mt-4 space-y-4" aria-live="polite">
           <p className="text-xl font-semibold text-slate-800">
             {crewStatusLabel("done")}
           </p>
@@ -43,9 +49,16 @@ export function ResultsSection({ phase, result, onPrintCurrent }: ResultsSection
             {result.agent_display_name}
           </p>
           <VerifiedGuideBadge visible={result.content.verified_guide} />
-          <p className="text-4xl font-bold leading-tight text-slate-950">
-            {resultsHeading(result)}
-          </p>
+          {result.route_intent === "TUTOR" ? (
+            <TutorStepCard
+              text={result.content.text}
+              stepCard={result.content.step_card}
+            />
+          ) : (
+            <p className="text-4xl font-semibold leading-tight text-slate-950">
+              {resultsHeading(result)}
+            </p>
+          )}
           {result.route_intent === "SCAM" ? (
             <p className="text-xl text-slate-900">{modeLabel(result.mode)}</p>
           ) : null}
@@ -54,9 +67,11 @@ export function ResultsSection({ phase, result, onPrintCurrent }: ResultsSection
               {AI_DISCLOSURE_COPY}
             </p>
           ) : null}
-          <p className="text-xl leading-relaxed text-slate-900">
-            {result.content.text}
-          </p>
+          {result.route_intent === "SCAM" ? (
+            <p className="text-xl leading-[1.2] text-slate-900">
+              {result.content.text}
+            </p>
+          ) : null}
           {links.length > 0 ? (
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
@@ -69,7 +84,7 @@ export function ResultsSection({ phase, result, onPrintCurrent }: ResultsSection
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-11 items-center text-blue-800 underline underline-offset-2 hover:text-blue-950"
+                      className="inline-flex min-h-11 items-center text-forest underline underline-offset-2 hover:text-ink"
                     >
                       {link.label}
                     </a>

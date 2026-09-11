@@ -5,5 +5,6 @@
  * Accurate for MVP: no human reads along; Extra Guidance is still the AI guide.
  * Caregivers do not receive pasted message bodies (SAD / US-002).
  */
-export const PRIVACY_REASSURANCE_COPY =
-  "A computer guide helps read your message. This is a private check. No live person is reading along with you.";
+import { PAGE_PRIVACY_SCAM } from "@/lib/copy/pageChrome";
+
+export const PRIVACY_REASSURANCE_COPY = PAGE_PRIVACY_SCAM;

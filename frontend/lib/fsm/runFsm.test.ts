@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { canReset, canRun, isFormLocked, transition } from "@/lib/fsm/runFsm";
+import { canReset, canRun, isFormLocked, isModeToggleLocked, transition } from "@/lib/fsm/runFsm";
 import type { RunInput } from "@/lib/types/run";
 
 const scamInput = (messageText: string): RunInput => ({
@@ -51,5 +51,11 @@ describe("runFsm", () => {
     expect(canReset("running")).toBe(false);
     expect(canReset("idle")).toBe(true);
     expect(canReset("done")).toBe(true);
+  });
+
+  it("locks the mode toggle only while running", () => {
+    expect(isModeToggleLocked("idle")).toBe(false);
+    expect(isModeToggleLocked("done")).toBe(false);
+    expect(isModeToggleLocked("running")).toBe(true);
   });
 });

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Lexend } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const lexend = Lexend({
+  variable: "--font-lexend",
   subsets: ["latin"],
+  weight: ["300", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} bg-stone-100 text-slate-900 antialiased`}>
+      <body
+        className={`${lexend.variable} ${lexend.className} bg-white font-light text-ink antialiased`}
+      >
         {children}
       </body>
     </html>

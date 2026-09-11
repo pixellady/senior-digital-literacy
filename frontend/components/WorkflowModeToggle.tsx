@@ -1,9 +1,8 @@
 "use client";
 
+import { MODE_TOGGLE_HINT } from "@/lib/copy/pageChrome";
 import type { WorkflowMode } from "@/lib/types/run";
-
-const baseClass =
-  "min-h-11 rounded-lg border-2 px-6 py-3 text-lg font-semibold focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2";
+import { btnSecondary, btnSelected } from "@/lib/ui/surfaces";
 
 type WorkflowModeToggleProps = {
   mode: WorkflowMode;
@@ -18,20 +17,23 @@ export function WorkflowModeToggle({
 }: WorkflowModeToggleProps) {
   return (
     <fieldset className="mt-6" aria-labelledby="workflow-mode-heading">
-      <legend id="workflow-mode-heading" className="text-lg font-medium text-slate-900">
+      <legend id="workflow-mode-heading" className="text-lg font-semibold text-slate-900">
         What would you like to do?
       </legend>
-      <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+      <p id="workflow-mode-hint" className="mt-2 text-xl text-slate-800">
+        {MODE_TOGGLE_HINT}
+      </p>
+      <div
+        className="mt-3 flex flex-col gap-3 sm:flex-row"
+        role="group"
+        aria-describedby="workflow-mode-hint"
+      >
         <button
           type="button"
           disabled={disabled}
           aria-pressed={mode === "scam"}
           onClick={() => onChange("scam")}
-          className={`${baseClass} ${
-            mode === "scam"
-              ? "border-blue-800 bg-blue-800 text-white focus-visible:outline-blue-800"
-              : "border-slate-800 bg-white text-slate-900 hover:bg-slate-100 focus-visible:outline-slate-900 disabled:border-slate-400 disabled:text-slate-400"
-          }`}
+          className={mode === "scam" ? btnSelected : btnSecondary}
         >
           Check a scam
         </button>
@@ -40,11 +42,7 @@ export function WorkflowModeToggle({
           disabled={disabled}
           aria-pressed={mode === "learn"}
           onClick={() => onChange("learn")}
-          className={`${baseClass} ${
-            mode === "learn"
-              ? "border-blue-800 bg-blue-800 text-white focus-visible:outline-blue-800"
-              : "border-slate-800 bg-white text-slate-900 hover:bg-slate-100 focus-visible:outline-slate-900 disabled:border-slate-400 disabled:text-slate-400"
-          }`}
+          className={mode === "learn" ? btnSelected : btnSecondary}
         >
           Learn a skill
         </button>

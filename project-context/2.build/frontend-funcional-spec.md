@@ -22,8 +22,8 @@ This spec describes the first frontend slice: a **single-route** form + results 
 
 - **Feature ID**: `CRW-001` (Critical Research Workflow) — maps to PRD **F1** Scam Defense Hub + US-002 check flow; critical/active-scam path from US-014
 - **Purpose**: Let a senior (Margaret) paste or describe a suspicious message or call, start a check, wait calmly, read a plain-language result, and review earlier checks from this browser session
-- **In Scope**: Single route `/` only. Proof path: paste → `explicit_path: "scam"` → `sendChat` (`POST /api/v1/chat`) → large-type verdict. Live Flow when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset. FSM `idle → running → done`; Crew banner; client **Pause** (US-009, no in-flight cancel); History; **Save or print** after `done` (`window.print()`, date/time/URL on the sheet); basic keyboard + headings
-- **Out of Scope**: Extra SAD routes (`/onboarding`, `/learn`, `/scam`, `/caregiver`, …); streaming; Tutor step on this page; Extra Guidance; auth; OCR; retry-diff
+- **In Scope**: Single route `/` only. Proof path: paste → `explicit_path: "scam"` → `sendChat` (`POST /api/v1/chat`) → large-type verdict. Learn a skill: pick a task → `explicit_path: "tutor"` → one owned step card. Live Flow when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B/C fixtures when unset. FSM `idle → running → done`; Crew banner; client **Pause** (US-009, no in-flight cancel); History with result preview; **Save or print** after `done` (`window.print()`, date/time/URL on the sheet); mode switch after results without Reset; basic keyboard + headings
+- **Out of Scope**: Extra SAD routes (`/onboarding`, `/learn`, `/scam`, `/caregiver`, …); streaming; Extra Guidance; auth; OCR; retry-diff; illustrated `step_card` unless the API sends a URL
 
 ---
 
@@ -55,9 +55,9 @@ All inputs are collected on route `/` while the FSM is `idle` (form enabled). Th
 
 - Labels in plain language; no shame language (US-009).
 - Prefer in-page form, not a modal (`prefer_modals: false`).
-- Form editable in `idle` only; read-only in `running` and `done` until **Reset**.
+- Form editable in `idle` only; read-only in `running` and `done` until **Reset** or a **mode switch** (Check a scam / Learn a skill). Mode toggle is locked only while `running`.
 - Page `h1` / document title: **Learn the Signs, Protect Yourself**.
-- Subtitle: “Check a suspicious message or call. You're safe here, and you're never wrong to ask.”
+- Subtitle follows mode: scam — “Check a suspicious message or call…”; learn — “Pick one task and get one clear step…” (`pageChrome.ts`). Eyebrow is sentence case (not all-caps).
 - Privacy reassurance (below subtitle): “A computer guide helps read your message. This is a private check. No live person is reading along with you.” (`frontend/lib/copy/privacyReassurance.ts`). MVP-accurate: no human reads along; Extra Guidance remains AI (US-013).
 
 ---
@@ -90,7 +90,7 @@ done --RESET--> idle      (Reset control; inputs cleared)
 |-------|-----|-----------------|
 | `idle` | Banner **Crew: idle** (gray); Inputs enabled | **Run** → `START`; **Reset** clears form |
 | `running` | Banner **Crew: running** (blue); Inputs locked | None (no pause / cancel / retry-diff) |
-| `done` | Banner **Crew: done** (green); Results visible; Inputs locked | **Reset** → `idle` |
+| `done` | Banner **Crew: done** (green); Results visible; Inputs locked | **Reset** → `idle`; **Check a scam / Learn a skill** → `idle` (History kept) |
 
 **Controls (this slice):** **Run**, **Reset**, and always-visible client **Pause** / **Resume** (US-009; does not cancel an in-flight request). Idle Pause copy: “Pause is always here, waiting for you.” Paused hint: `PAUSE_HINT` in `frontend/lib/copy/safetyBar.ts`. On send/runtime failure: return to `idle`, keep the same inputs, show an inline alert and a **Retry** button. Validation errors show the alert **without** Retry. **Pause** blocks a new Run until Resume.
 
@@ -132,11 +132,13 @@ On send throw: `RESET` → `idle`, inline error, **Retry**. Reset also clears `s
 
 ### Accessibility (this slice)
 
-- One `h1` (**Learn the Signs, Protect Yourself**); section `h2`s: Inputs, Run, Results, History
+- One `h1` (**Learn the Signs, Protect Yourself**); section `h2`s: Inputs or Pick a task, Results, History
 - Native form controls; Tab order follows the page; visible focus rings
 - Skip link to `#workflow-main`
+- After a mode switch, focus moves to the next section heading (`tabIndex={-1}`)
+- Results use `aria-live="polite"` when a check finishes
 - `lang="en"` on the document
-- Advanced accessibility, live-region strategy, and resilience deferred to the observability phase
+- Speech input (US-018 AC4) is still deferred
 
 ---
 
@@ -155,6 +157,8 @@ Shown only when phase is `done`. Result is a SAD §4 `ChatResponse`. This slice 
 | `ai_disclosure` | boolean | “This check uses AI.” when `true` |
 | `session_id` | UUID string | Not shown on Results or the print sheet; History key prefix |
 | `caps.tutor_sessions_*` / `tutor_capped` | number / boolean | **Hidden.** Fixture zeros until `@backend.eng` counts real weekly sessions (`WEEKLY_CAPS_ARE_REAL`). No CapMessage. |
+
+**Tutor results:** when `route_intent` is `TUTOR`, Results show a **Step 1** card (`TutorStepCard`) with **Your next step** and `content.text`. If `content.step_card.illustration_url` is present, the image uses `alt_text`. Scam results stay large-type risk heading + body.
 
 **Fixture rules (when API base is unset)**
 
@@ -196,14 +200,17 @@ Session-scoped list of completed runs (React state only). **Not** written to `lo
 |-------|------|---------|
 | `sessionId` | string (`ChatResponse.session_id`) | Internal key |
 | `completedAt` | ISO-8601 string | Locale-friendly time |
-| `inputPreview` | string | First ~80 characters of `messageText` (no full body required on the list) |
-| `riskLevel` | `content.risk_level` | Same `riskHeading` copy as Results (not a separate badge) |
+| `inputPreview` | string | Learn: task title. Scam: **A message you pasted** (never the paste body — US-016 / senior reading) |
+| `resultPreview` | string | First ~140 characters of `content.text` |
+| `resultHeading` | string | Same heading as Results (`riskHeading` or **Your next step**) |
+| `riskLevel` | `content.risk_level` | Stored; heading uses `resultHeading` |
 | `activeScamNow` | boolean | **Happening now** when true (UI-only; not on ChatRequest) |
 
 **Rules**
 
 - Newest first.
 - Empty state: “No checks yet in this visit.”
+- Each row: kind, You asked, What we found, optional **Save or print this check**.
 - List key: `` `${sessionId}-${completedAt}-${index}` `` (fixture `session_id` is fixed, so it is not unique alone).
 - Caregiver-visible Progress Service fields are **out of scope**; this list is senior-session only and must not be treated as the caregiver API.
 
@@ -458,17 +465,17 @@ Update this checklist **in the same change as each commit** that touches Critica
 | S2 | Inputs `messageText`, `activeScamNow`; max 4000; form locked when `running`/`done` | synced | `activeScamNow` selects Path B on fixtures only; still not a `ChatRequest` field. |
 | S3 | FSM `idle` → `running` → `done`; events START / COMPLETE / RESET | synced | Unchanged. Pause is a UX freeze, not a fourth FSM state. |
 | S4 | One non-streaming `POST /api/v1/chat`; `explicit_path: "scam"` | synced | Live `fetch` when `NEXT_PUBLIC_API_BASE_URL` is set; Path A/B fixtures when unset (`7c42dc1`). |
-| S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | synced | Caps hidden. Save or print after `done`; sheet has Checked + Website; no session_id or paste. |
-| S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | synced | Unchanged — key is `sessionId-completedAt-index`. |
-| S7 | Run, Reset, Retry; client Pause always visible | synced | Idle copy: “Pause is always here, waiting for you.” |
-| S8 | `frontend.md` Audit records this FE change | synced | Recorded print Checked + Website, commit `6273d22`. |
-| S9 | SAD extra routes and Tutor step not implemented | synced | Tutor still deferred; live Flow on `/` already wired. |
+| S5 | Results: large-type verdict, Scam checker, `verified_guide`, resources | pending | Tutor uses a Step 1 card; scam verdict unchanged. |
+| S6 | History is session memory; newest first; `inputPreview` + `riskLevel` | pending | Result preview + per-row print; scam paste not shown. |
+| S7 | Run, Reset, Retry; client Pause always visible | pending | Mode switch after `done` without Reset. |
+| S8 | `frontend.md` Audit records this FE change | pending | Senior-reading UX: mode, history, tutor card, chrome. |
+| S9 | SAD extra routes and Tutor step not implemented | pending | One tutor step is on `/`; extra SAD routes still out. |
 | S10 | Banner `Crew: idle\|running\|done`; gray/blue/green; Last updated | synced | Unchanged. |
-| S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | synced | h1 is **Learn the Signs, Protect Yourself**. |
+| S11 | Basic a11y: skip link `#workflow-main`, h1/h2, native keyboard/focus | pending | Mode switch focuses the next section heading. |
 | S12 | Contracts match SAD §4 JSON + `lib/types/chat.ts` | synced | `caps` remain on the wire; UI gate `shouldShowWeeklyCaps`. |
 
-**Last synced commit:** `6273d22`  
-**Last synced at:** 2026-08-30T08:50:00Z
+**Last synced commit:** pending  
+**Last synced at:** pending
 
 ---
 
@@ -680,3 +687,11 @@ Update this checklist **in the same change as each commit** that touches Critica
 | Action | `sync-docs` — Spec Sync S8 SHA `6273d22` |
 | Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
 | Output | S8 synced; Last synced commit `6273d22` |
+
+| Field | Value |
+|-------|-------|
+| Timestamp | 2026-09-05T14:50:00Z |
+| Persona id | `frontend-eng` |
+| Action | `style-ui` — senior reading: mode switch, history preview, tutor step card, chrome |
+| Resolved `AAMAD_TARGET_RUNTIME` | `crewai` (env unset) |
+| Output | Mode toggle after done; History result preview; TutorStepCard; pageChrome |
